@@ -11,9 +11,9 @@ necesario ejecutar la aplicación ServidorPersistenciaH2.jar en el directorio
 
 Para ello sólo es necesario abrir una terminal en dicho directorio y ejecutar:
 
-'''
+```
 java -jar ServidorPersistenciaH2.jar
-'''
+```
 
 ## Autor.
 
