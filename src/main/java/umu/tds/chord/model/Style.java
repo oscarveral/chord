@@ -29,5 +29,4 @@ public enum Style {
 	public String toString() {
 		return name;
 	}
-
 }
