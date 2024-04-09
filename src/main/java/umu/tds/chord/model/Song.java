@@ -7,10 +7,10 @@ package umu.tds.chord.model;
  */
 public final class Song {
 
-	private String name;
-	private String author;
-	private String path;
-	private Style style;
+	private final String name;
+	private final String author;
+	private final String path;
+	private final Style style;
 	
 	/**
 	 * Constructor de canciones inmutables.

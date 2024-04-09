@@ -19,7 +19,7 @@ public enum Style {
 	
 	// ----------------
 	
-	private String name;
+	private final String name;
 
 	private Style(String name) {
 		this.name = name;
