@@ -62,4 +62,28 @@ public final class Song {
 	public Style getStyle() {
 		return style;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (obj == null)
+			return false;
+		if (this == obj)
+			return true;
+		if (this.getClass() != obj.getClass())
+			return false;
+		
+		Song song = (Song) obj;
+		
+		if (this.name != song.name)
+			return false;
+		if (this.author != song.author)
+			return false;
+		if (this.path != song.path)
+			return false;
+		if (this.style != song.style)
+			return false;
+		
+		return true;
+	}
 }
