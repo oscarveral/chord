@@ -3,7 +3,7 @@
 Proyecto de desarrollo de software de una aplicación que imitaría un servicio de 
 streaming de música.
 
-# Servicio de persistencia.
+## Servicio de persistencia.
 
 Para poder ccrear y utilizar la base de datos del servicio de persistencia es 
 necesario que la aplicación ServidorPersistenciaH2.jar del directorio 
