@@ -68,6 +68,15 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	}
 	
 	/**
+	 * Conversión explicita de playlist a su versión mutable.
+	 * 
+	 * @return Vista mutable de la playlist.
+	 */
+	public Playlist.Internal asMut() {
+		return (Playlist.Internal) this;
+	}
+	
+	/**
 	 * Clase de representación interna de una playlist. Expone métodos que 
 	 * permiten mutar el estado de la playlist.
 	 */
