@@ -3,39 +3,94 @@ package umu.tds.chord.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Clase abstracta que representa una playlist. Expone sólo métodos de lectura
  * de datos.
  */
 public sealed abstract class Playlist permits Playlist.Internal {
-	
+		
 	private final String name;
 	private final String description;
 	private final List<Song> songs;
 	
 	/**
-	 * Constructor general de playlist.
-	 * 
-	 * @param name Nombre que tendrá la playlist.
-	 * @param description Descripción de la playlist.
-	 * @param songs Lista de las canciones que contiene. Véase {@link Song}.
+	 * Clase constructora de playlists.
 	 */
-	private Playlist(String name, String description, List<Song> songs) {
-		this.name = name;
-		this.description = description;
-		this.songs = songs;
+	public final static class Builder {
+		
+		private String name;
+		private String description;
+		private List<Song> songs;
+		
+		/**
+		 * Crea un nuevo builder a partir del nombre de la playlist.
+		 * Por defecto la descripción será {@code null} y la lista de 
+		 * canciones estará vacia. Se obligará a dar una descripción a la
+		 * lista.
+		 * 
+		 * @param name Nombre de la playlist.
+		 */
+		public Builder(String name) {
+			this.name = name;
+			this.description = null;
+			this.songs = new ArrayList<Song>();
+		}
+		
+		/**
+		 * Establece la descripción de la playlist.
+		 * 
+		 * @param description Descripción de la playlist.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+		
+		/**
+		 * Establece la lista de canciones de la playlist.
+		 * 
+		 * @param songs Lista de canciones de la playlist.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder songs(List<Song> songs) {
+			this.songs = songs;
+			return this;
+		}
+		
+		private boolean validate() {
+			// Forzar a que la descripción no sea nula.
+			return this.description != null;
+		}
+		
+		/**
+		 * Construye un playlist a partir de la información actual.
+		 * 
+		 * @return Playlist construida o un opcional vacío si no se ha
+		 * proporcionado una descripción.
+		 */
+		public Optional<Playlist> build() {
+			if (!validate())
+				return Optional.empty();
+			
+			return Optional.of(new Playlist.Internal(this));
+		}
 	}
 	
 	/**
-	 * Constructor simple de playlists. Se inicia con la lista de canciones
-	 * vacía.
+	 * Constructor de playlists.
 	 * 
-	 * @param name Nombre de la playlist.
-	 * @param description Descripción de la playlist.
+	 * @param builder Builder de playlists que contiene la información 
+	 * establecida para la nueva playlist.
 	 */
-	private Playlist(String name, String description) {
-		this(name, description, new ArrayList<Song>());
+	private Playlist(Playlist.Builder builder) {
+		this.name = builder.name;
+		this.description = builder.description;
+		this.songs = builder.songs;
 	}
 	
 	/**
@@ -59,8 +114,6 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	/**
 	 * Método para obtener una lista no modificable de canciones de la playlist.
 	 * 
-	 * @apiNote Recuérdese que {@link Song} es una clase inmutable.
-	 * 
 	 * @return Lista no modificable de las canciones de la playlist.
 	 */
 	public List<Song> getSongs() {
@@ -79,7 +132,8 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	}
 	
 	/**
-	 * Conversión explicita de playlist a su versión mutable.
+	 * Conversión explicita de playlist a su versión mutable. Permitirá acceder
+	 * a los métodos que mutan los datos.
 	 * 
 	 * @return Vista mutable de la playlist.
 	 */
@@ -94,25 +148,13 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	public final static class Internal extends Playlist{
 		
 		/**
-		 * Constructor general de playlist.
+		 * Constructor de playlists.
 		 * 
-		 * @param name Nombre que tendrá la playlist.
-		 * @param description Descripción de la playlist.
-		 * @param songs Lista de las canciones que contiene. Véase {@link Song}.
+		 * @param builder Builder de playlists que contiene la información 
+		 * establecida para la nueva playlist.
 		 */
-		public Internal(String name, String description, List<Song> songs) {
-			super(name, description, songs);
-		}
-		
-		/**
-		 * Constructor simple de playlists. Se inicia con la lista de canciones
-		 * vacía.
-		 * 
-		 * @param name Nombre de la playlist.
-		 * @param description Descripción de la playlist.
-		 */
-		public Internal(String name, String description) {
-			super(name, description);
+		private Internal(Playlist.Builder builder) {
+			super(builder);
 		}
 			
 		/**
