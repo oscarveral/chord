@@ -21,7 +21,7 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	 * @param description Descripción de la playlist.
 	 * @param songs Lista de las canciones que contiene. Véase {@link Song}.
 	 */
-	public Playlist(String name, String description, List<Song> songs) {
+	private Playlist(String name, String description, List<Song> songs) {
 		this.name = name;
 		this.description = description;
 		this.songs = songs;
@@ -34,7 +34,7 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	 * @param name Nombre de la playlist.
 	 * @param description Descripción de la playlist.
 	 */
-	public Playlist(String name, String description) {
+	private Playlist(String name, String description) {
 		this(name, description, new ArrayList<Song>());
 	}
 	
