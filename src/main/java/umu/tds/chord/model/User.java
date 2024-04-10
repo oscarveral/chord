@@ -139,7 +139,7 @@ public abstract sealed class User permits User.Internal{
 		/**
 		 * Construye un usuario a partir de la información actual.
 		 * 
-		 * @return Usuario construindo o un opcional vacío si no se ha 
+		 * @return Usuario construido o un opcional vacío si no se ha 
 		 * proporcionado contraseña o cumpleaños. Véase {@link User}.
 		 */
 		public Optional<User> build() {
@@ -270,7 +270,7 @@ public abstract sealed class User permits User.Internal{
 		 * @param builder Builder de usuarios que contiene la información 
 		 * establecida para el nuevo usuario.
 		 */
-		public Internal(User.Builder builder) {
+		private Internal(User.Builder builder) {
 			super(builder);
 		}
 		
