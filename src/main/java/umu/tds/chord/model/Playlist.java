@@ -68,6 +68,17 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	}
 	
 	/**
+	 * Método para obtener una canción de la lista según el índice dado.
+	 * 
+	 * @param index Índice de la canción que se desea obtener.
+	 * 
+	 * @return Canción de la lista correspondiente al índice dado.
+	 */
+	public Song getSong(int index) {
+		return songs.get(index);
+	}
+	
+	/**
 	 * Conversión explicita de playlist a su versión mutable.
 	 * 
 	 * @return Vista mutable de la playlist.
@@ -109,7 +120,7 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		 * 
 		 * @param song Canción que se desea añadir.
 		 */
-		public void add(int index, Song song) {
+		public void addSong(int index, Song song) {
 			super.songs.add(index, song);
 		}
 		
@@ -120,19 +131,8 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		 * 
 		 * @return Canción eliminada de la lista.
 		 */
-		public Song remove(int index) {
+		public Song removeSong(int index) {
 			return super.songs.remove(index);
-		}
-		
-		/**
-		 * Método para obtener una canción de la lista según el índice dado.
-		 * 
-		 * @param index Índice de la canción que se desea obtener.
-		 * 
-		 * @return Canción de la lista correspondiente al índice dado.
-		 */
-		public Song get(int index) {
-			return super.songs.get(index);
 		}
 	}
 }
