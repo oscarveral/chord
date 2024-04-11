@@ -13,7 +13,7 @@ public enum UserRepository {
 
 	INSTANCE;
 	
-	private Map<String, User> users;
+	private final Map<String, User> users;
 	
 	private UserRepository() {
 		users = new HashMap<String, User>();
