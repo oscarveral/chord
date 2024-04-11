@@ -64,7 +64,10 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		
 		private boolean validate() {
 			// Forzar a que la descripción no sea nula.
-			return this.description != null;
+			if (this.description == null)
+				return false;
+			
+			return true;
 		}
 		
 		/**
