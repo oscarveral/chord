@@ -1,5 +1,7 @@
 package umu.tds.chord.model;
 
+import java.util.Optional;
+
 /**
  * Clase de objetos inmutables que representa a las canciones dentro de nuestra 
  * aplicación. Mantienen almacenada la ruta al fichero con dicha canción para 
@@ -13,6 +15,91 @@ public final class Song {
 	private final Style style;
 	
 	/**
+	 * Constructor de canciones.
+	 */
+	public final static class Builder {
+		
+		private String name;
+		private String author;
+		private String path;
+		private Style style;
+	
+		/**
+		 * Crea un nuevo builder de canciones estableciendo el nombre de la
+		 * canción. Se deberá establecer obligatoriamente autor, path y estilo.
+		 * 
+		 * @param name Nombre de la canción.
+		 */
+		public Builder(String name) {
+			this.name = name;
+			this.author = null;
+			this.path = null;
+			this.style = null;
+		}
+		
+		/**
+		 * Establece el autor de la canción.
+		 * 
+		 * @param author Autor de la canción.
+		 * 
+		 * @return Intancia actual del builder.
+		 */
+		public Builder author(String author) {
+			this.author = author;
+			return this;
+		}
+		
+		/**
+		 * Establece la ruta al fichero de la canción.
+		 * 
+		 * @param path Ruta al fichero de la canción.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder path(String path) {
+			this.path = path;
+			return this;
+		}
+		
+		/**
+		 * Establece el estilo de la canción. Véase {@link Style}.
+		 * 
+		 * @param style Estilo de la canción.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder style(Style style) {
+			this.style = style;
+			return this;
+		}
+		
+		private boolean validate() {
+			// Forzar a establecer los 3 parámtros.
+			if (this.author == null)
+				return false;
+			if (this.path == null)
+				return false;
+			if (this.style == null)
+				return false;
+			
+			return true;
+		}
+		
+		/**
+		 * Construye una nueva canción a partir de los datos actuales.
+		 * 
+		 * @return Un opcional vacío si no se ha proporcionado autor, path o
+		 * estilo. Un opcional con la canción creada en otro caso.
+		 */
+		public Optional<Song> build() {
+			if (!validate())
+				return Optional.empty();
+			
+			return Optional.of(new Song(this));
+		}
+	}
+	
+	/**
 	 * Constructor de canciones inmutables.
 	 * 
 	 * @param name Nombre de la canción.
@@ -20,11 +107,11 @@ public final class Song {
 	 * @param path Ruta donde se encuentra el fichero de la canción.
 	 * @param style Estilo musical de la canción. Véase {@link Style}.
 	 */
-	public Song(String name, String author, String path, Style style) {
-		this.name = name;
-		this.author = author;
-		this.path = path;
-		this.style = style;
+	private Song(Song.Builder builder) {
+		this.name = builder.name;
+		this.author = builder.author;
+		this.path = builder.path;
+		this.style = builder.style;
 	}
 	
 	/**
