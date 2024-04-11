@@ -128,9 +128,9 @@ public abstract sealed class User permits User.Internal{
 		
 		private boolean validate() {
 			// Se fuerza establecer contraseña y cumpleaños.
-			if (this.hashedPassword != null)
+			if (this.hashedPassword == null)
 				return false;
-			if (this.birthday != null)
+			if (this.birthday == null)
 				return false;
 			
 			return true;
