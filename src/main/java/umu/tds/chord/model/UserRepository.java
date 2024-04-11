@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * Repositorio de usuarios. Utilizado para la creación, obtención y 
- * actualización de los datos de los usuarios.
+ * actualización de los datos de los usuarios. Véase {@link User}.
  */
 public enum UserRepository {
 
@@ -63,7 +63,7 @@ public enum UserRepository {
 	}
 	
 	/**
-	 * Obtiene el usuario especificado.
+	 * Obtiene el usuario especificado. Véase {@link User}.
 	 * 
 	 * @param username Nombre del usuario especificado.
 	 * @param password Contraseña del usuario especificado.
@@ -91,7 +91,7 @@ public enum UserRepository {
 	 * 
 	 * @param u Usuario del que se desea actualizar la información. Se espera 
 	 * que u haya sido obtenido mediante
-	 * {@link UserRepository#getUser(String, String)}.
+	 * {@link UserRepository#getUser(String, String)}. Véase {@link User}.
 	 * 
 	 * @return {@code false} Si el usuario es {@code null}, no estaba 
 	 * registrado o existe alguna inconsitencia entre el mapeo del nombre del 
