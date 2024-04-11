@@ -3,11 +3,11 @@ package umu.tds.chord.model;
 import java.util.Optional;
 
 /**
- * Clase de objetos inmutables que representa a las canciones dentro de nuestra 
- * aplicación. Mantienen almacenada la ruta al fichero con dicha canción para 
- * que pueda ser localizada y reproducida.
+ * Clase que representa a las canciones dentro de la aplicación. Mantienen 
+ * almacenada la ruta al fichero con dicha canción para que pueda ser 
+ * localizada y reproducida.
  */
-public final class Song {
+public sealed abstract class Song permits Song.Internal {
 
 	private final String name;
 	private final String author;
@@ -95,17 +95,14 @@ public final class Song {
 			if (!validate())
 				return Optional.empty();
 			
-			return Optional.of(new Song(this));
+			return Optional.of(new Song.Internal(this));
 		}
 	}
 	
 	/**
 	 * Constructor de canciones inmutables.
 	 * 
-	 * @param name Nombre de la canción.
-	 * @param author Autor de la canción.
-	 * @param path Ruta donde se encuentra el fichero de la canción.
-	 * @param style Estilo musical de la canción. Véase {@link Style}.
+	 * @param builder Constructor de canciones con los datos de la canción.
 	 */
 	private Song(Song.Builder builder) {
 		this.name = builder.name;
@@ -172,5 +169,32 @@ public final class Song {
 			return false;
 		
 		return true;
+	}
+	
+	/**
+	 * Conversión explicita de canción a su versión mutable. Permitirá acceder
+	 * a los métodos que mutan los datos.
+	 * 
+	 * @return Vista mutable de la canción.
+	 */
+	public Song.Internal asMut() {
+		return (Song.Internal) this;
+	}
+	
+	/**
+	 * Clase de representación interna de una canción. Expone métodos que 
+	 * permiten mutar el estado de la canción.
+	 */
+	public final static class Internal extends Song {
+		
+		/**
+		 * Constructor de canciones inmutables.
+		 * 
+		 * @param builder Constructor de canciones con los datos de la canción.
+		 */
+		private Internal(Song.Builder builder) {
+			super(builder);
+		}
+		
 	}
 }
