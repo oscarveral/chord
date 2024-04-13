@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import umu.tds.chord.dao.Persistent;
+
 /**
  * Clase abstracta que representa una playlist. Expone sólo métodos de lectura
  * de datos.
@@ -146,9 +148,13 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	
 	/**
 	 * Clase de representación interna de una playlist. Expone métodos que 
-	 * permiten mutar el estado de la playlist.
+	 * permiten mutar el estado de la playlist. Se exponen también los métodos
+	 * necesarios para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends Playlist{
+	public final static class Internal extends Playlist implements Persistent {
+		
+		private int id;
+		private boolean isRegistered;
 		
 		/**
 		 * Constructor de playlists.
@@ -158,6 +164,9 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		 */
 		private Internal(Playlist.Builder builder) {
 			super(builder);
+			
+			this.id = 0;
+			this.isRegistered = false;
 		}
 			
 		/**
@@ -178,6 +187,34 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		 */
 		public Song removeSong(int index) {
 			return super.songs.remove(index);
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getId() {
+			return id;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isRegistered() {
+			return isRegistered;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void registerId(int id) {
+			if (isRegistered())
+				return;
+			
+			this.id = id;
+			this.isRegistered = true;
 		}
 	}
 }
