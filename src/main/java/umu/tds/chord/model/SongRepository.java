@@ -48,7 +48,7 @@ public enum SongRepository {
 						.build()
 						.get();
 		
-		// Comprobación de existencia.
+		// Comprobación de duplicidad.
 		if (songs.contains(song))
 			return false;
 		
