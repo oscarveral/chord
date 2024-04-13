@@ -2,7 +2,7 @@ package umu.tds.chord.model;
 
 import java.util.Optional;
 
-import umu.tds.chord.dao.Persistent;
+import umu.tds.chord.dao.DAOPersistent;
 
 /**
  * Clase que representa a las canciones dentro de la aplicación. Mantienen 
@@ -186,9 +186,9 @@ public sealed abstract class Song permits Song.Internal {
 	/**
 	 * Clase de representación interna de una canción. Expone métodos que 
 	 * permiten mutar el estado de la canción. Se exponen también los métodos
-	 * necesarios para la persistencia {@link Persistent}.
+	 * necesarios para la persistencia {@link DAOPersistent}.
 	 */
-	public final static class Internal extends Song implements Persistent {
+	public final static class Internal extends Song implements DAOPersistent {
 		
 		private int id;
 		private boolean isRegistered;

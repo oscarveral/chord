@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import umu.tds.chord.dao.Persistent;
+import umu.tds.chord.dao.DAOPersistent;
 
 /**
  * Clase abstracta que representa una playlist. Expone sólo métodos de lectura
@@ -149,9 +149,9 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	/**
 	 * Clase de representación interna de una playlist. Expone métodos que 
 	 * permiten mutar el estado de la playlist. Se exponen también los métodos
-	 * necesarios para la persistencia {@link Persistent}.
+	 * necesarios para la persistencia {@link DAOPersistent}.
 	 */
-	public final static class Internal extends Playlist implements Persistent {
+	public final static class Internal extends Playlist implements DAOPersistent {
 		
 		private int id;
 		private boolean isRegistered;
