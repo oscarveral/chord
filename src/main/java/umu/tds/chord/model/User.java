@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import umu.tds.chord.dao.Persistent;
 import umu.tds.chord.utils.StringHasher;
 
 /**
@@ -260,9 +261,13 @@ public abstract sealed class User permits User.Internal{
 	
 	/**
 	 * Clase de representación interna de un usuario. Expone métodos que 
-	 * permiten mutar los datos del usuario.
+	 * permiten mutar los datos del usuario. Se exponen también los métodos
+	 * necesarios para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends User {		
+	public final static class Internal extends User implements Persistent {		
+		
+		private int id;
+		private boolean isRegistered;
 		
 		/**
 		 * Constructor de usuarios. 
@@ -272,6 +277,9 @@ public abstract sealed class User permits User.Internal{
 		 */
 		private Internal(User.Builder builder) {
 			super(builder);
+			
+			this.id = 0;
+			this.isRegistered = false;
 		}
 		
 		/**
@@ -333,6 +341,34 @@ public abstract sealed class User permits User.Internal{
 		 */
 		public Song removeRecentSong(int index) {
 			return super.recentSongs.remove(index);
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getId() {
+			return id;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isRegistered() {
+			return isRegistered;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void registerId(int id) {
+			if (isRegistered())
+				return;
+			
+			this.id = id;
+			this.isRegistered = true;
 		}
 	}
 }

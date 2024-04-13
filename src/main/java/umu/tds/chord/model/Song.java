@@ -2,6 +2,8 @@ package umu.tds.chord.model;
 
 import java.util.Optional;
 
+import umu.tds.chord.dao.Persistent;
+
 /**
  * Clase que representa a las canciones dentro de la aplicación. Mantienen 
  * almacenada la ruta al fichero con dicha canción para que pueda ser 
@@ -183,9 +185,13 @@ public sealed abstract class Song permits Song.Internal {
 	
 	/**
 	 * Clase de representación interna de una canción. Expone métodos que 
-	 * permiten mutar el estado de la canción.
+	 * permiten mutar el estado de la canción. Se exponen también los métodos
+	 * necesarios para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends Song {
+	public final static class Internal extends Song implements Persistent {
+		
+		private int id;
+		private boolean isRegistered;
 		
 		/**
 		 * Constructor de canciones inmutables.
@@ -194,7 +200,37 @@ public sealed abstract class Song permits Song.Internal {
 		 */
 		private Internal(Song.Builder builder) {
 			super(builder);
+			
+			this.id = 0;
+			this.isRegistered = false;
 		}
 		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getId() {
+			return id;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isRegistered() {
+			return isRegistered;
+		}
+		
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void registerId(int id) {
+			if (isRegistered())
+				return;
+			
+			this.id = id;
+			this.isRegistered = true;
+		}
 	}
 }
