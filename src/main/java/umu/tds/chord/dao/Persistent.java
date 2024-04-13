@@ -29,7 +29,7 @@ public interface Persistent {
 	 * 
 	 * @param uuid Id que se desea utilizar para el objeto.
 	 */
-	public default void registerId(int uuid) {
+	public default void registerId(int id) {
 		if (isRegistered())
 			return;
 	}
