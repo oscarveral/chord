@@ -6,14 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import umu.tds.chord.dao.DAOPersistent;
 import umu.tds.chord.utils.StringHasher;
 
 /**
  * Clase abstracta que representa un usuario. Expone sólo los métodos de lectura
  * de datos.
  */
-public abstract sealed class User permits User.Internal{
+public abstract sealed class User implements Mutable<User.Internal>{
 	
 	private final String username;
 	private final String hashedPassword;
@@ -262,9 +261,9 @@ public abstract sealed class User permits User.Internal{
 	/**
 	 * Clase de representación interna de un usuario. Expone métodos que 
 	 * permiten mutar los datos del usuario. Se exponen también los métodos
-	 * necesarios para la persistencia {@link DAOPersistent}.
+	 * necesarios para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends User implements DAOPersistent {		
+	public final static class Internal extends User implements Persistent {		
 		
 		private int id;
 		private boolean isRegistered;

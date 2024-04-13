@@ -5,13 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import umu.tds.chord.dao.DAOPersistent;
-
 /**
  * Clase abstracta que representa una playlist. Expone sólo métodos de lectura
  * de datos.
  */
-public sealed abstract class Playlist permits Playlist.Internal {
+public abstract sealed class Playlist implements Mutable<Playlist.Internal> 
+{
 		
 	private final String name;
 	private final String description;
@@ -136,12 +135,13 @@ public sealed abstract class Playlist permits Playlist.Internal {
 		return songs.get(index);
 	}
 	
-	/**
+	/** 
 	 * Conversión explicita de playlist a su versión mutable. Permitirá acceder
 	 * a los métodos que mutan los datos.
 	 * 
 	 * @return Vista mutable de la playlist.
 	 */
+	@Override
 	public Playlist.Internal asMut() {
 		return (Playlist.Internal) this;
 	}
@@ -149,9 +149,9 @@ public sealed abstract class Playlist permits Playlist.Internal {
 	/**
 	 * Clase de representación interna de una playlist. Expone métodos que 
 	 * permiten mutar el estado de la playlist. Se exponen también los métodos
-	 * necesarios para la persistencia {@link DAOPersistent}.
+	 * necesarios para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends Playlist implements DAOPersistent {
+	public final static class Internal extends Playlist implements Persistent {
 		
 		private int id;
 		private boolean isRegistered;

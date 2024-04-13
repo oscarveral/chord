@@ -1,10 +1,10 @@
-package umu.tds.chord.dao;
+package umu.tds.chord.model;
 
 /**
  * Clase abstracta que implementan aquellos elementos del modelo que son 
  * persistentes.
  */
-public interface DAOPersistent {
+public interface Persistent {
 	
 	/**
 	 * Obtiene la id actual.
@@ -18,7 +18,7 @@ public interface DAOPersistent {
 	 * persistente. Es decir, si se ha registrado mediante un DAO.
 	 * 
 	 * @return {@code true} si se le asignó una id en algun momento mediante
-	 * {@link DAOPersistent#registerId(int)}. 
+	 * {@link Persistent#registerId(int)}. 
 	 * {@code false} en otro caso.
 	 */
 	public boolean isRegistered();
