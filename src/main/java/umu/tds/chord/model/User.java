@@ -343,6 +343,15 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		}
 		
 		/**
+		 * Método para obtener la contraseña hasheada del usuario.
+		 * 
+		 * @return Hash de la contraseña del usuario.
+		 */
+		public String getHashedPassword() {
+			return super.hashedPassword;
+		}
+		
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
