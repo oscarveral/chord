@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import umu.tds.chord.dao.DAOFactory;
+
 /**
  * Repositorio de usuarios. Utilizado para la creación, obtención y 
  * actualización de los datos de los usuarios. Véase {@link User}.
@@ -17,12 +19,11 @@ public enum UserRepository {
 	
 	private UserRepository() {
 		users = new HashMap<String, User>();
-		/*
+		
 		DAOFactory.getInstance()
 			.getUserDAO()
 			.recoverAll()
-			.forEach(u -> usuarios.put(u.getUserName(), u));
-		*/
+			.forEach(u -> users.put(u.getUserName(), u));
 	}
 	
 	/**
@@ -46,15 +47,13 @@ public enum UserRepository {
 					.build()
 					.get();
 		
-		/*
 		// Persistencia.
 		boolean persistence = DAOFactory.getInstance()
 								.getUserDAO()
-								.register(user);
+								.register(user.asMut());
 				
 		// Fallo de registro en persistencia.
 		if (!persistence) return false;
-		*/
 		
 		// Registrar al usuario en memoria.
 		users.put(user.getUserName(), user);
@@ -111,20 +110,43 @@ public enum UserRepository {
 		// Solo hace falta actualizar la información del usuario en 
 		// persistencia.
 	
-		/*
 		// Actualización en persistencia.
 		boolean persistence = DAOFactory.getInstance()
 								.getUserDAO()
-								.modify(u);
+								.modify(u.asMut());
 				
 		// Fallo de actualización en persistencia da lugar a eliminación del 
 		// usuario del mapa en memoria
 		if (!persistence) {
-			usuarios.remove(u.getUserName());
+			users.remove(u.getUserName());
 		}
 		
 		return persistence;
-		*/
-		return true;
+	}
+	
+	/**
+	 * Elimina el usuario y su información asociada.
+	 * 
+	 * @param u Usuario que se desea eliminar.
+	 * @return {@code true} si el usuario existía en el repositorio y pudo ser
+	 * eliminado.
+	 */
+	public boolean removeUser(User u) {
+		
+		// Comprobar si este usuario está registrado.
+		if (u == null || !users.containsKey(u.getUserName())) return false;
+		// Doble comprobacion. La instancia de usuario asociada es la misma.
+		if (!users.get(u.getUserName()).equals(u)) return false;
+		
+		// Eliminación de persistencia.
+		boolean persistence = DAOFactory.getInstance()
+								.getUserDAO()
+								.delete(u.asMut());
+		
+		// Si hubo exito en la eliminación de persistencia se quita del mapa.
+		if (persistence)
+			users.remove(u.getUserName());
+		
+		return persistence;
 	}
 }

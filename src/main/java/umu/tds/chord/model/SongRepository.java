@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import umu.tds.chord.dao.DAOFactory;
+
 /**
  * Repositorio de canciones. Utilizado para el registro y recuperación de 
  * canciones. Dado que las canciones son inmutables no se ofrecen métodos de
@@ -18,12 +20,10 @@ public enum SongRepository {
 	private SongRepository() {
 		songs = new HashSet<Song>();
 		
-		/*
 		DAOFactory.getInstance()
 			.getSongDAO()
 			.recoverAll()
-			.forEach(s -> songs.add(u));
-		*/
+			.forEach(s -> songs.add(s));
 	}
 	
 	/**
@@ -52,15 +52,13 @@ public enum SongRepository {
 		if (songs.contains(song))
 			return false;
 		
-		/*
 		// Persistencia.
 		boolean persistence = DAOFactory.getInstance()
 								.getSongDAO()
-								.register(song);
+								.register(song.asMut());
 				
 		// Fallo de registro en persistencia.
 		if (!persistence) return false;
-		*/
 		
 		return songs.add(song);
 	}
@@ -73,5 +71,21 @@ public enum SongRepository {
 	 */
 	public Set<Song> getSongs() {
 		return Collections.unmodifiableSet(this.songs);
+	}
+	
+	public boolean removeSong(Song s) {
+		// Comprobar que la canción está en el repositorio.
+		if (s == null || !songs.contains(s)) return false;
+		
+		// Eliminación de persistencia.
+		boolean persistence = DAOFactory.getInstance()
+								.getSongDAO()
+								.delete(s.asMut());
+		
+		// Eliminación de memoria.
+		if (persistence)
+			songs.remove(s);
+		
+		return persistence;
 	}
 }
