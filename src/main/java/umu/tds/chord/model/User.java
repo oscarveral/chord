@@ -301,8 +301,8 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		 * playlist.
 		 * @param playlist Playlist que se desea añadir a la lista.
 		 */
-		public void addPlaylist(int index, Playlist playlist) {
-			super.playlists.add(index, playlist);
+		public void addPlaylist(Playlist playlist) {
+			super.playlists.add(playlist);
 		}
 		
 		/**
@@ -326,8 +326,8 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		 * proprocionada.
 		 * @param recentSong Canción que se desea añadir a la lista.
 		 */
-		public void addRecentSong(int index, Song recentSong) {
-			super.recentSongs.add(index, recentSong);
+		public void addRecentSong(Song recentSong) {
+			super.recentSongs.add(recentSong);
 		}
 		
 		/**
