@@ -48,7 +48,7 @@ public enum SongRepository {
 						.build()
 						.get();
 		
-		// Comprobación de duplicidad.
+		// Comprobación de duplicidad de la canción.
 		if (songs.contains(song))
 			return false;
 		
@@ -73,6 +73,14 @@ public enum SongRepository {
 		return Collections.unmodifiableSet(this.songs);
 	}
 	
+	/**
+	 * Elimina la canción y su información aosicada.
+	 * 
+	 * @param s Canción que se desea eliminar.
+	 * 
+	 * @return {@code true} si la canción estaba en el repositorio y se ha
+	 * podido eliminar.
+	 */
 	public boolean removeSong(Song s) {
 		// Comprobar que la canción está en el repositorio.
 		if (s == null || !songs.contains(s)) return false;
