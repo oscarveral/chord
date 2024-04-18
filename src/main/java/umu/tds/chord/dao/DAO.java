@@ -87,7 +87,7 @@ public interface DAO<T extends Persistent> {
 	 * @return Devuelve el objeto identificado por id en persistencia en el 
 	 * caso de estar registrado.
 	 */
-	public Optional<T> recover(int uuid);
+	public Optional<T> recover(int id);
 	
 	/**
 	 * Obtiene una lista con todos los objetos registrados.

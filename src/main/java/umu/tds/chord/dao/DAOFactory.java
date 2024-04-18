@@ -72,21 +72,21 @@ public abstract class DAOFactory {
 	/**
 	 * Obtiene el adaptador DAO para usuarios.
 	 * 
-	 * @return Implementación de {@link DAO} para {@link User}.
+	 * @return Implementación de {@link DAO} para {@link User.Internal}.
 	 */
 	public abstract DAO<User.Internal> getUserDAO();
 	
 	/**
 	 * Obtiene el adaptador DAO para playlists.
 	 * 
-	 * @return Implementación de {@link DAO} para {@link Playlist}.
+	 * @return Implementación de {@link DAO} para {@link Playlist.Internal}.
 	 */
 	public abstract DAO<Playlist.Internal> getPlaylistDAO();
 	
 	/**
 	 * Obtiene el adaptador DAO para canciones.
 	 * 
-	 * @return Implementación de {@link DAO} para {@link Song}.
+	 * @return Implementación de {@link DAO} para {@link Song.Internal}.
 	 */
 	public abstract DAO<Song.Internal> getSongDAO();
 }
