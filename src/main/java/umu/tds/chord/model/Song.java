@@ -167,6 +167,8 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 			return false;
 		if (this.style != song.style)
 			return false;
+		if (this.asMut().id != song.asMut().id)
+			return false;
 		
 		return true;
 	}

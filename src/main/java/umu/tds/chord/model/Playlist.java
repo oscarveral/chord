@@ -174,8 +174,8 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal>
 		 * 
 		 * @param song Canción que se desea añadir.
 		 */
-		public void addSong(int index, Song song) {
-			super.songs.add(index, song);
+		public void addSong(Song song) {
+			super.songs.add(song);
 		}
 		
 		/**
@@ -215,6 +215,24 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal>
 			
 			this.id = id;
 			this.isRegistered = true;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			
+			if (obj == null)
+				return false;
+			if (this == obj)
+				return true;
+			if (this.getClass() != obj.getClass())
+				return false;
+			
+			Internal playlist = (Internal) obj;
+			
+			if (this.id != playlist.id)
+				return false;
+			
+			return true;
 		}
 	}
 }

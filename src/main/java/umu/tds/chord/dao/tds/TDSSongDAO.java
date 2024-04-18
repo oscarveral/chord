@@ -72,6 +72,7 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 		// Registro.
 		eSong = persistence.registrarEntidad(eSong);
 		s.registerId(eSong.getId());
+		TDSPoolDAO.addPersistent(s);
 		
 		return true;
 	}
@@ -207,6 +208,9 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 		persistence.eliminarPropiedadEntidad(eSong, Properties.AUTHOR.name());
 		persistence.eliminarPropiedadEntidad(eSong, Properties.PATH.name());
 		persistence.eliminarPropiedadEntidad(eSong, Properties.STYLE.name());
+		
+		// Eliminar de la pool.
+		TDSPoolDAO.removePersistent(s);
 		
 		// Eliminación de la canción.
 		return persistence.borrarEntidad(eSong);

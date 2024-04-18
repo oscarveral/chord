@@ -3,8 +3,10 @@ package umu.tds.chord.dao.tds;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import beans.Entidad;
@@ -15,6 +17,7 @@ import umu.tds.chord.dao.DAO;
 import umu.tds.chord.dao.DAOFactory;
 import umu.tds.chord.dao.DAOFactory.DAOImplementation;
 import umu.tds.chord.model.Persistent;
+import umu.tds.chord.model.Playlist;
 import umu.tds.chord.model.User;
 /**
  * Adaptador {@link DAO} para {@link User} utilizando el driver de persistencia
@@ -30,7 +33,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 	/**
 	 * Enumerado de todas las propiedades que tiene una entidad usuario.
 	 */
-	private enum UserProperties {
+	private enum Properties {
 		USER_ENTITY_TYPE,
 		USER_NAME,
 		PASSWORD_HASH,
@@ -72,17 +75,17 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 
 		// Creación de la entidad.
 		eUser = new Entidad();
-		eUser.setNombre(UserProperties.USER_ENTITY_TYPE.name());
+		eUser.setNombre(Properties.USER_ENTITY_TYPE.name());
 		
 		// Propiedades.
 		eUser.setPropiedades(Arrays.asList(
-			new Propiedad(UserProperties.USER_NAME.name(), 
+			new Propiedad(Properties.USER_NAME.name(), 
 					user.getUserName()),
-			new Propiedad(UserProperties.PASSWORD_HASH.name(), 
+			new Propiedad(Properties.PASSWORD_HASH.name(), 
 					user.getHashedPassword()),
-			new Propiedad(UserProperties.BIRTHDAY.name(), 
+			new Propiedad(Properties.BIRTHDAY.name(), 
 					user.getBirthday().toString()),
-			new Propiedad(UserProperties.PLAYLISTS.name(),
+			new Propiedad(Properties.PLAYLISTS.name(),
 					DAO.persistentsToString(
 					// Necesito la versión interna de las playlist para
 					// poder obtener sus ids en persistencia.
@@ -90,7 +93,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 						.map(p -> p.asMut())
 						.toList())
 			),
-			new Propiedad(UserProperties.RECENT_SONGS.name(), 
+			new Propiedad(Properties.RECENT_SONGS.name(), 
 					DAO.persistentsToString(
 					// Necesito la versión interna de las canciones para
 					// poder obtener sus ids en persistencia.
@@ -98,14 +101,14 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 						.map(s-> s.asMut())
 						.toList())
 			),
-			new Propiedad(UserProperties.PREMIUM.name(), 
+			new Propiedad(Properties.PREMIUM.name(), 
 					String.valueOf(user.isPremium()))
 		));
 		
 		// Registro de la entidad y establecimiento del id.
 		eUser = persistence.registrarEntidad(eUser);
-				
 		user.registerId(eUser.getId());
+		TDSPoolDAO.addPersistent(user);
 		
 		return true;
 	}
@@ -131,7 +134,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		Entidad eUser = persistence.recuperarEntidad(id);
 								
 		// Asegurar que el tipo es de usuario.
-		if (!eUser.getNombre().equals(UserProperties.USER_ENTITY_TYPE.name()))
+		if (!eUser.getNombre().equals(Properties.USER_ENTITY_TYPE.name()))
 			return Optional.empty();
 				
 		// Propiedades primitivas que recuperar.
@@ -142,20 +145,20 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		
 		// Recuperación de primitivas.
 		userName = persistence.recuperarPropiedadEntidad
-				(eUser, UserProperties.USER_NAME.name());
+				(eUser, Properties.USER_NAME.name());
 		passwordHash = persistence.recuperarPropiedadEntidad
-				(eUser, UserProperties.PASSWORD_HASH.name());
+				(eUser, Properties.PASSWORD_HASH.name());
 		
 		try {
 			birthday = LocalDate.parse(persistence.recuperarPropiedadEntidad
-					(eUser, UserProperties.BIRTHDAY.name()));
+					(eUser, Properties.BIRTHDAY.name()));
 		} 
 		catch (DateTimeParseException e) {
 			return Optional.empty();
 		}
 				
 		premium = Boolean.valueOf(persistence.recuperarPropiedadEntidad
-				(eUser,UserProperties.PREMIUM.name()));
+				(eUser,Properties.PREMIUM.name()));
 
 		// Creación de la representación interna del usuario. 
 		User.Internal user = new User.Builder(userName)
@@ -172,9 +175,9 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		
 		// Obtención de las cadenas con los objetos referenciados.
 		String playlistsStr = persistence.recuperarPropiedadEntidad(eUser, 
-				UserProperties.PLAYLISTS.name());
+				Properties.PLAYLISTS.name());
 		String recentSongsStr = persistence.recuperarPropiedadEntidad(eUser,
-				UserProperties.RECENT_SONGS.name());
+				Properties.RECENT_SONGS.name());
 		
 		// Añadir playlists.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
@@ -197,7 +200,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 	 */
 	@Override
 	public List<User.Internal> recoverAll() {
-		return persistence.recuperarEntidades(UserProperties.USER_ENTITY_TYPE.name())
+		return persistence.recuperarEntidades(Properties.USER_ENTITY_TYPE.name())
 				.stream()
 				.map(entity -> this.recover(entity.getId()).orElse(null))
 				.filter(u -> u!=null)
@@ -220,12 +223,12 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		
 		// Si la entidad recuperada no es de usuario hay inconsistencias.
 		Entidad eUser = persistence.recuperarEntidad(u.getId());
-		if (!eUser.getNombre().equals(UserProperties.USER_ENTITY_TYPE.name()))
+		if (!eUser.getNombre().equals(Properties.USER_ENTITY_TYPE.name()))
 			return false;
 		
 		eUser.getPropiedades().forEach(p -> {
 			
-			switch (UserProperties.valueOf(p.getNombre())) {
+			switch (Properties.valueOf(p.getNombre())) {
 			case USER_NAME:
 				p.setValor(u.getUserName());
 				break;
@@ -240,11 +243,55 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				break;
 			case PLAYLISTS:
 				
-				/* 
-				 * Se deben eliminar las playlist que ya no se encuentren
-				 * asociadas al usuario, registrar las nuevas playlists y
-				 * actualizar el resto.
-				 */
+				// Recuperar playlists guardadas.
+				String playlistsStr = p.getValor();
+				Set<Playlist.Internal> oldPlaylists = 
+						new HashSet<Playlist.Internal>
+				(
+						DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+						.getPlaylistDAO()
+						.stringToPersistents(playlistsStr)
+				);
+				
+				// Crear un set con ids actuales de las playlists.
+				Set<Playlist.Internal> newPlaylists = 
+						new HashSet<Playlist.Internal>
+				(
+						u.getPlaylists()
+						.stream()
+						.map(l -> l.asMut())
+						.toList()
+				);
+				
+				// Obtener y registrar nuevas playlist
+				Set<Playlist.Internal> createdPlaylists  = 
+						new HashSet<Playlist.Internal>(newPlaylists);
+				createdPlaylists.removeAll(oldPlaylists);
+				createdPlaylists.forEach(playlist -> 
+					DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+						.getPlaylistDAO()
+						.register(playlist)
+				);
+					
+				// Eliminar playlists que ya no están presentes.
+				Set<Playlist.Internal> removedPlaylists  = 
+						new HashSet<Playlist.Internal>(oldPlaylists);
+				removedPlaylists.removeAll(newPlaylists);
+				removedPlaylists.forEach(playlist -> 
+					DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+					.getPlaylistDAO()
+					.delete(playlist)
+				);
+				
+				// Actualizamos el resto de playlists.
+				Set<Playlist.Internal> updatePlaylists = 
+						new HashSet<Playlist.Internal>(newPlaylists);
+				updatePlaylists.retainAll(oldPlaylists);
+				updatePlaylists.forEach(playlist -> 
+					DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+					.getPlaylistDAO()
+					.modify(playlist)
+				);
 				
 				p.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las playlist para
@@ -292,7 +339,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		
 		// Si la entidad no es de usuario hay inconsistencias.
 		Entidad eUser = persistence.recuperarEntidad(u.getId());
-		if (eUser.getNombre() != UserProperties.USER_ENTITY_TYPE.name())
+		if (eUser.getNombre() != Properties.USER_ENTITY_TYPE.name())
 			return false;
 		
 		// Eliminación en cascada de las playlists asociadas al usuario.
@@ -302,17 +349,22 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				.delete(p.asMut());	
 		});
 		
-		/* 
-		 * Eliminar un usuario no debe suponer la eliminación de las canciones
-		 * en su lista de recientes ya que podrían estar siendo referenciadas
-		 * por otras entidades persistentes.
-		 * 
-			u.getRecentSongs().forEach(s -> {
-				DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
-					.getSongDAO()
-					.delete(s.asMut());	
-			});
-		*/
+		// Eliminación de propiedades.
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.USER_NAME.name());
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.PASSWORD_HASH.name());
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.BIRTHDAY.name());
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.PLAYLISTS.name());
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.RECENT_SONGS.name());
+		persistence.eliminarPropiedadEntidad
+			(eUser, Properties.PREMIUM.name());
+		
+		// Eliminar de la pool.
+		TDSPoolDAO.removePersistent(u);
 		
 		// Eliminación del usuario.
 		return persistence.borrarEntidad(eUser);

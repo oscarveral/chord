@@ -80,6 +80,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal>{
 		// Registro.
 		ePlaylist = persistence.registrarEntidad(ePlaylist);
 		p.registerId(ePlaylist.getId());
+		TDSPoolDAO.addPersistent(p);
 		
 		return true;
 	}
@@ -168,12 +169,13 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal>{
 		if (p == null || !p.isRegistered()) return false;
 		
 		// Si la entidad recuperada no es de canción hay inconsistencias.
-		Entidad eSong = persistence.recuperarEntidad(p.getId());
-		if (!eSong.getNombre().equals(Properties.PLAYLIST_ENTITY_TYPE.name()))
+		Entidad ePlaylist = persistence.recuperarEntidad(p.getId());
+		if (!ePlaylist.getNombre()
+				.equals(Properties.PLAYLIST_ENTITY_TYPE.name()))
 			return false;
 		
 		// Modificación de propiedades de la entidad.
-		eSong.getPropiedades().forEach(prop -> {
+		ePlaylist.getPropiedades().forEach(prop -> {
 			
 			switch (Properties.valueOf(prop.getNombre())) {
 			case NAME:
@@ -195,7 +197,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal>{
 			}
 			persistence.modificarPropiedad(prop);
 		});
-		persistence.modificarEntidad(eSong);
+		persistence.modificarEntidad(ePlaylist);
 		
 		return true;
 	}
@@ -213,19 +215,22 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal>{
 		if (p == null || !p.isRegistered()) return false;		
 		
 		// Si la entidad no es de canción hay inconsistencias.
-		Entidad eSong = persistence.recuperarEntidad(p.getId());
-		if (eSong.getNombre() != Properties.PLAYLIST_ENTITY_TYPE.name())
+		Entidad ePlaylist = persistence.recuperarEntidad(p.getId());
+		if (ePlaylist.getNombre() != Properties.PLAYLIST_ENTITY_TYPE.name())
 			return false;
 		
-		// Eliminar las propiedades de la canción.
+		// Eliminar las propiedades de la playlist.
 		persistence.eliminarPropiedadEntidad
-			(eSong, Properties.NAME.name());
+			(ePlaylist, Properties.NAME.name());
 		persistence.eliminarPropiedadEntidad
-			(eSong, Properties.DESCRIPTION.name());
+			(ePlaylist, Properties.DESCRIPTION.name());
 		persistence.eliminarPropiedadEntidad
-			(eSong, Properties.SONGS.name());
+			(ePlaylist, Properties.SONGS.name());
+		
+		// Eliminar de la pool
+		TDSPoolDAO.removePersistent(p);
 		
 		// Eliminación de la canción.
-		return persistence.borrarEntidad(eSong);
+		return persistence.borrarEntidad(ePlaylist);
 	}
 }
