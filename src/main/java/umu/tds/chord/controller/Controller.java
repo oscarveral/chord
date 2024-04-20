@@ -13,6 +13,10 @@ import umu.tds.chord.model.UserRepository;
  * negocio. Dado que no se permite que la interfaz modifique el estado de dichos
  * elementos directamente, los métodos que lo pertiten se exponen a través 
  * de este controlador.
+ * 
+ * Se utilizarán Listeners para que la interfaz pueda ser notificada de cambios
+ * en el estado del los elementos del modelo producidos por llamadas a métodos
+ * en este controlador.
  */
 public enum Controller {
 
