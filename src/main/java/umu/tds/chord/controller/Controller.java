@@ -66,6 +66,16 @@ public enum Controller {
 		current = Optional.empty();
 	}
 	
+	public void togglePremium() {
+		// Invertir el estado premium si hay usuario actual.
+		current.ifPresent(u -> {
+			boolean premium = !u.isPremium();
+			u.asMut().setPremium(premium);
+			// Informar a los listeners del cambio.
+			listeners.forEach(l -> l.onPremiumChange(premium));
+		});
+	}
+	
 	/**
 	 * Registra un listener de estado de usuario en el controlador.
 	 * 
