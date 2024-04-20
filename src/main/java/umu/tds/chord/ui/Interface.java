@@ -63,7 +63,7 @@ public final class Interface {
 		initializeLoginPanel();
 		initializeMainPanel();
 						
-		registerBackendListener();
+		registerControllerListener();
 				
 		ventana.setContentPane(container);
 	}
@@ -131,7 +131,7 @@ public final class Interface {
 	
 	// -------- Interacción con el controlador --------
 	
-	private void registerBackendListener() {
+	private void registerControllerListener() {
 		// Escuchar inicios y fin de sesiones para establecer el panel
 		// que se debe mostrar.
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {

@@ -29,6 +29,10 @@ import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.model.User;
 
+/**
+ * Panel con la interfaz de inicio de sesión o registro. Es el panel que se
+ * muestra al abrir la aplicación.
+ */
 public final class LoginPanel extends JPanel{
 
 	private static final long serialVersionUID = 5363840226169510119L;
@@ -85,7 +89,7 @@ public final class LoginPanel extends JPanel{
 		initializeRegisterButton();
 		initializeFailedLoginWarn();
 		
-		registerBackendListener();
+		registerControllerListener();
 		
 		listeners = new HashSet<InterfaceEventListener>();
 		
@@ -374,25 +378,31 @@ public final class LoginPanel extends JPanel{
 		listeners.remove(l);
 	}
 	
-	private void refresh() {
-		// Reinicia la interfaz.
-		userInput.setText(userDefaultInput);
-		userInput.setForeground(Color.GRAY);
-		
-		passwordInput.setText(passwordDefaultInput);
-		passwordInput.setEchoChar((char) 0);
-		passwordInput.setForeground(Color.GRAY);
-		
-		userInputEmpty = true;
-		passwordInputEmpty = true;
-		
-		loginButton.setEnabled(isValidInput());
-		
-		failedLoginWarn.setText(emptyText);
-	}
-	
 	// -------- Interacción con el controlador --------
 
+	private void registerControllerListener() {
+		// Refrescar la interfaz después de un inicio de sesión exitoso.
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+			
+			@Override
+			public void onLogin(User u) {
+				userInput.setText(userDefaultInput);
+				userInput.setForeground(Color.GRAY);
+				
+				passwordInput.setText(passwordDefaultInput);
+				passwordInput.setEchoChar((char) 0);
+				passwordInput.setForeground(Color.GRAY);
+				
+				userInputEmpty = true;
+				passwordInputEmpty = true;
+				
+				loginButton.setEnabled(isValidInput());
+				
+				failedLoginWarn.setText(emptyText);
+			}
+		});
+	}
+	
 	private boolean login() {
 		// Recuperar usuario y contraseña introducidos.
 		String user = userInput.getText();
@@ -400,21 +410,5 @@ public final class LoginPanel extends JPanel{
 				
 		// Intenar login.
 		return Controller.INSTANCE.login(user, pass);
-	}
-	
-	private void registerBackendListener() {
-		// Escuchar inicios y fin de sesiones para refrescar la interfaz.
-		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-			
-			@Override
-			public void onLogin(User u) {
-				refresh();
-			}
-			
-			@Override
-			public void onLogout() {
-				refresh();
-			}
-		});
-	}
+	}	
 }
