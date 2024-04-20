@@ -208,7 +208,8 @@ public final class MainPanel extends JPanel{
 	
 	private void registerControllerListener() {
 		// Escuchar eventos para establecer la interfaz de forma acorde.
-		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener()
+		{
 			
 			@Override
 			public void onLogin(User u) {
