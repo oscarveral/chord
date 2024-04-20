@@ -1,6 +1,8 @@
 package umu.tds.chord.controller;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
@@ -17,9 +19,11 @@ public enum Controller {
 	INSTANCE;
 	
 	private Optional<User> current;
-
+	private Set<UserStatusListener> listeners;
+	
 	private Controller() {
 		current = Optional.empty();
+		listeners = new HashSet<UserStatusListener>();
 	}
 	
 	/**
@@ -36,8 +40,11 @@ public enum Controller {
 		if (current.isPresent())
 			return false;
 		
-		// Recuperación del usuario.
+		// Recuperación del usuario y notificación.
 		current = UserRepository.INSTANCE.getUser(username, password);
+		current.ifPresent(u -> {
+			listeners.forEach(l -> l.onLogin(u));
+		});
 		
 		// Retornar el resultado de la recuperación.
 		return current.isPresent();
@@ -48,19 +55,28 @@ public enum Controller {
 	 */
 	public void logout() {
 		// Si hay un usuario actual, actualizar su información.
-		current.ifPresent(u ->
-			UserRepository.INSTANCE.updateUser(u)
-		);	
+		current.ifPresent(u -> {
+			UserRepository.INSTANCE.updateUser(u);
+			listeners.forEach(l -> l.onLogout());
+		});
 		current = Optional.empty();
 	}
 	
 	/**
-	 * Obtiene el usuario actual de la aplicación.
+	 * Registra un listener de estado de usuario en el controlador.
 	 * 
-	 * @return Opcional con el usuario actual o un opcional vacío si no se había
-	 * iniciado sesión con ningún usuario.
+	 * @param l Listener que se desea registrar.
 	 */
-	public Optional<User> getUser() {
-		return current;
+	public void registerUserStatusListener(UserStatusListener l) {
+		listeners.add(l);
+	}
+	
+	/**
+	 * Elimina un listener de estado de usuario del controlador.
+	 * 
+	 * @param l Listener que se desea eliminar.
+	 */
+	public void removeUserStatusListener(UserStatusListener l) {
+		listeners.remove(l);
 	}
 }
