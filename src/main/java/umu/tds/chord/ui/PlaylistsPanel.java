@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 /**
  * Panel usado para mostar la lista de playlist actual del usuario.
  */
-public class PlaylistsPanel extends JPanel{
+final public class PlaylistsPanel extends JPanel{
 
 	private static final long serialVersionUID = 8430914823843086279L;
 
