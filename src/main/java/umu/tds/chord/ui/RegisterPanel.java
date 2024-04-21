@@ -206,16 +206,16 @@ final public class RegisterPanel extends JPanel {
 			public void removeUpdate(DocumentEvent e) {
 				if (passwordInput.getPassword().length == 0) {
 					passwordInputEmpty = true;
-					registerButton.setEnabled(isValidInput());
 				}
+				registerButton.setEnabled(isValidInput());				
 			}
 			
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				if (passwordInputEmpty) {
 					passwordInputEmpty = false;
-					registerButton.setEnabled(isValidInput());
 				}
+				registerButton.setEnabled(isValidInput());
 			}
 			
 			@Override
@@ -283,16 +283,16 @@ final public class RegisterPanel extends JPanel {
 				public void removeUpdate(DocumentEvent e) {
 					if (confirmPasswordInput.getPassword().length == 0) {
 						confirmPasswordInputEmpty = true;
-						registerButton.setEnabled(isValidInput());
 					}
+					registerButton.setEnabled(isValidInput());
 				}
 				
 				@Override
 				public void insertUpdate(DocumentEvent e) {
 					if (confirmPasswordInputEmpty) {
 						confirmPasswordInputEmpty = false;
-						registerButton.setEnabled(isValidInput());
 					}
+					registerButton.setEnabled(isValidInput());
 				}
 				
 				@Override
