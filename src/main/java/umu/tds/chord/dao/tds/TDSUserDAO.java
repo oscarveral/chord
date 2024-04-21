@@ -40,6 +40,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		BIRTHDAY,
 		PLAYLISTS,
 		RECENT_SONGS,
+		FAVOURITE_SONGS,
 		PREMIUM,
 	}
 	
@@ -99,6 +100,14 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 					// poder obtener sus ids en persistencia.
 					user.getRecentSongs().stream()
 						.map(s-> s.asMut())
+						.toList())
+			),
+			new Propiedad(Properties.FAVOURITE_SONGS.name(),
+					DAO.persistentsToString(
+					// Necesito la versión interna de las canciones para
+					// poder obtener sus ids en persistencia.
+					user.getFavouriteSongs().stream()
+						.map(p -> p.asMut())
 						.toList())
 			),
 			new Propiedad(Properties.PREMIUM.name(), 
@@ -178,6 +187,8 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				Properties.PLAYLISTS.name());
 		String recentSongsStr = persistence.recuperarPropiedadEntidad(eUser,
 				Properties.RECENT_SONGS.name());
+		String favouriteSongsStr = persistence.recuperarPropiedadEntidad(eUser,
+				Properties.FAVOURITE_SONGS.name());
 		
 		// Añadir playlists.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
@@ -190,6 +201,12 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 			.getSongDAO()
 			.stringToPersistents(recentSongsStr)
 			.forEach(s -> user.addRecentSong(s));
+		
+		// Añadir canciones favoritas.
+		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+			.getSongDAO()
+			.stringToPersistents(favouriteSongsStr)
+			.forEach(s -> user.addFavouriteSong(s));
 		
 		// Retorno del objeto.
 		return Optional.of(user);
@@ -312,6 +329,15 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 					)
 				);
 				break;
+			case FAVOURITE_SONGS:
+				p.setValor(DAO.persistentsToString(
+						// Necesito la versión interna de las canciones para
+						// poder obtener sus ids en persistencia.
+						u.getFavouriteSongs().stream()
+							.map(s -> s.asMut())
+							.toList()
+					)
+				);
 			default:
 				break;
 			}

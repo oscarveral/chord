@@ -3,8 +3,10 @@ package umu.tds.chord.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import umu.tds.chord.utils.StringHasher;
 
@@ -19,6 +21,7 @@ public abstract sealed class User implements Mutable<User.Internal>{
 	private final LocalDate birthday;
 	private final List<Playlist> playlists;
 	private final List<Song> recentSongs;
+	private final Set<Song> favouriteSongs;
 	
 	private boolean isPremium;
 	
@@ -32,6 +35,7 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		private LocalDate birthday;
 		private List<Playlist> playlists;
 		private List<Song> recentSongs;
+		private Set<Song> favouriteSongs;
 		private boolean isPremium;
 		
 		/**
@@ -48,6 +52,7 @@ public abstract sealed class User implements Mutable<User.Internal>{
 			this.birthday = null;
 			this.playlists = new ArrayList<Playlist>();
 			this.recentSongs = new ArrayList<Song>();
+			this.favouriteSongs = new HashSet<Song>();
 			this.isPremium = false;
 		}
 		
@@ -115,6 +120,19 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		}
 		
 		/**
+		 * Establece el set de canciones favoritas del usuario.
+		 * 
+		 * @param recentSongs Set de canciones favoritas del usuario. Véase
+		 * {@link Song}.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder favouriteSongs(Set<Song> favouriteSongs) {
+			this.favouriteSongs = favouriteSongs;
+			return this;
+		}
+		
+		/**
 		 * Establece el estado premium del usuario.
 		 * 
 		 * @param isPremium Estado premium del usuario.
@@ -162,6 +180,7 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		this.birthday = builder.birthday;
 		this.playlists = builder.playlists;
 		this.recentSongs = builder.recentSongs;
+		this.favouriteSongs = builder.favouriteSongs;
 		this.isPremium = builder.isPremium;
 	}
 	
@@ -211,6 +230,15 @@ public abstract sealed class User implements Mutable<User.Internal>{
 	 */
 	public List<Song> getRecentSongs() {
 		return Collections.unmodifiableList(recentSongs);
+	}
+	/**
+	 * Método para obtener un set no modificable de las canciones favoritas
+	 * del usuario.
+	 * 
+	 * @return Set no modificable de las canciones favoritas.
+	 */
+	public Set<Song> getFavouriteSongs() {
+		return Collections.unmodifiableSet(favouriteSongs);
 	}
 	
 	/**
@@ -322,8 +350,6 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		 * Añade una canción a la lista de canciones recientes. Véase 
 		 * {@link Song}.
 		 * 
-		 * @param index Posicion en la que se desea añadir la canción 
-		 * proprocionada.
 		 * @param recentSong Canción que se desea añadir a la lista.
 		 */
 		public void addRecentSong(Song recentSong) {
@@ -336,10 +362,34 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		 * 
 		 * @param index Índice de la canción que se desea eliminar de la lista
 		 * de canciones recientes.
-		 * @return
+		 * 
+		 * @return Canción que se ha eliminado.
 		 */
 		public Song removeRecentSong(int index) {
 			return super.recentSongs.remove(index);
+		}
+		
+		/**
+		 * Añade una canción al set de canciones favoritas. Véase 
+		 * {@link Song}.
+		 * 
+		 * @param favSong Canción que se desea añadir a la lista.
+		 */
+		public void addFavouriteSong(Song favSong) {
+			super.favouriteSongs.add(favSong);
+		}
+		
+		/**
+		 * Elimina una canción del set de canciones favoritas. Véase
+		 * {@link Song}.
+		 * 
+		 * @param index Índice de la canción que se desea eliminar del set
+		 * de canciones favoritas.
+		 * 
+		 * @return {@code true} si se eliminó la canción favorita.
+		 */
+		public boolean removeFavouriteSong(Song favSong) {
+			return super.favouriteSongs.remove(favSong);
 		}
 		
 		/**

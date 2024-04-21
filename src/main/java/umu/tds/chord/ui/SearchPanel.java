@@ -21,10 +21,12 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.model.Style;
 
 /**
- * Panél utilizado para la búsqueda y gestión de canciones.
+ * Panel utilizado para la búsqueda y gestión de canciones.
  */
 final public class SearchPanel extends JPanel {
 
@@ -36,6 +38,7 @@ final public class SearchPanel extends JPanel {
 	private static final String favouriteText = "Favoritos";
 	private static final String documentPropertyChangeErrorMsg = 
 			"Unexpected change on properties for documment listener: ";
+	private static final String emptyFilter = "";
 
 	private JTextField interpreterFilter;
 	private JTextField titleFilter;
@@ -69,6 +72,8 @@ final public class SearchPanel extends JPanel {
 		initializeStyleFilter();
 		initializeSearchButton();
 		initializeResultsPanel();
+		
+		registerControllerListener();
 				
 		setBorder(BorderFactory.createTitledBorder
 				(BorderFactory.createLineBorder(Color.BLACK), panelTitle));
@@ -284,7 +289,43 @@ final public class SearchPanel extends JPanel {
 		add(resultsPanel, constraints);
 	}
 	
+	// -------- Interacción con el controlador --------
+	
+	private void registerControllerListener() {
+		// Escuchar eventos para establecer la interfaz de forma acorde.
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener()
+		{
+			// Resetear filtros de búsqueda.
+			@Override
+			public void onLogout() {
+				interpreterEmpty = true;
+				interpreterFilter.setText(interpreterFilterText);
+				interpreterFilter.setForeground(Color.GRAY);
+				
+				titleEmpty = true;
+				titleFilter.setText(titleFilterText);
+				titleFilter.setForeground(Color.GRAY);
+				
+				favouriteFilter.setSelected(false);
+
+				styleFilter.setSelectedItem(Style.TODOS);
+			}
+		});
+	}
+	
 	private void search() {
-		// TODO: Búsqueda y carga de canciones.
+		// Recuperación de filtros;
+		String name = emptyFilter;
+		if (!titleEmpty) name = titleFilter.getText();
+		
+		String author = emptyFilter;
+		if (!interpreterEmpty) author = interpreterFilter.getText();
+		
+		boolean favourite = favouriteFilter.isSelected();
+		
+		Style style = (Style) styleFilter.getSelectedItem();
+		
+		// Búsqueda.
+		Controller.INSTANCE.searchSongs(name, author, favourite, style);
 	}
 }

@@ -2,7 +2,9 @@ package umu.tds.chord.model;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import umu.tds.chord.dao.DAOFactory;
 
@@ -95,5 +97,29 @@ public enum SongRepository {
 			songs.remove(s);
 		
 		return persistence;
+	}
+	
+	/**
+	 * Función utilizada para la búsqueda de canciones mediante filtros.
+	 * 
+	 * @param name Nombre de la canción. Una cadena vacía "" se corresponde con
+	 * cualquier nombre de canción.
+	 * @param author Autor. Una cadena vacía "" se corresponde con todos los autores.
+	 * @param s Estilo de la canción. {@link Style#TODOS} se corresponde con 
+	 * todos los estilos.
+	 * 
+	 * @return Lista mutable de canciones encontrada que respeta los filtros
+	 * especificados.
+	 */
+	public List<Song> getSearch(String name, String author, Style s) {
+		return songs.stream()
+				.filter(song -> song.getName().contains(name))
+				.filter(song -> song.getAuthor().contains(author))
+				.filter(song -> {
+					if (!s.equals(Style.TODOS))
+						return song.getStyle().equals(s);
+					return true;
+				})
+				.collect(Collectors.toList());
 	}
 }

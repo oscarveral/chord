@@ -2,9 +2,13 @@ package umu.tds.chord.controller;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import umu.tds.chord.model.Song;
+import umu.tds.chord.model.SongRepository;
+import umu.tds.chord.model.Style;
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
 
@@ -23,12 +27,14 @@ public enum Controller {
 
 	INSTANCE;
 	
-	private Optional<User> current;
-	private Set<UserStatusListener> listeners;
+	private Optional<User> currentUser;
+	private Set<UserStatusListener> userStatusListeners;
+	private Set<SongStatusListener> songStatusListeners;
 	
 	private Controller() {
-		current = Optional.empty();
-		listeners = new HashSet<UserStatusListener>();
+		currentUser = Optional.empty();
+		userStatusListeners = new HashSet<UserStatusListener>();
+		songStatusListeners = new HashSet<SongStatusListener>();
 	}
 	
 	/**
@@ -56,17 +62,17 @@ public enum Controller {
 	 */
 	public boolean login(String username, String password) {
 		// No se puede hacer login si ya se está logeado.
-		if (current.isPresent())
+		if (currentUser.isPresent())
 			return false;
 		
 		// Recuperación del usuario y notificación.
-		current = UserRepository.INSTANCE.getUser(username, password);
-		current.ifPresent(u -> {
-			listeners.forEach(l -> l.onLogin(u));
+		currentUser = UserRepository.INSTANCE.getUser(username, password);
+		currentUser.ifPresent(u -> {
+			userStatusListeners.forEach(l -> l.onLogin(u));
 		});
 		
 		// Retornar el resultado de la recuperación.
-		return current.isPresent();
+		return currentUser.isPresent();
 	}
 	
 	/**
@@ -74,11 +80,11 @@ public enum Controller {
 	 */
 	public void logout() {
 		// Si hay un usuario actual, actualizar su información.
-		current.ifPresent(u -> {
+		currentUser.ifPresent(u -> {
 			UserRepository.INSTANCE.updateUser(u);
-			listeners.forEach(l -> l.onLogout());
+			userStatusListeners.forEach(l -> l.onLogout());
 		});
-		current = Optional.empty();
+		currentUser = Optional.empty();
 	}
 	
 	/**
@@ -89,9 +95,9 @@ public enum Controller {
 	 */
 	public boolean remove() {
 		// Si no hay usuario actual retornamos.
-		if(!current.isPresent()) return false;
+		if(!currentUser.isPresent()) return false;
 		// Obtenemos el usuario actual y forzamos un cierre de sesión.
-		User u = current.get();
+		User u = currentUser.get();
 		logout();
 		// Se elimina la cuenta del repositorio.
 		return UserRepository.INSTANCE.removeUser(u);
@@ -102,12 +108,34 @@ public enum Controller {
 	 */
 	public void togglePremium() {
 		// Invertir el estado premium si hay usuario actual.
-		current.ifPresent(u -> {
+		currentUser.ifPresent(u -> {
 			boolean premium = !u.isPremium();
 			u.asMut().setPremium(premium);
 			// Informar a los listeners del cambio.
-			listeners.forEach(l -> l.onPremiumChange(premium));
+			userStatusListeners.forEach(l -> l.onPremiumChange(premium));
 		});
+	}
+	
+	/**
+	 * Realiza una búsqueda de canciones a partir de los filtros proporcionados.
+	 * 
+	 * @param n Nombre de la canción.
+	 * @param a Autor de la canción.
+	 * @param f El usuario la ha marcado como favorita.
+	 * @param s Estilo de la canción.
+	 */
+	public void searchSongs(String n, String a, boolean f, Style s) {
+		// No se permiten búsquedas sin una sesión abierta.
+		if (!currentUser.isPresent()) return;
+		
+		// Buscar y eliminar las que no coincidan con el filtro de favorito.
+		List<Song> searched = SongRepository.INSTANCE.getSearch(n, a, s);
+		searched.removeIf(song -> 
+			!currentUser.get().getFavouriteSongs().contains(song)
+		);
+		
+		// Pasar la infomración a los escuchadores interesados.
+		songStatusListeners.forEach(l -> l.onSongSearch(searched));
 	}
 	
 	/**
@@ -116,7 +144,7 @@ public enum Controller {
 	 * @param l Listener que se desea registrar.
 	 */
 	public void registerUserStatusListener(UserStatusListener l) {
-		listeners.add(l);
+		userStatusListeners.add(l);
 	}
 	
 	/**
@@ -125,6 +153,24 @@ public enum Controller {
 	 * @param l Listener que se desea eliminar.
 	 */
 	public void removeUserStatusListener(UserStatusListener l) {
-		listeners.remove(l);
+		userStatusListeners.remove(l);
+	}
+	
+	/**
+	 * Registra un listener de estado de canciones en el controlador.
+	 * 
+	 * @param l Listener que se desea registrar.
+	 */
+	public void registerSongStatusListener(SongStatusListener l) {
+		songStatusListeners.add(l);
+	}
+	
+	/**
+	 * Elimina un listener de estado de usuario del controlador.
+	 * 
+	 * @param l Listener que se desea eliminar.
+	 */
+	public void removeSongStatusListener(SongStatusListener l) {
+		songStatusListeners.remove(l);
 	}
 }
