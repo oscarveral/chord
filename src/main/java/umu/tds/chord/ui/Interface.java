@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +29,7 @@ public final class Interface {
 	private static final String iconPath = "/images/icon.png";
 	private static final String loginTag = "login";
 	private static final String mainTag = "main";
+	private static final String registerTitle = "Registro";
 	private static final String invalidFrontendEventOnLoginPanel = 
 			"Error. El panel de inicio de sesión ha enviado el evento: ";
 	
@@ -38,6 +40,9 @@ public final class Interface {
 	
 	private LoginPanel loginPanel;
 	private MainPanel mainPanel;
+	
+	private JDialog registerDialog;
+	private RegisterPanel registerPanel;
 	
 	/**
 	 * Constructor por defecto.
@@ -62,6 +67,7 @@ public final class Interface {
 		initializeFrame();
 		initializeLoginPanel();
 		initializeMainPanel();
+		initializeRegisterPanel();
 						
 		registerControllerListener();
 				
@@ -111,7 +117,8 @@ public final class Interface {
 					break;
 					
 				case REGISTER_PANEL_REQUEST:
-					// TODO: Change panel.
+					registerDialog.setLocationRelativeTo(ventana);
+					registerDialog.setVisible(true);
 					break;
 					
 				default:
@@ -127,6 +134,18 @@ public final class Interface {
 	private void initializeMainPanel() {
 		mainPanel = new MainPanel();
 		container.add(mainPanel, mainTag);
+	}
+	
+	private void initializeRegisterPanel() {
+		registerPanel = new RegisterPanel();
+
+		registerDialog = new JDialog(ventana, true);
+		registerDialog.setAlwaysOnTop(true);				
+		registerDialog.setTitle(registerTitle);
+		registerDialog.setContentPane(registerPanel);
+		registerDialog.pack();
+		registerDialog.setResizable(false);
+		registerDialog.setVisible(false);
 	}
 	
 	// -------- Interacción con el controlador --------
