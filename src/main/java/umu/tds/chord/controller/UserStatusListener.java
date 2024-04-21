@@ -1,12 +1,14 @@
 package umu.tds.chord.controller;
 
+import java.util.EventListener;
+
 import umu.tds.chord.model.User;
 
 /**
  * Interfaz listener para poder suscribirse a eventos producidos por el 
  * controlador en relación al usuario actual.
  */
-public interface UserStatusListener {
+public interface UserStatusListener extends EventListener{
 	
 	/**
 	 * Método de notificación de inicio de sesión de un usuario. Se proporciona

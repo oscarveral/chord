@@ -1,5 +1,6 @@
 package umu.tds.chord.controller;
 
+import java.util.EventListener;
 import java.util.List;
 
 import umu.tds.chord.model.Song;
@@ -7,7 +8,7 @@ import umu.tds.chord.model.Song;
 /**
  * Interfaz para los escuchadores de eventos relacionados con las canciones.
  */
-public interface SongStatusListener {
+public interface SongStatusListener extends EventListener{
 	
 	/**
 	 * Método emitido cuando se ha producido una búsqueda de canciones.
