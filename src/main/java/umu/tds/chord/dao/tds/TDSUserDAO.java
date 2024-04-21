@@ -336,33 +336,19 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		// Checks obligatorios
 		if (u == null) return false;
 		if (!u.isRegistered()) return false;		
-		
+				
 		// Si la entidad no es de usuario hay inconsistencias.
 		Entidad eUser = persistence.recuperarEntidad(u.getId());
-		if (eUser.getNombre() != Properties.USER_ENTITY_TYPE.name())
+		if (!eUser.getNombre().equals(Properties.USER_ENTITY_TYPE.name()))
 			return false;
-		
+				
 		// Eliminación en cascada de las playlists asociadas al usuario.
 		u.getPlaylists().forEach(p -> {
 			DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 				.getPlaylistDAO()
 				.delete(p.asMut());	
 		});
-		
-		// Eliminación de propiedades.
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.USER_NAME.name());
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.PASSWORD_HASH.name());
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.BIRTHDAY.name());
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.PLAYLISTS.name());
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.RECENT_SONGS.name());
-		persistence.eliminarPropiedadEntidad
-			(eUser, Properties.PREMIUM.name());
-		
+				
 		// Eliminar de la pool.
 		TDSPoolDAO.removePersistent(u);
 		

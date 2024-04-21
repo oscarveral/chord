@@ -200,14 +200,8 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 		
 		// Si la entidad no es de canción hay inconsistencias.
 		Entidad eSong = persistence.recuperarEntidad(s.getId());
-		if (eSong.getNombre() != Properties.SONG_ENTITY_TYPE.name())
+		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name()))
 			return false;
-		
-		// Eliminar las propiedades de la canción.
-		persistence.eliminarPropiedadEntidad(eSong, Properties.NAME.name());
-		persistence.eliminarPropiedadEntidad(eSong, Properties.AUTHOR.name());
-		persistence.eliminarPropiedadEntidad(eSong, Properties.PATH.name());
-		persistence.eliminarPropiedadEntidad(eSong, Properties.STYLE.name());
 		
 		// Eliminar de la pool.
 		TDSPoolDAO.removePersistent(s);

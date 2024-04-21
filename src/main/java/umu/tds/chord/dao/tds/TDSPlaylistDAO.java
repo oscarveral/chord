@@ -216,17 +216,9 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal>{
 		
 		// Si la entidad no es de canción hay inconsistencias.
 		Entidad ePlaylist = persistence.recuperarEntidad(p.getId());
-		if (ePlaylist.getNombre() != Properties.PLAYLIST_ENTITY_TYPE.name())
+		if (!ePlaylist.getNombre().equals(Properties.PLAYLIST_ENTITY_TYPE.name()))
 			return false;
-		
-		// Eliminar las propiedades de la playlist.
-		persistence.eliminarPropiedadEntidad
-			(ePlaylist, Properties.NAME.name());
-		persistence.eliminarPropiedadEntidad
-			(ePlaylist, Properties.DESCRIPTION.name());
-		persistence.eliminarPropiedadEntidad
-			(ePlaylist, Properties.SONGS.name());
-		
+				
 		// Eliminar de la pool
 		TDSPoolDAO.removePersistent(p);
 		
