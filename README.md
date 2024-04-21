@@ -5,7 +5,7 @@ streaming de música.
 
 ## Servicio de persistencia.
 
-Para poder ccrear y utilizar la base de datos del servicio de persistencia es 
+Para poder crear y utilizar la base de datos del servicio de persistencia es 
 necesario que la aplicación ServidorPersistenciaH2.jar del directorio 
 /persistencia/server se encuentre en ejecución.
 
@@ -34,6 +34,31 @@ utilizando el siguiente fragmento de texto.
   <groupId>umu.tds</groupId>
   <artifactId>driverPersistencia</artifactId>
   <version>2.0</version>
+</dependency>
+```
+
+## Componente JavaBeam Luz.
+
+Como requisito para esta aplicación, se encuentra el uso de un componente 
+JavaBeam proporcionado por los profesores de la asignatura. Dicho componente
+es un pulsador proporcionado mediante la librería /componentes/Luz.jar. Será 
+necesario instalarla en el repositorio local de Maven.
+
+Para realizar la instalación se deberá ejecutar el siguiente comando 
+desde /persistencia/driver para instalar el componente JavaBeam Luz.
+
+```bash
+mvn install:install-file -Dfile="Luz.jar" -DgroupId="umu.tds" -DartifactId="luz" -Dversion="1.0" -Dpackaging="jar" -DgeneratePom=true
+```
+
+Una vez instalado se podrá se indica su uso en este proyecto añadiendolo al POM
+utilizando el siguiente fragmento de texto.
+
+```xml
+<dependency>
+	  <groupId>umu.tds</groupId>
+	  <artifactId>luz</artifactId>
+	  <version>1.0</version>
 </dependency>
 ```
 
