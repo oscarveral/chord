@@ -1,5 +1,6 @@
 package umu.tds.chord.controller;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +29,20 @@ public enum Controller {
 	private Controller() {
 		current = Optional.empty();
 		listeners = new HashSet<UserStatusListener>();
+	}
+	
+	/**
+	 * Función para el registro de nuevos usuarios.
+	 * 
+	 * @param username Nombre de usuario del nuevo usuario.
+	 * @param pass Contraseña del nuevo usuario.
+	 * @param birthday Cumpleaños del nuevo usuario.
+	 * 
+	 * @return {@code false} si existe ya un usuario registrado con el nombre
+	 * de usuario proporcionado.
+	 */
+	public boolean register(String username, String pass, LocalDate birthday) {
+		return UserRepository.INSTANCE.addUser(username, pass, birthday);
 	}
 	
 	/**
