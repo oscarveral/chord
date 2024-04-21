@@ -81,6 +81,25 @@ public enum Controller {
 		current = Optional.empty();
 	}
 	
+	/**
+	 * Cierra la sesión del usuario actual y elimina su cuenta.
+	 * 
+	 * @return {@code true} si se eliminó la cuenta del usuario de forma 
+	 * exitosa.
+	 */
+	public boolean remove() {
+		// Si no hay usuario actual retornamos.
+		if(!current.isPresent()) return false;
+		// Obtenemos el usuario actual y forzamos un cierre de sesión.
+		User u = current.get();
+		logout();
+		// Se elimina la cuenta del repositorio.
+		return UserRepository.INSTANCE.removeUser(u);
+	}
+	
+	/**
+	 * Invierte el estado premium del usuario actual si lo hay.
+	 */
 	public void togglePremium() {
 		// Invertir el estado premium si hay usuario actual.
 		current.ifPresent(u -> {

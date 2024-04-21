@@ -37,6 +37,7 @@ public final class MainPanel extends JPanel{
 	private static final String templateUserName = "<no user>";
 	private static final String premiumText = "Premium";
 	private static final String logoutButtonText = "Cerrar sesión";
+	private static final String deleteAccButtonText = "Eliminar cuenta";
 	private static final String invisibleTag = "invisible";
 	private static final String searchTag = "search";
 	private static final String invalidFrontendEventOnUtilityPanel = 
@@ -45,6 +46,7 @@ public final class MainPanel extends JPanel{
 	private JPanel userPanel;
 	private JLabel userName;
 	private JButton logoutButton;
+	private JButton deleteAccButton;
 	private JToggleButton premiumToggle;
 	
 	private UtilityPanel utilityPanel;
@@ -143,12 +145,20 @@ public final class MainPanel extends JPanel{
 		GridBagConstraints logoutButtonConstraints = new GridBagConstraints();
 		logoutButtonConstraints.gridx = 2;
 		logoutButtonConstraints.gridy = 0;
-		logoutButtonConstraints.insets = new Insets(0, 5, 10, 10);
+		logoutButtonConstraints.insets = new Insets(0, 5, 10, 5);
 		logoutButtonConstraints.fill = GridBagConstraints.BOTH;
+		
+		GridBagConstraints deleteAccButtonConstraints = 
+				new GridBagConstraints();
+		deleteAccButtonConstraints.gridx = 3;
+		deleteAccButtonConstraints.gridy = 0;
+		deleteAccButtonConstraints.insets = new Insets(0, 5, 10, 10);
+		deleteAccButtonConstraints.fill = GridBagConstraints.BOTH;
 		
 		initializeUserName();
 		initializePremiumToggle();
 		initializeLogoutButton();
+		initializeDeleteAccButton();
 		
 		userPanel = new JPanel(userPanelLayout);
 		userPanel.setBorder(BorderFactory.createTitledBorder
@@ -156,6 +166,7 @@ public final class MainPanel extends JPanel{
 		userPanel.add(userName, userNameConstraints);
 		userPanel.add(premiumToggle, premiumToggleConstraints);
 		userPanel.add(logoutButton, logoutButtonConstraints);
+		userPanel.add(deleteAccButton, deleteAccButtonConstraints);
 		
 		add(userPanel, BorderLayout.PAGE_START);
 	}
@@ -204,6 +215,24 @@ public final class MainPanel extends JPanel{
 			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), logoutButtonText);
 	}
 	
+	private void initializeDeleteAccButton() {
+		deleteAccButton = new JButton(deleteAccButtonText);
+		Action action = new AbstractAction() {
+			
+			private static final long serialVersionUID = 649772716674952602L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				remove();
+			}
+		};
+		
+		deleteAccButton.addActionListener(action);
+		deleteAccButton.getActionMap().put(deleteAccButtonText, action);
+		deleteAccButton.getInputMap().put
+			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), deleteAccButtonText);
+	}
+	
 	// -------- Interacción con el controlador --------
 	
 	private void registerControllerListener() {
@@ -234,6 +263,10 @@ public final class MainPanel extends JPanel{
 	
 	private void logout() {
 		Controller.INSTANCE.logout();
+	}
+	
+	private void remove() {
+		Controller.INSTANCE.remove();
 	}
 	
 	private void togglePremium() {
