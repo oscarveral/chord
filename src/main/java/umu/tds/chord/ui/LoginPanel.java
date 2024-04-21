@@ -237,9 +237,7 @@ public final class LoginPanel extends JPanel{
 		
 		// Cualquier acción provoca un intento de inicio de sesión.
 		passwordInput.addActionListener(e -> {
-			if (isValidInput() && !login()) {
-				failedLoginWarn.setText(failedLoginText);
-			}
+			login();
 		});
 		
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -260,9 +258,7 @@ public final class LoginPanel extends JPanel{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isValidInput() && !login()) {
-					failedLoginWarn.setText(failedLoginText);
-				}
+				login();
 			}
 		};
 		
@@ -403,12 +399,20 @@ public final class LoginPanel extends JPanel{
 		});
 	}
 	
-	private boolean login() {
+	private void login() {
+		
+		if (!isValidInput()) return;
+		
 		// Recuperar usuario y contraseña introducidos.
 		String user = userInput.getText();
 		String pass = String.valueOf(passwordInput.getPassword());
-				
+		
 		// Intenar login.
-		return Controller.INSTANCE.login(user, pass);
+		boolean result = Controller.INSTANCE.login(user, pass);
+		
+		// Si hay fallo se pone un aviso.
+		if (!result) {
+			failedLoginWarn.setText(failedLoginText);
+		}
 	}	
 }
