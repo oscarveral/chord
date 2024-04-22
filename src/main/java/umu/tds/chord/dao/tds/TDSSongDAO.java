@@ -12,7 +12,6 @@ import tds.driver.ServicioPersistencia;
 import umu.tds.chord.dao.DAO;
 import umu.tds.chord.model.Persistent;
 import umu.tds.chord.model.Song;
-import umu.tds.chord.model.Style;
 
 /**
  * Adaptador {@link DAO} para {@link Song.Internal} utilizando el driver de 
@@ -66,7 +65,7 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 			new Propiedad(Properties.NAME.name(), s.getName()),
 			new Propiedad(Properties.AUTHOR.name(), s.getAuthor()),
 			new Propiedad(Properties.PATH.name(), s.getPath()),
-			new Propiedad(Properties.STYLE.name(), s.getStyle().name())
+			new Propiedad(Properties.STYLE.name(), s.getStyle())
 		));
 		
 		// Registro.
@@ -104,7 +103,7 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 		String name = null;
 		String author = null;
 		String path = null;
-		Style style = null;
+		String style = null;
 		
 		name = persistence.recuperarPropiedadEntidad
 				(eSong, Properties.NAME.name());
@@ -112,8 +111,8 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 				(eSong, Properties.AUTHOR.name());
 		path = persistence.recuperarPropiedadEntidad
 				(eSong, Properties.PATH.name());
-		style = Style.valueOf(persistence.recuperarPropiedadEntidad
-				(eSong, Properties.STYLE.name()));	
+		style = persistence.recuperarPropiedadEntidad
+				(eSong, Properties.STYLE.name());	
 		
 		// Construcción y registro.
 		Song.Internal s = new Song.Builder(name)
@@ -164,18 +163,11 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 		eSong.getPropiedades().forEach(p -> {
 			
 			switch (Properties.valueOf(p.getNombre())) {
+			// No se puden mutar las canciones.
 			case NAME:
-				p.setValor(s.getName());
-				break;
 			case AUTHOR:
-				p.setValor(s.getAuthor());
-				break;
 			case PATH:
-				p.setValor(s.getPath());
-				break;
 			case STYLE:
-				p.setValor(s.getStyle().name());
-				break;
 			default:
 				break;
 			}

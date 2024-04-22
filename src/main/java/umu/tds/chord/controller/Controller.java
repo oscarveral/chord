@@ -8,7 +8,6 @@ import java.util.Set;
 
 import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
-import umu.tds.chord.model.Style;
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
 
@@ -35,6 +34,20 @@ public enum Controller {
 		currentUser = Optional.empty();
 		userStatusListeners = new HashSet<UserStatusListener>();
 		songStatusListeners = new HashSet<SongStatusListener>();
+	}
+	
+	/**
+	 * Función utilizada por la interfaz para indicar al controlador que está
+	 * lista para funcionar y cargar datos.
+	 */
+	public void ready() {
+		// Enviar datos de estilos.
+		songStatusListeners.forEach(l -> {
+			l.onStyleList(
+				SongRepository.INSTANCE.getStyles(), 
+				SongRepository.INSTANCE.getStyleWildcard()
+			);	
+		});
 	}
 	
 	/**
@@ -124,7 +137,7 @@ public enum Controller {
 	 * @param f El usuario la ha marcado como favorita.
 	 * @param s Estilo de la canción.
 	 */
-	public void searchSongs(String n, String a, boolean f, Style s) {
+	public void searchSongs(String n, String a, boolean f, String s) {
 		// No se permiten búsquedas sin una sesión abierta.
 		if (!currentUser.isPresent()) return;
 		

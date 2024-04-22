@@ -72,6 +72,9 @@ public final class Interface {
 		registerControllerListener();
 				
 		ventana.setContentPane(container);
+		
+		// Fin de la inicialización de la interfaz.
+		ready();
 	}
 	
 	private void initializeFrame() {
@@ -173,5 +176,10 @@ public final class Interface {
 	private void forceLogout() {
 		// Utilizado para forzar el cierre de sesión al cerrar la app.
 		Controller.INSTANCE.logout();
+	}
+	
+	private void ready() {
+		// Indicar al controlador que se ha terminado de inicializar.
+		Controller.INSTANCE.ready();
 	}
 }

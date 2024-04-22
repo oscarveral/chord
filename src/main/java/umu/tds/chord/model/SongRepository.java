@@ -18,14 +18,23 @@ public enum SongRepository {
 	INSTANCE;
 	
 	private final Set<Song> songs;
+	private final Set<String> styles;
+	private final String allStyles;
 	
 	private SongRepository() {
 		songs = new HashSet<Song>();
+		styles = new HashSet<String>();
+		allStyles = "Perron";
+		
+		styles.add(allStyles);
 		
 		DAOFactory.getInstance()
 			.getSongDAO()
 			.recoverAll()
-			.forEach(s -> songs.add(s));
+			.forEach(s -> {
+				songs.add(s);
+				styles.add(s.getStyle());
+			});
 	}
 	
 	/**
@@ -40,7 +49,8 @@ public enum SongRepository {
 	 * un fallo con el servidio de persistencia. {@code true} en cualquier otro
 	 * caso.
 	 */
-	public boolean addSong(String name, String author, String path, Style sty) {
+	public boolean addSong(String name, String author, String path, String sty) 
+	{
 		
 		// Creación de la canción.
 		Song song = new Song.Builder(name)
@@ -62,7 +72,9 @@ public enum SongRepository {
 		// Fallo de registro en persistencia.
 		if (!persistence) return false;
 		
-		return songs.add(song);
+		styles.add(sty);
+		songs.add(song);
+		return true;
 	}
 	
 	/**
@@ -83,18 +95,24 @@ public enum SongRepository {
 	 * @return {@code true} si la canción estaba en el repositorio y se ha
 	 * podido eliminar.
 	 */
-	public boolean removeSong(Song s) {
+	public boolean removeSong(Song song) {
 		// Comprobar que la canción está en el repositorio.
-		if (s == null || !songs.contains(s)) return false;
+		if (song == null || !songs.contains(song)) return false;
 		
 		// Eliminación de persistencia.
 		boolean persistence = DAOFactory.getInstance()
 								.getSongDAO()
-								.delete(s.asMut());
+								.delete(song.asMut());
 		
 		// Eliminación de memoria.
-		if (persistence)
-			songs.remove(s);
+		if (persistence) {
+			songs.remove(song);
+			
+			// Eliminar el estilo de la lista si no quedan canciones del mismo.
+			String style = song.getStyle();
+			if (!songs.stream().anyMatch(s -> s.getStyle().equals(style)))
+				styles.remove(style);
+		}
 		
 		return persistence;
 	}
@@ -104,22 +122,39 @@ public enum SongRepository {
 	 * 
 	 * @param name Nombre de la canción. Una cadena vacía "" se corresponde con
 	 * cualquier nombre de canción.
-	 * @param author Autor. Una cadena vacía "" se corresponde con todos los autores.
-	 * @param s Estilo de la canción. {@link Style#TODOS} se corresponde con 
-	 * todos los estilos.
+	 * @param author Autor. Una cadena vacía "" se corresponde con todos los 
+	 * autores.
+	 * @param sty Estilo de la canción. El comodín no filtrará ninguna.
 	 * 
 	 * @return Lista mutable de canciones encontrada que respeta los filtros
 	 * especificados.
 	 */
-	public List<Song> getSearch(String name, String author, Style s) {
+	public List<Song> getSearch(String name, String author, String sty) {
 		return songs.stream()
 				.filter(song -> song.getName().contains(name))
 				.filter(song -> song.getAuthor().contains(author))
 				.filter(song -> {
-					if (!s.equals(Style.TODOS))
-						return song.getStyle().equals(s);
+					if (!sty.equals(allStyles))
+						return song.getStyle().equals(sty);
 					return true;
 				})
 				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Retorna el set de estilos de las canciones del repositorio.
+	 * 
+	 * @return Set de estilos de las canciones.
+	 */
+	public Set<String> getStyles() {
+		return Collections.unmodifiableSet(styles);
+	}
+	
+	/**
+	 * Función para obtener el estilo comodín utilizado en las búsquedas
+	 * @return
+	 */
+	public String getStyleWildcard() {
+		return allStyles;
 	}
 }

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.AbstractAction;
@@ -22,8 +23,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusListener;
-import umu.tds.chord.model.Style;
 
 /**
  * Panel utilizado para la búsqueda y gestión de canciones.
@@ -43,7 +44,7 @@ final public class SearchPanel extends JPanel {
 	private JTextField interpreterFilter;
 	private JTextField titleFilter;
 	private JCheckBox favouriteFilter;
-	private JComboBox<Style> styleFilter;
+	private JComboBox<String> styleFilter;
 
 	private boolean interpreterEmpty;
 	private boolean titleEmpty;
@@ -51,6 +52,8 @@ final public class SearchPanel extends JPanel {
 	private JButton searchButton;
 	
 	private JPanel resultsPanel;
+	
+	private String currentWildcardStyle;
 	
 	/**
 	 * Constructor por defecto.
@@ -73,7 +76,7 @@ final public class SearchPanel extends JPanel {
 		initializeSearchButton();
 		initializeResultsPanel();
 		
-		registerControllerListener();
+		registerControllerListeners();
 				
 		setBorder(BorderFactory.createTitledBorder
 				(BorderFactory.createLineBorder(Color.BLACK), panelTitle));
@@ -235,8 +238,9 @@ final public class SearchPanel extends JPanel {
 	
 	private void initializeStyleFilter() {
 		
-		styleFilter = new JComboBox<Style>(Style.values());
-		styleFilter.setSelectedItem(Style.TODOS);
+		styleFilter = new JComboBox<String>();
+		
+		currentWildcardStyle = emptyFilter;
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
@@ -291,7 +295,7 @@ final public class SearchPanel extends JPanel {
 	
 	// -------- Interacción con el controlador --------
 	
-	private void registerControllerListener() {
+	private void registerControllerListeners() {
 		// Escuchar eventos para establecer la interfaz de forma acorde.
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener()
 		{
@@ -308,7 +312,21 @@ final public class SearchPanel extends JPanel {
 				
 				favouriteFilter.setSelected(false);
 
-				styleFilter.setSelectedItem(Style.TODOS);
+				styleFilter.setSelectedItem(currentWildcardStyle);
+			}
+		});
+				
+		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
+		
+			// Establecer las opciones del filtro de estilo.
+			@Override
+			public void onStyleList(Set<String> styles, String wildcard) {
+				
+				currentWildcardStyle = wildcard;
+		
+				styleFilter.removeAllItems();
+				styles.forEach(s -> styleFilter.addItem(s));
+				styleFilter.setSelectedItem(currentWildcardStyle);
 			}
 		});
 	}
@@ -321,9 +339,9 @@ final public class SearchPanel extends JPanel {
 		String author = emptyFilter;
 		if (!interpreterEmpty) author = interpreterFilter.getText();
 		
+		String style = (String) styleFilter.getSelectedItem();
+	
 		boolean favourite = favouriteFilter.isSelected();
-		
-		Style style = (Style) styleFilter.getSelectedItem();
 		
 		// Búsqueda.
 		Controller.INSTANCE.searchSongs(name, author, favourite, style);

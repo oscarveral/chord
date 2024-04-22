@@ -8,11 +8,11 @@ import java.util.Optional;
  * localizada y reproducida.
  */
 public sealed abstract class Song implements Mutable<Song.Internal> {
-
+	
 	private final String name;
 	private final String author;
 	private final String path;
-	private final Style style;
+	private final String style;
 	
 	/**
 	 * Constructor de canciones.
@@ -22,7 +22,7 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 		private String name;
 		private String author;
 		private String path;
-		private Style style;
+		private String style;
 	
 		/**
 		 * Crea un nuevo builder de canciones estableciendo el nombre de la
@@ -62,13 +62,13 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 		}
 		
 		/**
-		 * Establece el estilo de la canción. Véase {@link Style}.
+		 * Establece el estilo de la canción.
 		 * 
 		 * @param style Estilo de la canción.
 		 * 
 		 * @return Instancia actual del builder.
 		 */
-		public Builder style(Style style) {
+		public Builder style(String style) {
 			this.style = style;
 			return this;
 		}
@@ -141,9 +141,9 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 	/**
 	 * Método para obtener el estilo musical de la canción.
 	 * 
-	 * @return Estilo musical de la canción. Véase {@link Style}.
+	 * @return Estilo musical de la canción.
 	 */
-	public Style getStyle() {
+	public String getStyle() {
 		return style;
 	}
 	
