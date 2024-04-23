@@ -1,7 +1,6 @@
 package umu.tds.chord.component;
 
 import java.util.EventListener;
-import java.util.EventObject;
 
 /**
  * Listener que permite la escucha de eventos de carga de canciones.
@@ -14,6 +13,6 @@ public interface CancionesListener extends EventListener {
 	 * 
 	 * @param e Evento producido.
 	 */
-	public void nuevasCanciones(EventObject e);
+	public void nuevasCanciones(CancionesEvent e);
 	
 }

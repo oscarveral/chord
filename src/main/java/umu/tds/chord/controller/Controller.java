@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import umu.tds.chord.component.BuscadorCanciones;
+import umu.tds.chord.component.Canciones;
+import umu.tds.chord.component.CancionesEvent;
+import umu.tds.chord.component.CancionesListener;
+import umu.tds.chord.component.CargadorCanciones;
 import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
 import umu.tds.chord.model.User;
@@ -29,11 +34,35 @@ public enum Controller {
 	private Optional<User> currentUser;
 	private Set<UserStatusListener> userStatusListeners;
 	private Set<SongStatusListener> songStatusListeners;
+	private BuscadorCanciones buscadorCanciones;
 	
 	private Controller() {
 		currentUser = Optional.empty();
 		userStatusListeners = new HashSet<UserStatusListener>();
 		songStatusListeners = new HashSet<SongStatusListener>();
+		
+		initializeBuscadorCanciones();
+	}
+	
+	private void initializeBuscadorCanciones() {
+		// Establecer el buscador utilizado y añadir listener
+		// para el procesamineto.
+		buscadorCanciones = CargadorCanciones.INSTANCE;
+		buscadorCanciones.addCancionesListener(new CancionesListener() {
+			
+			@Override
+			public void nuevasCanciones(CancionesEvent e) {
+				Canciones c = e.getCanciones();
+				// Añadir las canciones al repositorio.
+				c.getCancion().forEach(s -> {
+					String name = s.getTitulo();
+					String author = s.getInterprete();
+					String url = s.getURL();
+					String style = s.getEstilo();
+					SongRepository.INSTANCE.addSong(name, author, url, style);
+				});
+			}
+		});
 	}
 	
 	/**
@@ -149,6 +178,15 @@ public enum Controller {
 		
 		// Pasar la infomración a los escuchadores interesados.
 		songStatusListeners.forEach(l -> l.onSongSearch(searched));
+	}
+	
+	/**
+	 * Método para iniciar la carga de canciones a partir de un fichero.
+	 * 
+	 * @param fichero Fichero que describe las canciones que cargar.
+	 */
+	public void cargarCanciones(String fichero) {
+		buscadorCanciones.setArchivoCanciones(fichero);
 	}
 	
 	/**
