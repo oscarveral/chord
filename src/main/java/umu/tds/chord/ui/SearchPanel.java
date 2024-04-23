@@ -41,8 +41,8 @@ final public class SearchPanel extends JPanel {
 			"Unexpected change on properties for documment listener: ";
 	private static final String emptyFilter = "";
 
-	private JTextField interpreterFilter;
 	private JTextField titleFilter;
+	private JTextField interpreterFilter;
 	private JCheckBox favouriteFilter;
 	private JComboBox<String> styleFilter;
 
@@ -51,7 +51,7 @@ final public class SearchPanel extends JPanel {
 	
 	private JButton searchButton;
 	
-	private JPanel resultsPanel;
+	private ResultsPanel resultsPanel;
 	
 	private String currentWildcardStyle;
 	
@@ -69,8 +69,8 @@ final public class SearchPanel extends JPanel {
 		
 		setLayout(layout);
 		
-		initializeInterpreterFilter();
 		initializeTitleFilter();
+		initializeInterpreterFilter();
 		initializeFavouriteFilter();
 		initializeStyleFilter();
 		initializeSearchButton();
@@ -80,6 +80,68 @@ final public class SearchPanel extends JPanel {
 				
 		setBorder(BorderFactory.createTitledBorder
 				(BorderFactory.createLineBorder(Color.BLACK), panelTitle));
+	}
+	
+	private void initializeTitleFilter() {
+		
+		titleEmpty = true;
+		titleFilter = new JTextField(titleFilterText);
+		titleFilter.setForeground(Color.GRAY);
+		
+		// Hacer más bonita la interfaz.
+		titleFilter.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (titleEmpty) {
+					titleEmpty = false;
+					titleFilter.setText(titleFilterText);
+					titleFilter.setForeground(Color.GRAY);
+					titleEmpty = true;
+				}
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (titleEmpty) {
+					titleFilter.setText(null);
+					titleFilter.setForeground(Color.BLACK);
+				}
+			}
+		});
+		titleFilter.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				if (titleFilter.getText().isEmpty()) {
+					titleEmpty = true;
+				}
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if (titleEmpty) {
+					titleEmpty = false;
+				}
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				throw new RuntimeException
+					(documentPropertyChangeErrorMsg + titleFilterText);
+			}
+		});
+		
+		titleFilter.addActionListener(e -> search());
+		
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		constraints.insets = new Insets(5, 10, 0, 5);
+		
+		add(titleFilter, constraints);
 	}
 	
 	private void initializeInterpreterFilter() {
@@ -139,75 +201,13 @@ final public class SearchPanel extends JPanel {
 		interpreterFilter.addActionListener(e -> search());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.weightx = 1.0;
-		constraints.insets = new Insets(5, 10, 0, 5);
-		
-		add(interpreterFilter, constraints);	
-	}
-	
-	private void initializeTitleFilter() {
-		
-		titleEmpty = true;
-		titleFilter = new JTextField(titleFilterText);
-		titleFilter.setForeground(Color.GRAY);
-		
-		// Hacer más bonita la interfaz.
-		titleFilter.addFocusListener(new FocusListener() {
-			
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (titleEmpty) {
-					titleEmpty = false;
-					titleFilter.setText(titleFilterText);
-					titleFilter.setForeground(Color.GRAY);
-					titleEmpty = true;
-				}
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				if (titleEmpty) {
-					titleFilter.setText(null);
-					titleFilter.setForeground(Color.BLACK);
-				}
-			}
-		});
-		titleFilter.getDocument().addDocumentListener(new DocumentListener() {
-			
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				if (titleFilter.getText().isEmpty()) {
-					titleEmpty = true;
-				}
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				if (titleEmpty) {
-					titleEmpty = false;
-				}
-			}
-			
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				throw new RuntimeException
-					(documentPropertyChangeErrorMsg + titleFilterText);
-			}
-		});
-		
-		titleFilter.addActionListener(e -> search());
-		
-		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
 		constraints.insets = new Insets(5, 5, 0, 10);
 		
-		add(titleFilter, constraints);
+		add(interpreterFilter, constraints);	
 	}
 	
 	private void initializeFavouriteFilter() {
@@ -274,14 +274,14 @@ final public class SearchPanel extends JPanel {
 		constraints.gridy = 2;
 		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(10, 10, 10, 10);
+		constraints.insets = new Insets(10, 10, 5, 10);
 		
 		add(searchButton, constraints);
 	}
 	
 	private void initializeResultsPanel() {
 		
-		resultsPanel = new JPanel();
+		resultsPanel = new ResultsPanel();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -289,7 +289,10 @@ final public class SearchPanel extends JPanel {
 		constraints.gridwidth = 2;
 		constraints.weightx = 1.0;
 		constraints.weighty = 1.0;
-		
+		constraints.fill = GridBagConstraints.BOTH;
+		constraints.insets = new Insets(5, 10, 10, 10);
+		constraints.anchor = GridBagConstraints.PAGE_END;
+
 		add(resultsPanel, constraints);
 	}
 	
