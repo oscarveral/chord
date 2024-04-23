@@ -159,13 +159,13 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 		
 		Song song = (Song) obj;
 		
-		if (this.name != song.name)
+		if (!this.name.equals(song.name))
 			return false;
-		if (this.author != song.author)
+		if (!this.author.equals(song.author))
 			return false;
-		if (this.path != song.path)
+		if (!this.path.equals(song.path))
 			return false;
-		if (this.style != song.style)
+		if (!this.style.equals(song.style))
 			return false;
 		if (this.asMut().id != song.asMut().id)
 			return false;
