@@ -189,7 +189,7 @@ public enum Controller {
 		// Buscar y eliminar las que no coincidan con el filtro de favorito.
 		List<Song> searched = SongRepository.INSTANCE.getSearch(n, a, s);
 		searched.removeIf(song -> 
-			!currentUser.get().getFavouriteSongs().contains(song)
+			currentUser.get().getFavouriteSongs().contains(song) != f
 		);
 		
 		// Pasar la infomración a los escuchadores interesados.
