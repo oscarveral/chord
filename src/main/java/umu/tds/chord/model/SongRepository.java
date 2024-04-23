@@ -131,8 +131,14 @@ public enum SongRepository {
 	 */
 	public List<Song> getSearch(String name, String author, String sty) {
 		return songs.stream()
-				.filter(song -> song.getName().contains(name))
-				.filter(song -> song.getAuthor().contains(author))
+				.filter(song -> 
+					song.getName()
+						.toLowerCase()
+						.contains(name.toLowerCase()))
+				.filter(song -> 
+					song.getAuthor()
+						.toLowerCase()
+						.contains(author.toLowerCase()))
 				.filter(song -> {
 					if (!sty.equals(allStyles))
 						return song.getStyle().equals(sty);
