@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.base.Objects;
+
 /**
  * Clase abstracta que representa una playlist. Expone sólo métodos de lectura
  * de datos.
@@ -229,10 +231,14 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal>
 			
 			Internal playlist = (Internal) obj;
 			
-			if (this.id != playlist.id)
-				return false;
-			
-			return true;
+			// Librería helper de Google
+			return Objects.equal(this.id, playlist.id);
+		}
+		
+		@Override
+		public int hashCode() {
+			// Librería helper de Google
+			return Objects.hashCode(this.id);
 		}
 	}
 }

@@ -2,6 +2,8 @@ package umu.tds.chord.model;
 
 import java.util.Optional;
 
+import com.google.common.base.Objects;
+
 /**
  * Clase que representa a las canciones dentro de la aplicación. Mantienen 
  * almacenada la ruta al fichero con dicha canción para que pueda ser 
@@ -149,28 +151,26 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 	
 	@Override
 	public boolean equals(Object obj) {
-		
 		if (obj == null)
 			return false;
 		if (this == obj)
 			return true;
-		if (this.getClass() != obj.getClass())
+		if (!this.getClass().equals(obj.getClass()))
 			return false;
 		
 		Song song = (Song) obj;
-		
-		if (!this.name.equals(song.name))
-			return false;
-		if (!this.author.equals(song.author))
-			return false;
-		if (!this.path.equals(song.path))
-			return false;
-		if (!this.style.equals(song.style))
-			return false;
-		if (this.asMut().id != song.asMut().id)
-			return false;
-		
-		return true;
+				
+		// Uso del helper de Google.
+		return Objects.equal(this.name, song.name) &&
+				Objects.equal(this.author, song.author) &&
+				Objects.equal(this.path, song.path) &&
+				Objects.equal(this.style, song.style);
+	}
+	
+	@Override
+	public int hashCode() {
+		// Helper de la libreria de Google.
+		return Objects.hashCode(this.name, this.author, this.path, this.style);
 	}
 	
 	/**
