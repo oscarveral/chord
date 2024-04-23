@@ -15,6 +15,7 @@ public enum CargadorCanciones implements BuscadorCanciones{
 	
 	private CargadorCanciones() {
 		archivoCanciones = Optional.empty();
+		listeners = new Vector<CancionesListener>();
 	}
 	
 	/**
