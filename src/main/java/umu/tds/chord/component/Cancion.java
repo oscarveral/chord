@@ -5,6 +5,7 @@
 // Generado el: 2017.10.26 a las 12:42:42 AM CEST 
 //
 
+
 package umu.tds.chord.component;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,7 +43,7 @@ import javax.xml.bind.annotation.XmlType;
     "estilo",
     "interprete"
 })
-public final class Cancion {
+public class Cancion {
 
     @XmlElement(name = "URL", required = true)
     protected String url;

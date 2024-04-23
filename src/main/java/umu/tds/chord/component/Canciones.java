@@ -5,6 +5,7 @@
 // Generado el: 2017.10.26 a las 12:42:42 AM CEST 
 //
 
+
 package umu.tds.chord.component;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
     "cancion"
 })
 @XmlRootElement(name = "canciones")
-public final class Canciones {
+public class Canciones {
 
     protected List<Cancion> cancion;
 
