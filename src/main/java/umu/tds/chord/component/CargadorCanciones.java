@@ -30,10 +30,7 @@ public enum CargadorCanciones implements BuscadorCanciones{
 		if (!archivoCanciones.isPresent()) return;
 		
 		Canciones canciones = MapperCancionesXMLtoJava
-								.cargarCanciones(archivoCanciones.get());
-		
-		if (canciones == null) return;
-		
+				.cargarCanciones(archivoCanciones.get());
 		CancionesEvent e = new CancionesEvent(this, canciones);
 		notificarCargaCanciones(e);
 	}

@@ -1,6 +1,7 @@
 package umu.tds.chord.component;
 
 import java.util.EventObject;
+import java.util.Optional;
 
 /**
  * Evento que representa la carga de una nueva lista de canciones.
@@ -9,7 +10,7 @@ public final class CancionesEvent extends EventObject {
 	
 	private static final long serialVersionUID = 2550233816129020392L;
 	
-	private Canciones canciones;
+	private Optional<Canciones> canciones;
 	
 	/**
 	 * Contructor del evento.
@@ -19,7 +20,7 @@ public final class CancionesEvent extends EventObject {
 	 */
 	public CancionesEvent(Object fuente, Canciones canciones) {
 		super(fuente);
-		this.canciones = canciones;
+		this.canciones = Optional.ofNullable(canciones);
 	}
 	
 	/**
@@ -27,7 +28,7 @@ public final class CancionesEvent extends EventObject {
 	 * 
 	 * @return canciones que se han cargado.
 	 */
-	public Canciones getCanciones() {
+	public Optional<Canciones> getCanciones() {
 		return canciones;
 	}
 }

@@ -24,7 +24,7 @@ public enum SongRepository {
 	private SongRepository() {
 		songs = new HashSet<Song>();
 		styles = new HashSet<String>();
-		allStyles = "Perron";
+		allStyles = "Todos";
 		
 		styles.add(allStyles);
 		

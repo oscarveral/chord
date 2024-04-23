@@ -8,18 +8,29 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.EventObject;
 
 import javax.swing.Action;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 
+import pulsador.EncendidoEvent;
+import pulsador.IEncendidoListener;
+import pulsador.Luz;
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.model.User;
 
@@ -42,12 +53,21 @@ public final class MainPanel extends JPanel{
 	private static final String searchTag = "search";
 	private static final String invalidFrontendEventOnUtilityPanel = 
 			"The utility panel sended an invalid event on this frontend: ";
+	private static final String fileExtensionDesc = "Fichero XML (*.xml)";
+	private static final String fileExtension = ".xml";
+	private static final String openFileDialogTitle = "Abrir fichero de carga";
+	private static final String badFormatFile = 
+			"El fichero proporcionado no sigue el esquema XML adecuado";
+	private static final String errorLoadFile = "Error de carga de canciones";
 	
 	private JPanel userPanel;
 	private JLabel userName;
 	private JButton logoutButton;
 	private JButton deleteAccButton;
 	private JToggleButton premiumToggle;
+	
+	private Luz pulsadorCarga;
+	private JFileChooser fileChooser;
 	
 	private UtilityPanel utilityPanel;
 	
@@ -74,7 +94,7 @@ public final class MainPanel extends JPanel{
 		initializeUtilityPanel();
 		initializeUserPanel();
 		
-		registerControllerListener();
+		registerControllerListeners();
 				
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));		
 	}
@@ -152,13 +172,21 @@ public final class MainPanel extends JPanel{
 				new GridBagConstraints();
 		deleteAccButtonConstraints.gridx = 3;
 		deleteAccButtonConstraints.gridy = 0;
-		deleteAccButtonConstraints.insets = new Insets(0, 5, 10, 10);
+		deleteAccButtonConstraints.insets = new Insets(0, 5, 10, 5);
 		deleteAccButtonConstraints.fill = GridBagConstraints.BOTH;
+		
+		GridBagConstraints pulsadorCargaConstraints = 
+				new GridBagConstraints();
+		pulsadorCargaConstraints.gridx = 4;
+		pulsadorCargaConstraints.gridy = 0;
+		pulsadorCargaConstraints.insets = new Insets(0, 5, 10, 10);
+		pulsadorCargaConstraints.fill = GridBagConstraints.BOTH;
 		
 		initializeUserName();
 		initializePremiumToggle();
 		initializeLogoutButton();
 		initializeDeleteAccButton();
+		initializePulsdadorCarga();
 		
 		userPanel = new JPanel(userPanelLayout);
 		userPanel.setBorder(BorderFactory.createTitledBorder
@@ -167,6 +195,7 @@ public final class MainPanel extends JPanel{
 		userPanel.add(premiumToggle, premiumToggleConstraints);
 		userPanel.add(logoutButton, logoutButtonConstraints);
 		userPanel.add(deleteAccButton, deleteAccButtonConstraints);
+		userPanel.add(pulsadorCarga, pulsadorCargaConstraints);
 		
 		add(userPanel, BorderLayout.PAGE_START);
 	}
@@ -233,9 +262,56 @@ public final class MainPanel extends JPanel{
 			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), deleteAccButtonText);
 	}
 	
+	private void initializePulsdadorCarga() {
+		
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+		fileChooser = new JFileChooser();
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileHidingEnabled(false);
+		fileChooser.setDialogTitle(openFileDialogTitle);
+		fileChooser.setFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return fileExtensionDesc;
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory()) return true;
+				String filename = f.getName().toLowerCase();
+				return filename.endsWith(fileExtension);
+			}
+		});
+		
+		pulsadorCarga = new Luz();
+		pulsadorCarga.addEncendidoListener(new IEncendidoListener() {
+			
+			@Override
+			public void enteradoCambioEncendido(EventObject arg0) {
+				EncendidoEvent e = (EncendidoEvent) arg0;
+				// Un cambio de encendido debe permitir solicitar la carga
+				// de nuevas canciones.
+				if (e.getNewEncendido() != e.getOldEncendido()) {
+					int res = fileChooser.showOpenDialog(userPanel.getParent());
+					if (res == JFileChooser.APPROVE_OPTION) {
+						// Obtener la ruta del fichero seleccionado.
+						File f = fileChooser.getSelectedFile();
+						try {
+							String path = f.getCanonicalPath();
+							cargarCanciones(path);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			}
+		});
+	}
+		
 	// -------- Interacción con el controlador --------
 	
-	private void registerControllerListener() {
+	private void registerControllerListeners() {
 		// Escuchar eventos para establecer la interfaz de forma acorde.
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener()
 		{
@@ -259,6 +335,18 @@ public final class MainPanel extends JPanel{
 				premiumToggle.setSelected(premium);
 			}
 		});
+		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener()
+		{
+			@Override
+			public void onSongLoadFailure() {
+				JOptionPane.showMessageDialog(
+						userPanel.getParent(), 
+						badFormatFile,
+			            errorLoadFile, 
+			            JOptionPane.ERROR_MESSAGE
+			    );
+			}
+		});
 	}
 	
 	private void logout() {
@@ -271,5 +359,9 @@ public final class MainPanel extends JPanel{
 	
 	private void togglePremium() {
 		Controller.INSTANCE.togglePremium();
+	}
+
+	private void cargarCanciones(String path) {
+		Controller.INSTANCE.cargarCanciones(path);
 	}
 }

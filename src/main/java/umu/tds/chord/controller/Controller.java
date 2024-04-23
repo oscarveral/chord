@@ -41,10 +41,6 @@ public enum Controller {
 		userStatusListeners = new HashSet<UserStatusListener>();
 		songStatusListeners = new HashSet<SongStatusListener>();
 		
-		initializeBuscadorCanciones();
-	}
-	
-	private void initializeBuscadorCanciones() {
 		// Establecer el buscador utilizado y añadir listener
 		// para el procesamineto.
 		buscadorCanciones = CargadorCanciones.INSTANCE;
@@ -52,16 +48,42 @@ public enum Controller {
 			
 			@Override
 			public void nuevasCanciones(CancionesEvent e) {
-				Canciones c = e.getCanciones();
-				// Añadir las canciones al repositorio.
-				c.getCancion().forEach(s -> {
-					String name = s.getTitulo();
-					String author = s.getInterprete();
-					String url = s.getURL();
-					String style = s.getEstilo();
-					SongRepository.INSTANCE.addSong(name, author, url, style);
-				});
+				processSongData(e.getCanciones());
 			}
+		});
+	}
+	
+	private void processSongData(Optional<Canciones> c) {
+		// Notificar de fallo si lo hubo.
+		if(!c.isPresent()) {
+			songStatusListeners.forEach(l -> l.onSongLoadFailure());
+			return;
+		}
+		// Añadir las canciones al repositorio.
+		Canciones canciones = c.get();
+		canciones.getCancion().forEach(s -> {
+			String name = s.getTitulo();
+			String author = s.getInterprete();
+			String url = s.getURL();
+			String style = s.getEstilo();
+			SongRepository.INSTANCE
+				.addSong(name, author, url, style);
+		});
+		// Reenviar los datos de las canciones.
+		sendSongData();
+	}
+	
+	private void sendSongData() {
+		// Función que envía información de las canciones a los 
+		// listeners interesados.
+		songStatusListeners.forEach(l -> {
+			l.onSongList(
+				SongRepository.INSTANCE.getSongs()
+			);
+			l.onStyleList(
+				SongRepository.INSTANCE.getStyles(),
+				SongRepository.INSTANCE.getStyleWildcard()
+			);
 		});
 	}
 	
@@ -70,13 +92,7 @@ public enum Controller {
 	 * lista para funcionar y cargar datos.
 	 */
 	public void ready() {
-		// Enviar datos de estilos.
-		songStatusListeners.forEach(l -> {
-			l.onStyleList(
-				SongRepository.INSTANCE.getStyles(), 
-				SongRepository.INSTANCE.getStyleWildcard()
-			);	
-		});
+		sendSongData();
 	}
 	
 	/**

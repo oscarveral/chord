@@ -27,4 +27,18 @@ public interface SongStatusListener extends EventListener{
 	 */
 	default public void onStyleList(Set<String> styles, String wildcard) {
 	}
+	
+	/**
+	 * Método emitido cuando ha cambiado la lista de canciones.
+	 * 
+	 * @param songs Conjunto nuevo de canciones.
+	 */
+	default public void onSongList(Set<Song> songs) {
+	}
+	
+	/**
+	 * Método emitido si ocurre un fallo de carga de canciones nuevas.
+	 */
+	default public void onSongLoadFailure() {
+	}
 }
