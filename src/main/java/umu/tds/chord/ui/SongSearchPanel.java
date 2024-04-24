@@ -12,7 +12,6 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -33,7 +32,7 @@ final public class SongSearchPanel extends JPanel {
 
 	private static final long serialVersionUID = 2422691492816036797L;
 	
-	private static final String panelTitle = "Buscar";
+	private static final String searchText = "Buscar";
 	private static final String interpreterFilterText = "Intérprete";
 	private static final String titleFilterText = "Título";
 	private static final String favouriteText = "Favoritos";
@@ -77,9 +76,6 @@ final public class SongSearchPanel extends JPanel {
 		initializeResultsPanel();
 		
 		registerControllerListeners();
-				
-		setBorder(BorderFactory.createTitledBorder
-				(BorderFactory.createLineBorder(Color.BLACK), panelTitle));
 	}
 	
 	private void initializeTitleFilter() {
@@ -276,11 +272,11 @@ final public class SongSearchPanel extends JPanel {
 			}
 		};
 		
-		searchButton = new JButton(panelTitle);
+		searchButton = new JButton(searchText);
 		searchButton.addActionListener(action);
-		searchButton.getActionMap().put(panelTitle, action); 
+		searchButton.getActionMap().put(searchText, action); 
 		searchButton.getInputMap().put
-			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), panelTitle);
+			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), searchText);
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;

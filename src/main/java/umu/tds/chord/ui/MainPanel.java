@@ -73,7 +73,7 @@ public final class MainPanel extends JPanel{
 	
 	private JPanel centerContainer;
 	private CardLayout centerLayout;
-	private SongSearchPanel searchPanel;
+	private SearchContainerPanel searchPanel;
 	
 	/**
 	 * Constructor por defecto.
@@ -100,7 +100,7 @@ public final class MainPanel extends JPanel{
 	}
 	
 	private void initializeCenterContainer() {
-		searchPanel = new SongSearchPanel();
+		searchPanel = new SearchContainerPanel();
 		
 		centerLayout = new CardLayout();
 		centerContainer = new JPanel(centerLayout);
