@@ -1,6 +1,8 @@
 package umu.tds.chord.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +34,17 @@ public enum Controller {
 	INSTANCE;
 	
 	private Optional<User> currentUser;
+	private List<Song> selectedSongs;
+	
 	private Set<UserStatusListener> userStatusListeners;
 	private Set<SongStatusListener> songStatusListeners;
+	
 	private BuscadorCanciones buscadorCanciones;
 	
 	private Controller() {
 		currentUser = Optional.empty();
+		selectedSongs = new ArrayList<Song>();
+		
 		userStatusListeners = new HashSet<UserStatusListener>();
 		songStatusListeners = new HashSet<SongStatusListener>();
 		
@@ -83,6 +90,9 @@ public enum Controller {
 			l.onStyleList(
 				SongRepository.INSTANCE.getStyles(),
 				SongRepository.INSTANCE.getStyleWildcard()
+			);
+			l.onSongSelection(
+				Collections.unmodifiableList(selectedSongs)
 			);
 		});
 	}
@@ -214,6 +224,42 @@ public enum Controller {
 		// Pasar la infomración a los escuchadores interesados.
 		songStatusListeners.forEach(l -> {
 			l.onSongSearch(searched, f);
+		});
+	}
+	
+	/**
+	 * Establece la selección actual de canciones sobre las que se podrán 
+	 * realizar operaciones.
+	 * 
+	 * @param s Lista de canciones que se desea que sea la selección actual.
+	 */
+	public void selectSongs(List<Song> list) {
+		// Cargar nueva selección.
+		selectedSongs.clear();
+		selectedSongs.addAll(list);
+		// Avisar a los interesados.
+		songStatusListeners.forEach(l -> 
+			l.onSongSelection(Collections.unmodifiableList(selectedSongs))
+		);
+	}
+	
+	/**
+	 * Elimina la selección actual de canciones del repositorio.
+	 */
+	public void removeSelectedSongs() {
+		// Eliminar canciones.
+		selectedSongs.forEach(s -> {
+			SongRepository.INSTANCE.removeSong(s);
+		});
+		// Limpiar la selección.
+		selectedSongs.clear();
+		// Reenviar datos de canciones actualizados.
+		sendSongData();
+		// Reenviar canciones favoritas. Han podido cambiar.
+		currentUser.ifPresent(u -> {
+			userStatusListeners.forEach(l -> 
+				l.onFavouritesChange(u.getFavouriteSongs())
+			);
 		});
 	}
 	

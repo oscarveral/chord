@@ -89,7 +89,9 @@ public enum SongRepository {
 	}
 	
 	/**
-	 * Elimina la canción y su información aosicada.
+	 * Elimina la canción y su información aosicada. Se mantiene la consistencia
+	 * con los datos de los usuarios, eliminandose de sus playlists y de sus
+	 * listas de canciones favoritas.
 	 * 
 	 * @param s Canción que se desea eliminar.
 	 * 
@@ -109,6 +111,9 @@ public enum SongRepository {
 		if (persistence) {
 			songs.remove(song);
 			
+			// Eliminar referencias a la canción de todos los usuarios.
+			removeSongFromUsers(song);
+			
 			// Eliminar el estilo de la lista si no quedan canciones del mismo.
 			String style = song.getStyle();
 			if (!songs.stream().anyMatch(s -> s.getStyle().equals(style)))
@@ -116,6 +121,25 @@ public enum SongRepository {
 		}
 		
 		return persistence;
+	}
+	
+	private void removeSongFromUsers(Song s) {
+		// Método de sincronización de las canciones de los usuarios.
+		UserRepository.INSTANCE.getUsers()
+			.stream()
+			.map(u -> u.asMut())
+			.forEach(u -> {
+				// Para cada usuario eliminamos la canción de favoritos.
+				u.removeFavouriteSong(s);
+				u.getPlaylists()
+					.stream()
+					.map(p -> p.asMut())
+					// Eliminamos la canción de todas las playlists.
+					.forEach(p -> {
+						p.removeSong(s);
+					});
+				UserRepository.INSTANCE.updateUser(u);
+			});
 	}
 	
 	/**

@@ -9,7 +9,8 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+
+import umu.tds.chord.controller.Controller;
 
 /**
  * Panel conenedor de búsqueda de canciones utilizado para la gestión de 
@@ -27,8 +28,12 @@ public final class SearchContainerPanel extends JPanel {
 	private JPanel buttonsPanel;
 	private JButton deleteButton;
 	
+	/**
+	 * Constructor por defecto.
+	 */
 	public SearchContainerPanel() {
-		
+		super();
+		// Se llama sólo al método de inicialización.
 		initialize();
 	}
 	
@@ -59,6 +64,8 @@ public final class SearchContainerPanel extends JPanel {
 	
 	private void initializeDeleteButton() {
 		deleteButton = new JButton(deleteText);
+		
+		deleteButton.addActionListener(e -> deleteSelectedSongs());
 	
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -68,5 +75,11 @@ public final class SearchContainerPanel extends JPanel {
 		constraints.fill = GridBagConstraints.BOTH;
 		
 		buttonsPanel.add(deleteButton, constraints);
+	}
+	
+	// -------- Interacción con el controlador --------
+	
+	private void deleteSelectedSongs() {
+		Controller.INSTANCE.removeSelectedSongs();
 	}
 }

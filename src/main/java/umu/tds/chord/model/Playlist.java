@@ -187,8 +187,8 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal>
 		 * 
 		 * @return Canción eliminada de la lista.
 		 */
-		public Song removeSong(int index) {
-			return super.songs.remove(index);
+		public boolean removeSong(Song song) {
+			return super.songs.remove(song);
 		}
 		
 		/**

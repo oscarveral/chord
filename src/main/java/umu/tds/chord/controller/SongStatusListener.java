@@ -30,6 +30,14 @@ public interface SongStatusListener extends EventListener{
 	}
 	
 	/**
+	 * Método emitido cuando se ha seleccionado una lista de canciones.
+	 * 
+	 * @param songs Lista de canciones que se ha seleccionado.
+	 */
+	default public void onSongSelection(List<Song> songs) {
+	}
+	
+	/**
 	 * Método emitido cuando ha cambiado la lista de canciones.
 	 * 
 	 * @param songs Conjunto nuevo de canciones.

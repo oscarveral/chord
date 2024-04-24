@@ -1,6 +1,8 @@
 package umu.tds.chord.model;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -148,5 +150,14 @@ public enum UserRepository {
 			users.remove(u.getUserName());
 		
 		return persistence;
+	}
+	
+	/**
+	 * Método para obtener la lista completa de usuarios.
+	 * 
+	 * @return Lista no modificable de usuarios.
+	 */
+	protected Collection<User> getUsers() {
+		return Collections.unmodifiableCollection(users.values());
 	}
 }

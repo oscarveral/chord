@@ -8,6 +8,9 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import umu.tds.chord.controller.Controller;
@@ -56,6 +59,29 @@ public final class SearchResultsPanel extends JPanel{
 		datos= new SongTableModel();
 		songTable = new JTable(datos);
 		songTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+		
+		// Listener para la selección de canciones.
+		songTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+
+				// Evitar doble selección.
+				if (e.getValueIsAdjusting()) return;
+				
+				// Obtenemos las canciones seleccionadas.
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				List<Song> selected = new ArrayList<Song>();
+				
+				if (!lsm.isSelectionEmpty())
+					for (int i : lsm.getSelectedIndices()) {
+						Song s = datos.getSongList().get(i);
+						selected.add(s);
+					}
+					
+				selectSong(selected);
+			}
+		});
 		
 		// Lo incluimos todo dentro de un panel deslizable.
 		JScrollPane scrollPane = new JScrollPane(
@@ -116,6 +142,10 @@ public final class SearchResultsPanel extends JPanel{
 	
 	private void toggleFavourite(Song s) {
 		Controller.INSTANCE.toggleFavourite(s);
+	}
+	
+	private void selectSong(List<Song> l) {
+		Controller.INSTANCE.selectSongs(l);
 	}
 	
 	// -------- Modelo de datos de la tabla --------
