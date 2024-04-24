@@ -175,6 +175,24 @@ public enum Controller {
 	}
 	
 	/**
+	 * Cambia el estado de favorito de la canción dada.
+	 * 
+	 * @param s Canción para la que se desea cambiar el estado de favorito.
+	 */
+	public void toggleFavourite(Song s) {
+		currentUser.ifPresent(u -> {
+			boolean isFavourite = u.getFavouriteSongs().contains(s);
+			// Modificar la lista de favoritos.
+			if (isFavourite) u.asMut().removeFavouriteSong(s);
+			else u.asMut().addFavouriteSong(s);
+			// Avisar a interesados.
+			userStatusListeners.forEach(l -> 
+				l.onFavouritesChange(u.getFavouriteSongs())
+			);
+		});
+	}
+	
+	/**
 	 * Realiza una búsqueda de canciones a partir de los filtros proporcionados.
 	 * 
 	 * @param n Nombre de la canción.
@@ -188,12 +206,15 @@ public enum Controller {
 		
 		// Buscar y eliminar las que no coincidan con el filtro de favorito.
 		List<Song> searched = SongRepository.INSTANCE.getSearch(n, a, s);
-		searched.removeIf(song -> 
-			currentUser.get().getFavouriteSongs().contains(song) != f
+		// Si se buscan favoritas eliminar las no favoritas.
+		if (f) searched.removeIf(song -> 
+			!currentUser.get().getFavouriteSongs().contains(song)
 		);
-		
+				
 		// Pasar la infomración a los escuchadores interesados.
-		songStatusListeners.forEach(l -> l.onSongSearch(searched));
+		songStatusListeners.forEach(l -> {
+			l.onSongSearch(searched, f);
+		});
 	}
 	
 	/**

@@ -29,7 +29,7 @@ import umu.tds.chord.controller.UserStatusListener;
 /**
  * Panel utilizado para la búsqueda y gestión de canciones.
  */
-final public class SearchPanel extends JPanel {
+final public class SongSearchPanel extends JPanel {
 
 	private static final long serialVersionUID = 2422691492816036797L;
 	
@@ -51,14 +51,14 @@ final public class SearchPanel extends JPanel {
 	
 	private JButton searchButton;
 	
-	private ResultsPanel resultsPanel;
+	private SearchResultsPanel resultsPanel;
 	
 	private String currentWildcardStyle;
 	
 	/**
 	 * Constructor por defecto.
 	 */
-	public SearchPanel() {
+	public SongSearchPanel() {
 		super();
 		// Sólo se llama al método de inicialización.
 		initialize();
@@ -99,6 +99,7 @@ final public class SearchPanel extends JPanel {
 					titleFilter.setForeground(Color.GRAY);
 					titleEmpty = true;
 				}
+				search();
 			}
 			
 			@Override
@@ -107,6 +108,7 @@ final public class SearchPanel extends JPanel {
 					titleFilter.setText(null);
 					titleFilter.setForeground(Color.BLACK);
 				}
+				search();
 			}
 		});
 		titleFilter.getDocument().addDocumentListener(new DocumentListener() {
@@ -116,6 +118,7 @@ final public class SearchPanel extends JPanel {
 				if (titleFilter.getText().isEmpty()) {
 					titleEmpty = true;
 				}
+				search();
 			}
 			
 			@Override
@@ -123,6 +126,7 @@ final public class SearchPanel extends JPanel {
 				if (titleEmpty) {
 					titleEmpty = false;
 				}
+				search();
 			}
 			
 			@Override
@@ -161,6 +165,7 @@ final public class SearchPanel extends JPanel {
 					interpreterFilter.setForeground(Color.GRAY);
 					interpreterEmpty = true;
 				}
+				search();
 			}
 			
 			@Override
@@ -169,6 +174,7 @@ final public class SearchPanel extends JPanel {
 					interpreterFilter.setText(null);
 					interpreterFilter.setForeground(Color.BLACK);
 				}
+				search();
 			}
 		});
 		interpreterFilter.getDocument().addDocumentListener
@@ -180,6 +186,7 @@ final public class SearchPanel extends JPanel {
 					if (interpreterFilter.getText().isEmpty()) {
 						interpreterEmpty = true;
 					}
+					search();
 				}
 				
 				@Override
@@ -187,6 +194,7 @@ final public class SearchPanel extends JPanel {
 					if (interpreterEmpty) {
 						interpreterEmpty = false;
 					}
+					search();
 				}
 				
 				@Override
@@ -218,7 +226,8 @@ final public class SearchPanel extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				favouriteFilter.setSelected(!favouriteFilter.isSelected());					
+				favouriteFilter.setSelected(!favouriteFilter.isSelected());	
+				search();
 			}
 		};
 
@@ -226,6 +235,8 @@ final public class SearchPanel extends JPanel {
 		favouriteFilter.getActionMap().put(favouriteText, action);
 		favouriteFilter.getInputMap().put
 			(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), favouriteText);
+		
+		favouriteFilter.addActionListener(e -> search());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -241,6 +252,8 @@ final public class SearchPanel extends JPanel {
 		styleFilter = new JComboBox<String>();
 		
 		currentWildcardStyle = emptyFilter;
+		
+		styleFilter.addActionListener(e -> search());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
@@ -281,7 +294,7 @@ final public class SearchPanel extends JPanel {
 	
 	private void initializeResultsPanel() {
 		
-		resultsPanel = new ResultsPanel();
+		resultsPanel = new SearchResultsPanel();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -305,13 +318,13 @@ final public class SearchPanel extends JPanel {
 			// Resetear filtros de búsqueda.
 			@Override
 			public void onLogout() {
-				interpreterEmpty = true;
 				interpreterFilter.setText(interpreterFilterText);
 				interpreterFilter.setForeground(Color.GRAY);
+				interpreterEmpty = true;
 				
-				titleEmpty = true;
 				titleFilter.setText(titleFilterText);
 				titleFilter.setForeground(Color.GRAY);
+				titleEmpty = true;
 				
 				favouriteFilter.setSelected(false);
 
@@ -327,8 +340,9 @@ final public class SearchPanel extends JPanel {
 				
 				currentWildcardStyle = wildcard;
 		
+				// Resetear el filtro de búsqueda.
 				styleFilter.removeAllItems();
-				styles.forEach(s -> styleFilter.addItem(s));
+				styles.forEach( s-> styleFilter.addItem(s));
 				styleFilter.setSelectedItem(currentWildcardStyle);
 			}
 		});

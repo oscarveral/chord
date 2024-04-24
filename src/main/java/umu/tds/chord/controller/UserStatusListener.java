@@ -1,7 +1,9 @@
 package umu.tds.chord.controller;
 
 import java.util.EventListener;
+import java.util.Set;
 
+import umu.tds.chord.model.Song;
 import umu.tds.chord.model.User;
 
 /**
@@ -33,5 +35,13 @@ public interface UserStatusListener extends EventListener{
 	 * @param premium Nuevo estado premium del usuario.
 	 */
 	public default void onPremiumChange(boolean premium) {
+	};
+	
+	/**
+	 * Método emitido cuando la lista de favoritos del usuario ha cambiado.
+	 * 
+	 * @param favourites Nuevo set de canciones favoritas.
+	 */
+	public default void onFavouritesChange(Set<Song> favourites) {
 	};
 }

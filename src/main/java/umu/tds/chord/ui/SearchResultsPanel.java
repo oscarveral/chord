@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,21 +20,20 @@ import umu.tds.chord.model.User;
  * Panel que muestra la tabla de canciones y búsquedas sobre la mismas.
  * También permite eliminar canciones del repositorio.
  */
-public final class ResultsPanel extends JPanel{
+public final class SearchResultsPanel extends JPanel{
 		
 	private static final long serialVersionUID = 5228359293226694415L;
 
-	private static final String deleteButtonText = "Eliminar canción";
-	
 	private SongTableModel datos;
 	private JTable songTable;
 	
-	private Set<Song> currentFavourites;
+	private List<Song> currentFavourites;
+	private boolean lastSearchFavourite;
 	
 	/**
 	 * Constructor por defecto.
 	 */
-	public ResultsPanel() {
+	public SearchResultsPanel() {
 		super();
 		// Sólo se llama al método de inicialización.
 		initialize();
@@ -44,17 +42,17 @@ public final class ResultsPanel extends JPanel{
 	private void initialize() {
 		BorderLayout layout = new BorderLayout();
 		layout.setVgap(10);
-		
 		setLayout(layout);
-		
 		initializeSongTable();
-		initializeDeleteButton();
-		
 		registerControllerListeners();
 	}
 	
 	private void initializeSongTable() {
-		// Creamos el modelo de tabla y la tabla final.
+		// Se guarda el estado de favoritos y busqueda anterior.
+		currentFavourites = new ArrayList<Song>();
+		lastSearchFavourite = false;
+		
+		// Creación del modelo de datos y tabla.
 		datos= new SongTableModel();
 		songTable = new JTable(datos);
 		songTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
@@ -69,14 +67,6 @@ public final class ResultsPanel extends JPanel{
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	private void initializeDeleteButton() {
-		JButton deleteButton = new JButton(deleteButtonText);
-		
-		// TODO: Acción de eliminar.
-		
-		add(deleteButton, BorderLayout.PAGE_END);
-	}
-	
 	// -------- Interacción con el controlador --------
 	
 	private void registerControllerListeners() {
@@ -86,7 +76,24 @@ public final class ResultsPanel extends JPanel{
 			// favoritos del usuario.
 			@Override
 			public void onLogin(User u) {
-				currentFavourites = u.getFavouriteSongs();
+				currentFavourites = new ArrayList<Song>(u.getFavouriteSongs());
+			}
+			
+			@Override
+			public void onFavouritesChange(Set<Song> favourites) {
+				// Actualizar los favoritos.
+				currentFavourites.clear();
+				currentFavourites.addAll(favourites);
+				
+				// Para hacer más interactiva la tabla, ocultamos los elementos
+				// que hayan dejado de ser favoritos si la última búsqueda
+				// filtraba por favoritos.
+				if (lastSearchFavourite) {
+					datos.getSongList().removeIf(s -> {
+						return !currentFavourites.contains(s);
+					});
+					datos.upadte();
+				}
 			}
 		});
 		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() 
@@ -100,10 +107,15 @@ public final class ResultsPanel extends JPanel{
 			}
 			// Establecer en la tabla la búsqueda realizada.
 			@Override
-			public void onSongSearch(List<Song> searched) {
+			public void onSongSearch(List<Song> searched, boolean f) {
 				datos.setSongList(searched);
+				lastSearchFavourite = f;
 			}
 		});
+	}
+	
+	private void toggleFavourite(Song s) {
+		Controller.INSTANCE.toggleFavourite(s);
 	}
 	
 	// -------- Modelo de datos de la tabla --------
@@ -155,7 +167,9 @@ public final class ResultsPanel extends JPanel{
 	    @Override
 	    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 	    	if (columnIndex == 3) {
-	    		// TODO: Modificar estado premium.
+	    		// Se solicita modificar el favorito de la canción.
+	    		Song s = songs.get(rowIndex);
+	    		toggleFavourite(s);
 	    	}
 	    }
 	    
@@ -169,11 +183,27 @@ public final class ResultsPanel extends JPanel{
 	        return songs.size();
 	    }
 
+	    /**
+	     * Establece una nueva lista de canciones para mostrar.
+	     * 
+	     * @param songs Lista de canciones que mostrar.
+	     */
 	    public void setSongList(List<Song> songs) {
 	        this.songs = songs;
 	        fireTableDataChanged();
 	    }
 
+	    public List<Song> getSongList() {
+	    	return songs;
+	    }
+	    
+	    /**
+	     * Forzar actualización de la tabla.
+	     */
+	    public void upadte() {
+	    	fireTableDataChanged();
+	    }
+	    
 	    @Override 
 	    public String getColumnName(int index) { 
 	        return columnNames[index]; 

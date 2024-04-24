@@ -1,5 +1,6 @@
 package umu.tds.chord.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -128,8 +129,15 @@ public enum SongRepository {
 	 * 
 	 * @return Lista mutable de canciones encontrada que respeta los filtros
 	 * especificados.
+	 * 
+	 * @implNote Cualquier parámetro nulo provocará la devolución de una lista
+	 * vacía.
 	 */
 	public List<Song> getSearch(String name, String author, String sty) {
+		
+		if (name == null || author == null || sty == null)
+			return new ArrayList<Song>();
+		
 		return songs.stream()
 				.filter(song -> 
 					song.getName()

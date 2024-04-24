@@ -15,8 +15,9 @@ public interface SongStatusListener extends EventListener{
 	 * Método emitido cuando se ha producido una búsqueda de canciones.
 	 * 
 	 * @param searched Lista con canciones resultado de la búsqueda.
+	 * @param f Indica si se realizó una búsqueda de favoritos.
 	 */
-	default public void onSongSearch(List<Song> searched) {
+	default public void onSongSearch(List<Song> searched, boolean f) {
 	}
 	
 	/**
