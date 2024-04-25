@@ -131,19 +131,19 @@ public enum Controller {
 	 * @return {@code true} si se ha iniciado sesión de forma exitosa con los 
 	 * datos proporcionados. {@code false} en cualquier otro caso.
 	 */
-	public boolean login(String username, String password) {
+	public void login(String username, String password) {
 		// No se puede hacer login si ya se está logeado.
 		if (currentUser.isPresent())
-			return false;
+			userStatusListeners.forEach(l -> l.onFailedLogin());
 		
 		// Recuperación del usuario y notificación.
 		currentUser = UserRepository.INSTANCE.getUser(username, password);
-		currentUser.ifPresent(u -> {
-			userStatusListeners.forEach(l -> l.onLogin(u));
-		});
 		
-		// Retornar el resultado de la recuperación.
-		return currentUser.isPresent();
+		// Notificación de resultados
+		if (currentUser.isPresent())
+			userStatusListeners.forEach(l -> l.onLogin(currentUser.get()));
+		else if (currentUser.isEmpty())
+			userStatusListeners.forEach(l -> l.onFailedLogin());
 	}
 	
 	/**

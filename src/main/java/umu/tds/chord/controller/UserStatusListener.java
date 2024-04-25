@@ -21,6 +21,13 @@ public interface UserStatusListener extends EventListener{
 	 */
 	public default void onLogin(User u) {
 	};
+	
+	/**
+	 * Método emitido cuando se ha producido un intento fallido de inicio
+	 * de sesión.
+	 */
+	public default void onFailedLogin() {	
+	};
 
 	/**
 	 * Método de notificación de cierre de sesión del usuario actual.

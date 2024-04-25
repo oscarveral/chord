@@ -396,6 +396,12 @@ public final class LoginPanel extends JPanel{
 				
 				failedLoginWarn.setText(emptyText);
 			}
+			
+			@Override
+			public void onFailedLogin() {
+				// Se avisa del fallo.
+				failedLoginWarn.setText(failedLoginText);
+			}
 		});
 	}
 	
@@ -408,11 +414,6 @@ public final class LoginPanel extends JPanel{
 		String pass = String.valueOf(passwordInput.getPassword());
 		
 		// Intenar login.
-		boolean result = Controller.INSTANCE.login(user, pass);
-		
-		// Si hay fallo se pone un aviso.
-		if (!result) {
-			failedLoginWarn.setText(failedLoginText);
-		}
+		Controller.INSTANCE.login(user, pass);
 	}	
 }
