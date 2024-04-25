@@ -394,6 +394,7 @@ final public class RegisterPanel extends JPanel {
 		return (!userInputEmpty && 
 				!passwordInputEmpty && 
 				!confirmPasswordInputEmpty &&
+				!nameInput.getText().isBlank() &&
 				samePassword);
 	}
 	

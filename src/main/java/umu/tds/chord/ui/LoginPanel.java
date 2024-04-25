@@ -335,7 +335,9 @@ public final class LoginPanel extends JPanel{
 	
 	private boolean isValidInput() {
 		// Validar inputs antes de intentar inicio de sesión.
-		return (!userInputEmpty && !passwordInputEmpty);
+		return !userInputEmpty && 
+				!passwordInputEmpty &&
+				!userInput.getText().isBlank();
 	}
 	
 	private void trigger(InterfaceEvent e) {
