@@ -219,7 +219,8 @@ public final class SearchResultsPanel extends JPanel{
 	     * @param songs Lista de canciones que mostrar.
 	     */
 	    public void setSongList(List<Song> songs) {
-	        this.songs = songs;
+	        this.songs.clear();
+	        this.songs.addAll(songs);
 	        fireTableDataChanged();
 	    }
 

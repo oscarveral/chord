@@ -148,6 +148,11 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal>
 		return (Playlist.Internal) this;
 	}
 	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
 	/**
 	 * Clase de representación interna de una playlist. Expone métodos que 
 	 * permiten mutar el estado de la playlist. Se exponen también los métodos
