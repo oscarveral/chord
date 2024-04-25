@@ -52,6 +52,12 @@ public enum SongRepository {
 	 */
 	public boolean addSong(String name, String author, String path, String sty) 
 	{
+		if (name.isBlank() || name.isEmpty() || 
+			author.isBlank() || author.isEmpty() || 
+			path.isBlank() || path.isEmpty() || 
+			sty.isBlank() || sty.isEmpty()
+		)
+			return false;
 		
 		// Creación de la canción.
 		Song song = new Song.Builder(name)
