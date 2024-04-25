@@ -30,8 +30,11 @@ import umu.tds.chord.model.UserRepository;
  * en este controlador.
  */
 public enum Controller {
+	
 
 	INSTANCE;
+	
+	private static final String adminUser = "admin";
 	
 	private Optional<User> currentUser;
 	private List<Song> selectedSongs;
@@ -246,7 +249,17 @@ public enum Controller {
 	/**
 	 * Elimina la selección actual de canciones del repositorio.
 	 */
-	public void removeSelectedSongs() {
+	public void removeSelectedSongs(String password) {
+		
+		boolean canDelete = currentUser.isPresent() && 
+							currentUser.get().getUserName().equals(adminUser) && 
+							currentUser.get().checkPassword(password);
+		
+		if (!canDelete) {
+			songStatusListeners.forEach(l -> l.onSongDeleteFailure());
+			return;
+		}
+				
 		// Eliminar canciones.
 		selectedSongs.forEach(s -> {
 			SongRepository.INSTANCE.removeSong(s);

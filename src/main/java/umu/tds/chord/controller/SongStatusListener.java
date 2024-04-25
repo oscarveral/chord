@@ -50,4 +50,10 @@ public interface SongStatusListener extends EventListener{
 	 */
 	default public void onSongLoadFailure() {
 	}
+	
+	/**
+	 * Método emitido en los fallos de eliminación de canciones.
+	 */
+	default public void onSongDeleteFailure() {
+	}
 }
