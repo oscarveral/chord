@@ -10,6 +10,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -381,26 +382,25 @@ public final class LoginPanel extends JPanel{
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 			
 			@Override
-			public void onLogin(User u) {
-				userInput.setText(userDefaultInput);
-				userInput.setForeground(Color.GRAY);
+			public void onLogin(Optional<User> u) {
 				
-				passwordInput.setText(passwordDefaultInput);
-				passwordInput.setEchoChar((char) 0);
-				passwordInput.setForeground(Color.GRAY);
-				
-				userInputEmpty = true;
-				passwordInputEmpty = true;
-				
-				loginButton.setEnabled(isValidInput());
-				
-				failedLoginWarn.setText(emptyText);
-			}
-			
-			@Override
-			public void onFailedLogin() {
-				// Se avisa del fallo.
-				failedLoginWarn.setText(failedLoginText);
+				if (u.isPresent()) {
+					
+					userInput.setText(userDefaultInput);
+					userInput.setForeground(Color.GRAY);
+					
+					passwordInput.setText(passwordDefaultInput);
+					passwordInput.setEchoChar((char) 0);
+					passwordInput.setForeground(Color.GRAY);
+					
+					userInputEmpty = true;
+					passwordInputEmpty = true;
+					
+					loginButton.setEnabled(isValidInput());
+					
+					failedLoginWarn.setText(emptyText);
+				}
+				else failedLoginWarn.setText(failedLoginText);
 			}
 		});
 	}

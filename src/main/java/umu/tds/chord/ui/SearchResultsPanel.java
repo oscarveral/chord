@@ -3,6 +3,7 @@ package umu.tds.chord.ui;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -101,8 +102,11 @@ public final class SearchResultsPanel extends JPanel{
 			// En el inicio de sesión se debe cargar la lista actual de 
 			// favoritos del usuario.
 			@Override
-			public void onLogin(User u) {
-				currentFavourites = new ArrayList<Song>(u.getFavouriteSongs());
+			public void onLogin(Optional<User> u) {
+				u.ifPresent(user -> {
+					currentFavourites = 
+							new ArrayList<Song>(user.getFavouriteSongs());					
+				});
 			}
 			
 			@Override

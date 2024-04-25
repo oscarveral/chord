@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -69,8 +70,10 @@ final public class PlaylistsPanel extends JPanel{
 			// En el inicio de sesión se debe cargar la lista actual de 
 			// favoritos del usuario.
 			@Override
-			public void onLogin(User u) {
-				datos.setPlaylistList(u.getPlaylists());
+			public void onLogin(Optional<User> u) {
+				u.ifPresent(user -> {
+					datos.setPlaylistList(user.getPlaylists());					
+				});
 			}
 		});
 	

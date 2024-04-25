@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.EventObject;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.AbstractAction;
@@ -317,10 +318,13 @@ public final class MainPanel extends JPanel{
 		{
 			
 			@Override
-			public void onLogin(User u) {
-				centerLayout.show(centerContainer, invisibleTag);
-				userName.setText(u.getUserName());
-				premiumToggle.setSelected(u.isPremium());
+			public void onLogin(Optional<User> u) {
+				u.ifPresent(user -> {
+					centerLayout.show(centerContainer, invisibleTag);
+					userName.setText(user.getUserName());
+					premiumToggle.setSelected(user.isPremium());
+				});
+				
 			}
 			
 			@Override

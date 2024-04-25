@@ -115,11 +115,10 @@ public enum Controller {
 	 * @param pass Contraseña del nuevo usuario.
 	 * @param birthday Cumpleaños del nuevo usuario.
 	 * 
-	 * @return {@code false} si existe ya un usuario registrado con el nombre
-	 * de usuario proporcionado.
 	 */
-	public boolean register(String username, String pass, LocalDate birthday) {
-		return UserRepository.INSTANCE.addUser(username, pass, birthday);
+	public void register(String username, String pass, LocalDate birthday) {
+		boolean res = UserRepository.INSTANCE.addUser(username, pass, birthday);
+		userStatusListeners.forEach(l -> l.onRegister(res));
 	}
 	
 	/**
@@ -128,22 +127,20 @@ public enum Controller {
 	 * @param username Nombre de usuario.
 	 * @param password Contraseña en claro del usuario.
 	 * 
-	 * @return {@code true} si se ha iniciado sesión de forma exitosa con los 
-	 * datos proporcionados. {@code false} en cualquier otro caso.
 	 */
 	public void login(String username, String password) {
 		// No se puede hacer login si ya se está logeado.
 		if (currentUser.isPresent())
-			userStatusListeners.forEach(l -> l.onFailedLogin());
+			userStatusListeners.forEach(l -> l.onLogin(Optional.empty()));
 		
 		// Recuperación del usuario y notificación.
 		currentUser = UserRepository.INSTANCE.getUser(username, password);
 		
 		// Notificación de resultados
 		if (currentUser.isPresent())
-			userStatusListeners.forEach(l -> l.onLogin(currentUser.get()));
+			userStatusListeners.forEach(l -> l.onLogin(currentUser));
 		else if (currentUser.isEmpty())
-			userStatusListeners.forEach(l -> l.onFailedLogin());
+			userStatusListeners.forEach(l -> l.onLogin(Optional.empty()));
 	}
 	
 	/**

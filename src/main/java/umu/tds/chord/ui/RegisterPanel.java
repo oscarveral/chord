@@ -27,6 +27,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.UserStatusListener;
 
 /**
  * Panel utilizado para el registro de usuarios.
@@ -83,6 +84,8 @@ final public class RegisterPanel extends JPanel {
 		initializeStatusLabel();
 		
 		initializeVisibilityListener();
+		
+		registerControllerListener();
 		
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 	}
@@ -418,6 +421,26 @@ final public class RegisterPanel extends JPanel {
 	
 	// -------- Interacción con el controlador --------
 	
+	private void registerControllerListener() {
+		// Se deben escuchar los intentos de registro.
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() 
+		{
+			// Actualizar UI según resultado
+			@Override
+			public void onRegister(boolean success) {
+				if (success) {
+					refreshInterface();
+					statusLabel.setForeground(new Color(0x73a657));
+					statusLabel.setText(succesfullRegister);
+				}
+				else {
+					statusLabel.setForeground(Color.RED);
+					statusLabel.setText(errorRegister);
+				}
+			}
+		});
+	}
+	
 	private void register() {
 		// Volvemos a validar el input.
 		if (!isValidInput()) return;
@@ -427,20 +450,6 @@ final public class RegisterPanel extends JPanel {
 		String pass = String.valueOf(passwordInput.getPassword());
 		
 		// TODO: Obtener la fecha mediante un calendario.
-		boolean result = Controller.INSTANCE
-				.register(user, pass, LocalDate.now());
-		
-		// Actualizar UI según resultado
-		if (result) {
-			
-			refreshInterface();
-			
-			statusLabel.setForeground(new Color(0x73a657));
-			statusLabel.setText(succesfullRegister);
-		}
-		else {
-			statusLabel.setForeground(Color.RED);
-			statusLabel.setText(errorRegister);
-		}
+		Controller.INSTANCE.register(user, pass, LocalDate.now());
 	}
 }

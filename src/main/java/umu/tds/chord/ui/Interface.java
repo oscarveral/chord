@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.WindowEvent;
+import java.util.Optional;
 import java.awt.event.WindowAdapter;
 
 import javax.swing.ImageIcon;
@@ -159,9 +160,11 @@ public final class Interface {
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 			
 			@Override
-			public void onLogin(User u) {
-				layout.show(container, mainTag);
-				mainPanel.requestFocus();
+			public void onLogin(Optional<User> u) {
+				u.ifPresent(user -> {
+					layout.show(container, mainTag);
+					mainPanel.requestFocus();
+				});
 			}
 			
 			@Override
