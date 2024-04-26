@@ -1,9 +1,11 @@
 package umu.tds.chord.controller;
 
 import java.util.EventListener;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import umu.tds.chord.model.Playlist;
 import umu.tds.chord.model.Song;
 import umu.tds.chord.model.User;
 
@@ -53,5 +55,29 @@ public interface UserStatusListener extends EventListener{
 	 * @param favourites Nuevo set de canciones favoritas.
 	 */
 	public default void onFavouritesChange(Set<Song> favourites) {
+	};
+	
+	/**
+	 * Método emitido cuando cambia la lista de canciones recientes del usuario.
+	 * 
+	 * @param recent Lista actual de canciones recientes.
+	 */
+	public default void onRecentSongChange(List<Song> recent) {
+	};
+	
+	/**
+	 * Método emitido cuando cambia la lista de playlist del usuario.
+	 * 
+	 * @param playlists Lista de playlists actual del usuario.
+	 */
+	public default void onPlaylistListChange(List<Playlist> playlists) {
+	};
+	
+	/**
+	 * Método emitido cuando se ha seleccionado un aplaylist del usuario.
+	 * 
+	 * @param playlist Playlist seleccionada.
+	 */
+	public default void onPlaylistSelection(Optional<Playlist> playlist) {
 	};
 }

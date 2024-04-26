@@ -135,8 +135,10 @@ public enum SongRepository {
 			.stream()
 			.map(u -> u.asMut())
 			.forEach(u -> {
-				// Para cada usuario eliminamos la canción de favoritos.
+				// Para cada usuario eliminamos la canción de favoritos y 
+				// recientes.
 				u.removeFavouriteSong(s);
+				u.removeRecentSong(s);
 				u.getPlaylists()
 					.stream()
 					.map(p -> p.asMut())

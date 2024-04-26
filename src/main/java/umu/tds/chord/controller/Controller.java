@@ -13,6 +13,8 @@ import umu.tds.chord.component.Canciones;
 import umu.tds.chord.component.CancionesEvent;
 import umu.tds.chord.component.CancionesListener;
 import umu.tds.chord.component.CargadorCanciones;
+import umu.tds.chord.model.Playlist;
+import umu.tds.chord.model.PlaylistFactory;
 import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
 import umu.tds.chord.model.User;
@@ -37,6 +39,7 @@ public enum Controller {
 	private static final String adminUser = "admin";
 	
 	private Optional<User> currentUser;
+	private Optional<Playlist> currentPlaylist;
 	private List<Song> selectedSongs;
 	
 	private Set<UserStatusListener> userStatusListeners;
@@ -46,6 +49,7 @@ public enum Controller {
 	
 	private Controller() {
 		currentUser = Optional.empty();
+		currentPlaylist = Optional.empty();
 		selectedSongs = new ArrayList<Song>();
 		
 		userStatusListeners = new HashSet<UserStatusListener>();
@@ -271,6 +275,46 @@ public enum Controller {
 				l.onFavouritesChange(u.getFavouriteSongs())
 			);
 		});
+	}
+	
+	/**
+	 * Método de creación de una playlist para el usuario actual.
+	 * 
+	 * @param name Nombre de la playlist.
+	 * @param description Descripción de la playlist.
+	 */
+	public void createPlaylist(String name, String description) {
+		if (currentUser.isEmpty()) return;
+		
+		// Crear playlist.
+		Optional<Playlist> p = 
+				PlaylistFactory.createPlaylist(name, description);
+		
+		// Añadirla si hubo exito.
+		p.ifPresent(playlist -> {
+			currentUser.get().asMut().addPlaylist(playlist);
+			userStatusListeners.forEach(l -> 
+				l.onPlaylistListChange(currentUser.get().getPlaylists())
+			);
+		});
+	}
+	
+	/**
+	 * Método que selecciona la playlist del usuario sobre la que aplicar 
+	 * operaciones.
+	 * 
+	 * @param p Playlist seleccionada.
+	 */
+	public void selectPlaylist(Playlist p) {
+		if (currentUser.isEmpty()) return;
+		
+		// Validación de que la playlist es del usuario.
+		if (currentUser.get().getPlaylists().contains(p))
+			currentPlaylist = Optional.ofNullable(p);
+		else currentPlaylist = Optional.empty();
+		
+		// Aviso a interesados.
+		userStatusListeners.forEach(l -> l.onPlaylistSelection(currentPlaylist));
 	}
 	
 	/**

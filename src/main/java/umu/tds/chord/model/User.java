@@ -365,8 +365,8 @@ public abstract sealed class User implements Mutable<User.Internal>{
 		 * 
 		 * @return Canción que se ha eliminado.
 		 */
-		public Song removeRecentSong(int index) {
-			return super.recentSongs.remove(index);
+		public boolean removeRecentSong(Song s) {
+			return super.recentSongs.remove(s);
 		}
 		
 		/**
