@@ -290,13 +290,16 @@ public enum Controller {
 		Optional<Playlist> p = 
 				PlaylistFactory.createPlaylist(name, description);
 		
+		// Avisar en fallo.
+		if (p.isEmpty()) userStatusListeners.forEach(l -> 
+			l.onPlaylistCreationFailure()
+		);
+		
 		// Añadirla si hubo exito.
-		p.ifPresent(playlist -> {
-			currentUser.get().asMut().addPlaylist(playlist);
-			userStatusListeners.forEach(l -> 
-				l.onPlaylistListChange(currentUser.get().getPlaylists())
-			);
-		});
+		currentUser.get().asMut().addPlaylist(p.get());
+		userStatusListeners.forEach(l -> 
+			l.onPlaylistListChange(currentUser.get().getPlaylists())
+		);
 	}
 	
 	/**

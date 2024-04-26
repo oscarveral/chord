@@ -72,12 +72,18 @@ public interface UserStatusListener extends EventListener{
 	 */
 	public default void onPlaylistListChange(List<Playlist> playlists) {
 	};
-	
+
 	/**
 	 * Método emitido cuando se ha seleccionado un aplaylist del usuario.
 	 * 
 	 * @param playlist Playlist seleccionada.
 	 */
 	public default void onPlaylistSelection(Optional<Playlist> playlist) {
+	};
+	
+	/**
+	 * Método emitido cuando se ha fallado en la creación de una playlist.
+	 */
+	public default void onPlaylistCreationFailure() {
 	};
 }
