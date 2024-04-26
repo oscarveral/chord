@@ -1,10 +1,9 @@
 //
-// Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.2.8-b130911.1802 
-// Visite <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
-// Generado el: 2017.10.26 a las 12:42:42 AM CEST 
+// Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.2.8-b130911.1802
+// Visite <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a>
+// Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen.
+// Generado el: 2017.10.26 a las 12:42:42 AM CEST
 //
-
 
 package umu.tds.chord.component;
 
@@ -14,12 +13,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Clase Java para Cancion complex type.
- * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
- * 
+ * <p>
+ * Clase Java para Cancion complex type.
+ *
+ * <p>
+ * El siguiente fragmento de esquema especifica el contenido que se espera que
+ * haya en esta clase.
+ *
  * <pre>
  * &lt;complexType name="Cancion">
  *   &lt;complexContent>
@@ -34,118 +35,98 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Cancion", propOrder = {
-    "url",
-    "estilo",
-    "interprete"
-})
+@XmlType(name = "Cancion", propOrder = { "url", "estilo", "interprete" })
 public class Cancion {
 
-    @XmlElement(name = "URL", required = true)
-    protected String url;
-    protected String estilo;
-    protected String interprete;
-    @XmlAttribute(name = "titulo", required = true)
-    protected String titulo;
+	protected String estilo;
+	protected String interprete;
+	@XmlAttribute(name = "titulo", required = true)
+	protected String titulo;
+	@XmlElement(name = "URL", required = true)
+	protected String url;
 
-    /**
-     * Obtiene el valor de la propiedad url.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getURL() {
-        return url;
-    }
+	/**
+	 * Obtiene el valor de la propiedad estilo.
+	 *
+	 * @return possible object is {@link String }
+	 *
+	 */
+	public String getEstilo() {
+		return estilo;
+	}
 
-    /**
-     * Define el valor de la propiedad url.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setURL(String value) {
-        this.url = value;
-    }
+	/**
+	 * Obtiene el valor de la propiedad interprete.
+	 *
+	 * @return possible object is {@link String }
+	 *
+	 */
+	public String getInterprete() {
+		return interprete;
+	}
 
-    /**
-     * Obtiene el valor de la propiedad estilo.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getEstilo() {
-        return estilo;
-    }
+	/**
+	 * Obtiene el valor de la propiedad titulo.
+	 *
+	 * @return possible object is {@link String }
+	 *
+	 */
+	public String getTitulo() {
+		return titulo;
+	}
 
-    /**
-     * Define el valor de la propiedad estilo.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setEstilo(String value) {
-        this.estilo = value;
-    }
+	/**
+	 * Obtiene el valor de la propiedad url.
+	 *
+	 * @return possible object is {@link String }
+	 *
+	 */
+	public String getURL() {
+		return url;
+	}
 
-    /**
-     * Obtiene el valor de la propiedad interprete.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getInterprete() {
-        return interprete;
-    }
+	/**
+	 * Define el valor de la propiedad estilo.
+	 *
+	 * @param value allowed object is {@link String }
+	 *
+	 */
+	public void setEstilo(String value) {
+		this.estilo = value;
+	}
 
-    /**
-     * Define el valor de la propiedad interprete.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setInterprete(String value) {
-        this.interprete = value;
-    }
+	/**
+	 * Define el valor de la propiedad interprete.
+	 *
+	 * @param value allowed object is {@link String }
+	 *
+	 */
+	public void setInterprete(String value) {
+		this.interprete = value;
+	}
 
-    /**
-     * Obtiene el valor de la propiedad titulo.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTitulo() {
-        return titulo;
-    }
+	/**
+	 * Define el valor de la propiedad titulo.
+	 *
+	 * @param value allowed object is {@link String }
+	 *
+	 */
+	public void setTitulo(String value) {
+		this.titulo = value;
+	}
 
-    /**
-     * Define el valor de la propiedad titulo.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTitulo(String value) {
-        this.titulo = value;
-    }
+	/**
+	 * Define el valor de la propiedad url.
+	 *
+	 * @param value allowed object is {@link String }
+	 *
+	 */
+	public void setURL(String value) {
+		this.url = value;
+	}
 
 }

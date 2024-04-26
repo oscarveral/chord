@@ -8,11 +8,11 @@ import java.util.EventListener;
 public interface CancionesListener extends EventListener {
 
 	/**
-	 * Método emitido cuando se ha producido la carga de una nueva lista
-	 * de canciones.
-	 * 
+	 * Método emitido cuando se ha producido la carga de una nueva lista de
+	 * canciones.
+	 *
 	 * @param e Evento producido.
 	 */
 	public void nuevasCanciones(CancionesEvent e);
-	
+
 }

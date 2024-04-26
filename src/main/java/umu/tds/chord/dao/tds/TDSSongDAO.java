@@ -14,11 +14,11 @@ import umu.tds.chord.model.Persistent;
 import umu.tds.chord.model.Song;
 
 /**
- * Adaptador {@link DAO} para {@link Song.Internal} utilizando el driver de 
+ * Adaptador {@link DAO} para {@link Song.Internal} utilizando el driver de
  * persistencia de TDS.
  */
-public enum TDSSongDAO implements DAO<Song.Internal>{
-	
+public enum TDSSongDAO implements DAO<Song.Internal> {
+
 	/**
 	 * Patrón Singleton. Instancia única de este adaptador.
 	 */
@@ -28,140 +28,62 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 	 * Enumerado de todas las propiedades que tiene una entidad canción.
 	 */
 	private enum Properties {
-		SONG_ENTITY_TYPE,
-		NAME,
-		AUTHOR,
-		PATH,
-		STYLE,
+		AUTHOR, NAME, PATH, SONG_ENTITY_TYPE, STYLE,
 	}
-	
-	private final ServicioPersistencia persistence = 
-			FactoriaServicioPersistencia.getInstance()
-										.getServicioPersistencia();
-	
+
+	private final ServicioPersistencia persistence = FactoriaServicioPersistencia.getInstance()
+			.getServicioPersistencia();
+
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @return {@code true} si la eliminación fue exitosa. {@code false} si el
+	 *         objeto es {@code null}, no está registrado o existen inconsistencias
+	 *         en el servicio de persistencia.
 	 */
 	@Override
-	public boolean register(Song.Internal s) {
-		
-		// Checks obligatorios.
-		if (s == null || s.isRegistered()) return false;
-		
-		// Comprobar si ya está registrado.
-		Entidad eSong = null;
-		try {
-			eSong = persistence.recuperarEntidad(s.getId());
-		} 
-		catch (NullPointerException e) {}
-		if (eSong != null) return false;
-		
-		// Creación de la entidad.
-		eSong = new Entidad();
-		eSong.setNombre(Properties.SONG_ENTITY_TYPE.name());
-		
-		// Propiedades.
-		eSong.setPropiedades(Arrays.asList(
-			new Propiedad(Properties.NAME.name(), s.getName()),
-			new Propiedad(Properties.AUTHOR.name(), s.getAuthor()),
-			new Propiedad(Properties.PATH.name(), s.getPath()),
-			new Propiedad(Properties.STYLE.name(), s.getStyle())
-		));
-		
-		// Registro.
-		eSong = persistence.registrarEntidad(eSong);
-		s.registerId(eSong.getId());
-		TDSPoolDAO.addPersistent(s);
-		
-		return true;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @return Devuelve el objeto identificado por id en persistencia en el caso
-	 * de estar registrado y ser de tipo canción.
-	 */
-	@Override
-	public Optional<Song.Internal> recover(int id) {
-		
-		// Comprobamos si la pool ya tenía el objeto y es del tipo canción.
-		if (TDSPoolDAO.contains(id)) {
-			Persistent cached = TDSPoolDAO.getPersistent(id).get();
-			if (cached.getClass() == Song.Internal.class) 
-				return Optional.of((Song.Internal) cached);
-			else return Optional.empty();
+	public boolean delete(Song.Internal s) {
+		// Checks obligatorios
+		if (s == null || !s.isRegistered()) {
+			return false;
 		}
-		
-		// Recuperación de la entidad.
-		Entidad eSong = persistence.recuperarEntidad(id);
-		// Asegurar que el tipo es de usuario.
-		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name()))
-			return Optional.empty();
-		
-		// Recuperación de propiedades.
-		String name = null;
-		String author = null;
-		String path = null;
-		String style = null;
-		
-		name = persistence.recuperarPropiedadEntidad
-				(eSong, Properties.NAME.name());
-		author = persistence.recuperarPropiedadEntidad
-				(eSong, Properties.AUTHOR.name());
-		path = persistence.recuperarPropiedadEntidad
-				(eSong, Properties.PATH.name());
-		style = persistence.recuperarPropiedadEntidad
-				(eSong, Properties.STYLE.name());	
-		
-		// Construcción y registro.
-		Song.Internal s = new Song.Builder(name)
-							.author(author)
-							.path(path)
-							.style(style)
-							.build()
-							.get()
-							.asMut();
-	
-		s.registerId(id);
-		TDSPoolDAO.addPersistent(s);
-		
-		return Optional.of(s);
+
+		// Si la entidad no es de canción hay inconsistencias.
+		Entidad eSong = persistence.recuperarEntidad(s.getId());
+		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name())) {
+			return false;
+		}
+
+		// Eliminar de la pool.
+		TDSPoolDAO.removePersistent(s);
+
+		// Eliminación de la canción.
+		return persistence.borrarEntidad(eSong);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 */
-	@Override
-	public List<Song.Internal> recoverAll() {
-		return persistence.recuperarEntidades
-				(Properties.SONG_ENTITY_TYPE.name())
-				.stream()
-				.map(entity -> this.recover(entity.getId()).orElse(null))
-				.filter(u -> u!=null) // Ignorar errores.
-				.collect(Collectors.toUnmodifiableList());
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @return {@code true} si la modificación fue exitosa. {@code false} si el 
-	 * objeto es {@code null}, no está registrado o existen inconsistencias en 
-	 * el servicio de persistencia.
+	 *
+	 * @return {@code true} si la modificación fue exitosa. {@code false} si el
+	 *         objeto es {@code null}, no está registrado o existen inconsistencias
+	 *         en el servicio de persistencia.
 	 */
 	@Override
 	public boolean modify(Song.Internal s) {
 		// Checks obligatorios
-		if (s == null || !s.isRegistered()) return false;
-		
+		if (s == null || !s.isRegistered()) {
+			return false;
+		}
+
 		// Si la entidad recuperada no es de canción hay inconsistencias.
 		Entidad eSong = persistence.recuperarEntidad(s.getId());
-		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name()))
+		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name())) {
 			return false;
-		
+		}
+
 		// Modificación de propiedades de la entidad.
 		eSong.getPropiedades().forEach(p -> {
-			
+
 			switch (Properties.valueOf(p.getNombre())) {
 			// No se puden mutar las canciones.
 			case NAME:
@@ -174,31 +96,102 @@ public enum TDSSongDAO implements DAO<Song.Internal>{
 			persistence.modificarPropiedad(p);
 		});
 		persistence.modificarEntidad(eSong);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @return {@code true} si la eliminación fue exitosa. {@code false} si el
-	 * objeto es {@code null}, no está registrado o existen inconsistencias en
-	 * el servicio de persistencia.
+	 *
+	 * @return Devuelve el objeto identificado por id en persistencia en el caso de
+	 *         estar registrado y ser de tipo canción.
 	 */
 	@Override
-	public boolean delete(Song.Internal s) {
-		// Checks obligatorios
-		if (s == null || !s.isRegistered()) return false;		
-		
-		// Si la entidad no es de canción hay inconsistencias.
-		Entidad eSong = persistence.recuperarEntidad(s.getId());
-		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name()))
+	public Optional<Song.Internal> recover(int id) {
+
+		// Comprobamos si la pool ya tenía el objeto y es del tipo canción.
+		if (TDSPoolDAO.contains(id)) {
+			Persistent cached = TDSPoolDAO.getPersistent(id).get();
+			if (cached.getClass() == Song.Internal.class) {
+				return Optional.of((Song.Internal) cached);
+			} else {
+				return Optional.empty();
+			}
+		}
+
+		// Recuperación de la entidad.
+		Entidad eSong = persistence.recuperarEntidad(id);
+		// Asegurar que el tipo es de usuario.
+		if (!eSong.getNombre().equals(Properties.SONG_ENTITY_TYPE.name())) {
+			return Optional.empty();
+		}
+
+		// Recuperación de propiedades.
+		String name = null;
+		String author = null;
+		String path = null;
+		String style = null;
+
+		name = persistence.recuperarPropiedadEntidad(eSong, Properties.NAME.name());
+		author = persistence.recuperarPropiedadEntidad(eSong, Properties.AUTHOR.name());
+		path = persistence.recuperarPropiedadEntidad(eSong, Properties.PATH.name());
+		style = persistence.recuperarPropiedadEntidad(eSong, Properties.STYLE.name());
+
+		// Construcción y registro.
+		Song.Internal s = new Song.Builder(name).author(author).path(path).style(style).build().get().asMut();
+
+		s.registerId(id);
+		TDSPoolDAO.addPersistent(s);
+
+		return Optional.of(s);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Song.Internal> recoverAll() {
+		return persistence.recuperarEntidades(Properties.SONG_ENTITY_TYPE.name()).stream()
+				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null) // Ignorar errores.
+				.collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean register(Song.Internal s) {
+
+		// Checks obligatorios.
+		if (s == null || s.isRegistered()) {
 			return false;
-		
-		// Eliminar de la pool.
-		TDSPoolDAO.removePersistent(s);
-		
-		// Eliminación de la canción.
-		return persistence.borrarEntidad(eSong);
+		}
+
+		// Comprobar si ya está registrado.
+		Entidad eSong = null;
+		try {
+			eSong = persistence.recuperarEntidad(s.getId());
+		} catch (NullPointerException e) {
+		}
+		if (eSong != null) {
+			return false;
+		}
+
+		// Creación de la entidad.
+		eSong = new Entidad();
+		eSong.setNombre(Properties.SONG_ENTITY_TYPE.name());
+
+		// Propiedades.
+		eSong.setPropiedades(Arrays.asList(new Propiedad(Properties.NAME.name(), s.getName()),
+				new Propiedad(Properties.AUTHOR.name(), s.getAuthor()),
+				new Propiedad(Properties.PATH.name(), s.getPath()),
+				new Propiedad(Properties.STYLE.name(), s.getStyle())));
+
+		// Registro.
+		eSong = persistence.registrarEntidad(eSong);
+		s.registerId(eSong.getId());
+		TDSPoolDAO.addPersistent(s);
+
+		return true;
 	}
 }

@@ -10,159 +10,148 @@ import java.util.Optional;
 import umu.tds.chord.dao.DAOFactory;
 
 /**
- * Repositorio de usuarios. Utilizado para la creación, obtención y 
+ * Repositorio de usuarios. Utilizado para la creación, obtención y
  * actualización de los datos de los usuarios. Véase {@link User}.
  */
 public enum UserRepository {
 
 	INSTANCE;
-	
+
 	private final Map<String, User> users;
-	
+
 	private UserRepository() {
-		users = new HashMap<String, User>();
-		
-		DAOFactory.getInstance()
-			.getUserDAO()
-			.recoverAll()
-			.forEach(u -> users.put(u.getUserName(), u));
+		users = new HashMap<>();
+
+		DAOFactory.getInstance().getUserDAO().recoverAll().forEach(u -> users.put(u.getUserName(), u));
 	}
-	
+
 	/**
 	 * Añade un usuario al repositorio.
-	 * 
+	 *
 	 * @param username Nombre de usuario.
 	 * @param password Contraseña deseada en texto plano.
 	 * @param birthday Cumpleaños del usuario.
-	 * 
-	 * @return {@code false} Si el usuario ya estaba registrado o username es 
-	 * {@code null}. {@code true} en otro caso.
+	 *
+	 * @return {@code false} Si el usuario ya estaba registrado o username es
+	 *         {@code null}. {@code true} en otro caso.
 	 */
 	public boolean addUser(String username, String password, LocalDate birthday) {
-		
+
 		// El usuario no debe estar registrado. Validación de datos.
-		if (username == null || 
-			username.isBlank() ||
-			username.isEmpty() ||
-			password.isBlank() ||
-			password.isEmpty() ||
-			users.containsKey(username)) return false;
-				
-		User user = new User.Builder(username)
-					.password(password)
-					.birthday(birthday)
-					.build()
-					.get();
-		
+		if (username == null || username.isBlank() || username.isEmpty() || password.isBlank() || password.isEmpty()
+				|| users.containsKey(username)) {
+			return false;
+		}
+
+		User user = new User.Builder(username).password(password).birthday(birthday).build().get();
+
 		// Persistencia.
-		boolean persistence = DAOFactory.getInstance()
-								.getUserDAO()
-								.register(user.asMut());
-				
+		boolean persistence = DAOFactory.getInstance().getUserDAO().register(user.asMut());
+
 		// Fallo de registro en persistencia.
-		if (!persistence) return false;
-		
+		if (!persistence) {
+			return false;
+		}
+
 		// Registrar al usuario en memoria.
 		users.put(user.getUserName(), user);
-			
+
 		return true;
 	}
-	
+
 	/**
 	 * Obtiene el usuario especificado. Véase {@link User}.
-	 * 
+	 *
 	 * @param username Nombre del usuario especificado.
 	 * @param password Contraseña del usuario especificado.
-	 * 
-	 * @return Devuelve el usuario si username y password son no nulas, el 
-	 * usuario estaba registrado y la contraseña coincide con la suya.
+	 *
+	 * @return Devuelve el usuario si username y password son no nulas, el usuario
+	 *         estaba registrado y la contraseña coincide con la suya.
 	 */
 	public Optional<User> getUser(String username, String password) {
-		
+
 		// El usuario debe estar registrado.
-		if (username == null || !users.containsKey(username)) 
-			return Optional.empty();
-		
 		// La contraseña debe coincidir.
-		if (password == null || !users.get(username).checkPassword(password)) 
+		if (username == null || !users.containsKey(username) || password == null
+				|| !users.get(username).checkPassword(password)) {
 			return Optional.empty();
-				
+		}
+
 		// Éxito
 		return Optional.of(users.get(username));
 	}
-	
-	/**
-	 * Actualiza los datos del usuario proporcionado, escribiendolos mediante
-	 * el servicio de persistencia.
-	 * 
-	 * @param u Usuario del que se desea actualizar la información. Se espera 
-	 * que u haya sido obtenido mediante
-	 * {@link UserRepository#getUser(String, String)}. Véase {@link User}.
-	 * 
-	 * @return {@code false} Si el usuario es {@code null}, no estaba 
-	 * registrado o existe alguna inconsitencia entre el mapeo del nombre del 
-	 * usuario proporcionado y el objeto usuario proprocionado. {@code true} 
-	 * en otro caso.
-	 */
-	public boolean updateUser(User u) {
-		
-		// Comprobar si este usuario está registrado.
-		if (u == null || !users.containsKey(u.getUserName())) return false;
-		// Doble comprobacion. La instancia de usuario asociada es la misma.
-		if (!users.get(u.getUserName()).equals(u)) return false;
-		
-		// Dado que la obtención de usuarios devuelve referencias. 
-		// Se espera que la actualización de datos las reciba, por tanto, dicha
-		// referencia se encuentra en el mapa de usuarios y ya está actualizada.
-		// Solo hace falta actualizar la información del usuario en 
-		// persistencia.
-	
-		// Actualización en persistencia.
-		boolean persistence = DAOFactory.getInstance()
-								.getUserDAO()
-								.modify(u.asMut());
-				
-		// Fallo de actualización en persistencia da lugar a eliminación del 
-		// usuario del mapa en memoria
-		if (!persistence) {
-			users.remove(u.getUserName());
-		}
-		
-		return persistence;
-	}
-	
-	/**
-	 * Elimina el usuario y su información asociada.
-	 * 
-	 * @param u Usuario que se desea eliminar.
-	 * @return {@code true} si el usuario existía en el repositorio y pudo ser
-	 * eliminado.
-	 */
-	public boolean removeUser(User u) {
-		
-		// Comprobar si este usuario está registrado.
-		if (u == null || !users.containsKey(u.getUserName())) return false;
-		// Doble comprobacion. La instancia de usuario asociada es la misma.
-		if (!users.get(u.getUserName()).equals(u)) return false;
-		
-		// Eliminación de persistencia.
-		boolean persistence = DAOFactory.getInstance()
-								.getUserDAO()
-								.delete(u.asMut());
-		
-		// Si hubo exito en la eliminación de persistencia se quita del mapa.
-		if (persistence)
-			users.remove(u.getUserName());
-		
-		return persistence;
-	}
-	
+
 	/**
 	 * Método para obtener la lista completa de usuarios.
-	 * 
+	 *
 	 * @return Lista no modificable de usuarios.
 	 */
 	protected Collection<User> getUsers() {
 		return Collections.unmodifiableCollection(users.values());
+	}
+
+	/**
+	 * Elimina el usuario y su información asociada.
+	 *
+	 * @param u Usuario que se desea eliminar.
+	 * @return {@code true} si el usuario existía en el repositorio y pudo ser
+	 *         eliminado.
+	 */
+	public boolean removeUser(User u) {
+
+		// Comprobar si este usuario está registrado.
+		// Doble comprobacion. La instancia de usuario asociada es la misma.
+		if (u == null || !users.containsKey(u.getUserName()) || !users.get(u.getUserName()).equals(u)) {
+			return false;
+		}
+
+		// Eliminación de persistencia.
+		boolean persistence = DAOFactory.getInstance().getUserDAO().delete(u.asMut());
+
+		// Si hubo exito en la eliminación de persistencia se quita del mapa.
+		if (persistence) {
+			users.remove(u.getUserName());
+		}
+
+		return persistence;
+	}
+
+	/**
+	 * Actualiza los datos del usuario proporcionado, escribiendolos mediante el
+	 * servicio de persistencia.
+	 *
+	 * @param u Usuario del que se desea actualizar la información. Se espera que u
+	 *          haya sido obtenido mediante
+	 *          {@link UserRepository#getUser(String, String)}. Véase {@link User}.
+	 *
+	 * @return {@code false} Si el usuario es {@code null}, no estaba registrado o
+	 *         existe alguna inconsitencia entre el mapeo del nombre del usuario
+	 *         proporcionado y el objeto usuario proprocionado. {@code true} en otro
+	 *         caso.
+	 */
+	public boolean updateUser(User u) {
+
+		// Comprobar si este usuario está registrado.
+		// Doble comprobacion. La instancia de usuario asociada es la misma.
+		if (u == null || !users.containsKey(u.getUserName()) || !users.get(u.getUserName()).equals(u)) {
+			return false;
+		}
+
+		// Dado que la obtención de usuarios devuelve referencias.
+		// Se espera que la actualización de datos las reciba, por tanto, dicha
+		// referencia se encuentra en el mapa de usuarios y ya está actualizada.
+		// Solo hace falta actualizar la información del usuario en
+		// persistencia.
+
+		// Actualización en persistencia.
+		boolean persistence = DAOFactory.getInstance().getUserDAO().modify(u.asMut());
+
+		// Fallo de actualización en persistencia da lugar a eliminación del
+		// usuario del mapa en memoria
+		if (!persistence) {
+			users.remove(u.getUserName());
+		}
+
+		return persistence;
 	}
 }
