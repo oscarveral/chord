@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import umu.tds.chord.dao.DAOFactory;
 
@@ -101,7 +100,7 @@ public enum SongRepository {
 						return song.getStyle().equals(sty);
 					}
 					return true;
-				}).collect(Collectors.toList());
+				}).toList();
 	}
 
 	/**
@@ -160,7 +159,7 @@ public enum SongRepository {
 
 			// Eliminar el estilo de la lista si no quedan canciones del mismo.
 			String style = song.getStyle();
-			if (!songs.stream().anyMatch(s -> s.getStyle().equals(style))) {
+			if (songs.stream().noneMatch(s -> s.getStyle().equals(style))) {
 				styles.remove(style);
 			}
 		}
@@ -170,16 +169,14 @@ public enum SongRepository {
 
 	private void removeSongFromUsers(Song s) {
 		// Método de sincronización de las canciones de los usuarios.
-		UserRepository.INSTANCE.getUsers().stream().map(u -> u.asMut()).forEach(u -> {
+		UserRepository.INSTANCE.getUsers().stream().map(Mutable::asMut).forEach(u -> {
 			// Para cada usuario eliminamos la canción de favoritos y
 			// recientes.
 			u.removeFavouriteSong(s);
 			u.removeRecentSong(s);
-			u.getPlaylists().stream().map(p -> p.asMut())
+			u.getPlaylists().stream().map(Mutable::asMut)
 					// Eliminamos la canción de todas las playlists.
-					.forEach(p -> {
-						p.removeSong(s);
-					});
+					.forEach(p -> p.removeSong(s));
 			UserRepository.INSTANCE.updateUser(u);
 		});
 	}

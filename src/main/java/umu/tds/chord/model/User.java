@@ -19,7 +19,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	/**
 	 * Clase constructora de usuarios.
 	 */
-	public final static class Builder {
+	public static final class Builder {
 
 		private LocalDate birthday;
 		private Set<Song> favouriteSongs;
@@ -149,11 +149,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 
 		private boolean validate() {
 			// Se fuerza establecer contraseña y cumpleaños.
-			if ((this.hashedPassword == null) || (this.birthday == null)) {
-				return false;
-			}
-
-			return true;
+			return (this.hashedPassword != null && this.birthday != null);
 		}
 	}
 
@@ -162,7 +158,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 * mutar los datos del usuario. Se exponen también los métodos necesarios para
 	 * la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends User implements Persistent {
+	public static final class Internal extends User implements Persistent {
 
 		private int id;
 		private boolean isRegistered;
@@ -301,11 +297,8 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	private final Set<Song> favouriteSongs;
 	private final String hashedPassword;
 	private boolean isPremium;
-
 	private final List<Playlist> playlists;
-
 	private final List<Song> recentSongs;
-
 	private final String username;
 
 	/**
@@ -344,8 +337,8 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 *         {@code false} en cualquier otro caso.
 	 */
 	public boolean checkPassword(String password) {
-		String hashedPassword = StringHasher.hash(password);
-		return this.hashedPassword.equals(hashedPassword);
+		String hp = StringHasher.hash(password);
+		return this.hashedPassword.equals(hp);
 	}
 
 	/**

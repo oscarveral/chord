@@ -6,8 +6,6 @@ import java.util.Set;
 
 import umu.tds.chord.component.BuscadorCanciones;
 import umu.tds.chord.component.Canciones;
-import umu.tds.chord.component.CancionesEvent;
-import umu.tds.chord.component.CancionesListener;
 import umu.tds.chord.component.CargadorCanciones;
 import umu.tds.chord.model.SongRepository;
 
@@ -27,7 +25,7 @@ public enum Controller {
 	INSTANCE;
 
 	private BuscadorCanciones buscadorCanciones;
-	
+
 	private Set<SongStatusListener> songStatusListeners;
 	private Set<UserStatusListener> userStatusListeners;
 
@@ -79,13 +77,7 @@ public enum Controller {
 	 */
 	private void registerCancionesListener() {
 		buscadorCanciones = CargadorCanciones.INSTANCE;
-		buscadorCanciones.addCancionesListener(new CancionesListener() {
-
-			@Override
-			public void nuevasCanciones(CancionesEvent e) {
-				processSongData(e.getCanciones());
-			}
-		});
+		buscadorCanciones.addCancionesListener(e -> processSongData(e.getCanciones()));
 	}
 
 	/**

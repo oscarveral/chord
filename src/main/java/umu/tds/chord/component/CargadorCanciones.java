@@ -1,5 +1,6 @@
 package umu.tds.chord.component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -11,7 +12,7 @@ public enum CargadorCanciones implements BuscadorCanciones {
 	INSTANCE;
 
 	private Optional<String> archivoCanciones;
-	private Vector<CancionesListener> listeners;
+	private List<CancionesListener> listeners;
 
 	private CargadorCanciones() {
 		archivoCanciones = Optional.empty();
@@ -20,7 +21,7 @@ public enum CargadorCanciones implements BuscadorCanciones {
 
 	@Override
 	public synchronized void addCancionesListener(CancionesListener l) {
-		listeners.addElement(l);
+		listeners.add(l);
 	}
 
 	private synchronized void notificarCargaCanciones(CancionesEvent e) {
@@ -29,7 +30,7 @@ public enum CargadorCanciones implements BuscadorCanciones {
 
 	@Override
 	public synchronized void removeCancionesListener(CancionesListener l) {
-		listeners.removeElement(l);
+		listeners.remove(l);
 	}
 
 	/**

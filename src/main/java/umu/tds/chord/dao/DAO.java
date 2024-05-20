@@ -49,12 +49,8 @@ public interface DAO<T extends Persistent> {
 	public default boolean delete(T t) {
 
 		// Checks obligatorios
-		if ((t == null) || !t.isRegistered()) {
-			return false;
-		}
-
+		return (t != null && t.isRegistered());
 		// Continuar en las implementaciones.
-		return true;
 	}
 
 	/**
@@ -72,12 +68,8 @@ public interface DAO<T extends Persistent> {
 	public default boolean modify(T t) {
 
 		// Checks obligatorios
-		if ((t == null) || !t.isRegistered()) {
-			return false;
-		}
-
+		return (t != null && t.isRegistered());
 		// Continuar en las implementaciones.
-		return true;
 	}
 
 	/**
@@ -114,12 +106,8 @@ public interface DAO<T extends Persistent> {
 	public default boolean register(T t) {
 
 		// Checks iniciales obligatorios.
-		if ((t == null) || t.isRegistered()) {
-			return false;
-		}
-
+		return (t != null && !t.isRegistered());
 		// Continuar checks y registro en implementaciones.
-		return true;
 	}
 
 	/**
@@ -137,6 +125,6 @@ public interface DAO<T extends Persistent> {
 	public default List<T> stringToPersistents(String representation) {
 		return Arrays.stream(representation.split(REPRESENTATION_STRING_SEPARATOR)).filter(s -> !s.isEmpty())
 				.map(id -> recover(Integer.valueOf(id))).filter(o -> o.isPresent()) // Ignorar fallos de obtención.
-				.map(o -> o.get()).collect(Collectors.toList());
+				.map(o -> o.get()).toList();
 	}
 }

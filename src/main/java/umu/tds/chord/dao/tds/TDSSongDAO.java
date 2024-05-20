@@ -3,7 +3,6 @@ package umu.tds.chord.dao.tds;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
@@ -86,10 +85,7 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 
 			switch (Properties.valueOf(p.getNombre())) {
 			// No se puden mutar las canciones.
-			case NAME:
-			case AUTHOR:
-			case PATH:
-			case STYLE:
+			case NAME, AUTHOR, PATH, STYLE:
 			default:
 				break;
 			}
@@ -153,7 +149,7 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 	public List<Song.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.SONG_ENTITY_TYPE.name()).stream()
 				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null) // Ignorar errores.
-				.collect(Collectors.toUnmodifiableList());
+				.toList();
 	}
 
 	/**

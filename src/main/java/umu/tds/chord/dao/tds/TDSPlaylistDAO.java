@@ -3,7 +3,6 @@ package umu.tds.chord.dao.tds;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
@@ -12,6 +11,7 @@ import tds.driver.ServicioPersistencia;
 import umu.tds.chord.dao.DAO;
 import umu.tds.chord.dao.DAOFactory;
 import umu.tds.chord.dao.DAOFactory.DAOImplementation;
+import umu.tds.chord.model.Mutable;
 import umu.tds.chord.model.Persistent;
 import umu.tds.chord.model.Playlist;
 import umu.tds.chord.model.Song;
@@ -97,7 +97,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 			case SONGS:
 				prop.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las canciones.
-						p.getSongs().stream().map(s -> s.asMut()).toList()));
+						p.getSongs().stream().map(Mutable::asMut).toList()));
 				break;
 			default:
 				break;
@@ -165,7 +165,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 	public List<Playlist.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.PLAYLIST_ENTITY_TYPE.name()).stream()
 				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null) // Ignorar errores.
-				.collect(Collectors.toUnmodifiableList());
+				.toList();
 	}
 
 	/**
@@ -185,6 +185,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 			ePlaylist = persistence.recuperarEntidad(p.getId());
 		} catch (NullPointerException e) {
 		}
+
 		if (ePlaylist != null) {
 			return false;
 		}
@@ -199,7 +200,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 				new Propiedad(Properties.SONGS.name(), DAO.persistentsToString(
 						// Necesito la versión interna de las cancions para
 						// leer las ids en persistencia.
-						p.getSongs().stream().map(pl -> pl.asMut()).toList()))));
+						p.getSongs().stream().map(Mutable::asMut).toList()))));
 
 		// Registro.
 		ePlaylist = persistence.registrarEntidad(ePlaylist);

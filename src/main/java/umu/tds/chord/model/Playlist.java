@@ -16,7 +16,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	/**
 	 * Clase constructora de playlists.
 	 */
-	public final static class Builder {
+	public static final class Builder {
 
 		private String description;
 		private String name;
@@ -75,11 +75,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 
 		private boolean validate() {
 			// Forzar a que la descripción no sea nula.
-			if (this.description == null) {
-				return false;
-			}
-
-			return true;
+			return this.description != null;
 		}
 	}
 
@@ -88,7 +84,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	 * mutar el estado de la playlist. Se exponen también los métodos necesarios
 	 * para la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends Playlist implements Persistent {
+	public static final class Internal extends Playlist implements Persistent {
 
 		private int id;
 		private boolean isRegistered;

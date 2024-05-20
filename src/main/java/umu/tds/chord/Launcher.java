@@ -7,7 +7,7 @@ import umu.tds.chord.ui.Interface;
 /**
  * Lanzador de la aplicación.
  */
-final public class Launcher {
+public final class Launcher {
 	/**
 	 * Loop principal de la aplicación.
 	 *

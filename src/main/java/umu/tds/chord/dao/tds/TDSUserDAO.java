@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import beans.Entidad;
 import beans.Propiedad;
@@ -16,6 +15,7 @@ import tds.driver.ServicioPersistencia;
 import umu.tds.chord.dao.DAO;
 import umu.tds.chord.dao.DAOFactory;
 import umu.tds.chord.dao.DAOFactory.DAOImplementation;
+import umu.tds.chord.model.Mutable;
 import umu.tds.chord.model.Persistent;
 import umu.tds.chord.model.Playlist;
 import umu.tds.chord.model.User;
@@ -63,9 +63,8 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		}
 
 		// Eliminación en cascada de las playlists asociadas al usuario.
-		u.getPlaylists().forEach(p -> {
-			DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().delete(p.asMut());
-		});
+		u.getPlaylists()
+				.forEach(p -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().delete(p.asMut()));
 
 		// Eliminar de la pool.
 		TDSPoolDAO.removePersistent(u);
@@ -114,27 +113,27 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 
 				// Recuperar playlists guardadas.
 				String playlistsStr = p.getValor();
-				Set<Playlist.Internal> oldPlaylists = new HashSet<Playlist.Internal>(DAOFactory
-						.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().stringToPersistents(playlistsStr));
+				Set<Playlist.Internal> oldPlaylists = new HashSet<>(DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+						.getPlaylistDAO().stringToPersistents(playlistsStr));
 
 				// Crear un set con ids actuales de las playlists.
-				Set<Playlist.Internal> newPlaylists = new HashSet<Playlist.Internal>(
-						u.getPlaylists().stream().map(l -> l.asMut()).toList());
+				Set<Playlist.Internal> newPlaylists = new HashSet<>(
+						u.getPlaylists().stream().map(Mutable::asMut).toList());
 
 				// Obtener y registrar nuevas playlist
-				Set<Playlist.Internal> createdPlaylists = new HashSet<Playlist.Internal>(newPlaylists);
+				Set<Playlist.Internal> createdPlaylists = new HashSet<>(newPlaylists);
 				createdPlaylists.removeAll(oldPlaylists);
 				createdPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().register(playlist));
 
 				// Eliminar playlists que ya no están presentes.
-				Set<Playlist.Internal> removedPlaylists = new HashSet<Playlist.Internal>(oldPlaylists);
+				Set<Playlist.Internal> removedPlaylists = new HashSet<>(oldPlaylists);
 				removedPlaylists.removeAll(newPlaylists);
 				removedPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().delete(playlist));
 
 				// Actualizamos el resto de playlists.
-				Set<Playlist.Internal> updatePlaylists = new HashSet<Playlist.Internal>(newPlaylists);
+				Set<Playlist.Internal> updatePlaylists = new HashSet<>(newPlaylists);
 				updatePlaylists.retainAll(oldPlaylists);
 				updatePlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().modify(playlist));
@@ -142,19 +141,20 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				p.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las playlist para
 						// poder obtener sus ids en persistencia.
-						u.getPlaylists().stream().map(l -> l.asMut()).toList()));
+						u.getPlaylists().stream().map(Mutable::asMut).toList()));
 				break;
 			case RECENT_SONGS:
 				p.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las canciones para
 						// poder obtener sus ids en persistencia.
-						u.getRecentSongs().stream().map(s -> s.asMut()).toList()));
+						u.getRecentSongs().stream().map(Mutable::asMut).toList()));
 				break;
 			case FAVOURITE_SONGS:
 				p.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las canciones para
 						// poder obtener sus ids en persistencia.
-						u.getFavouriteSongs().stream().map(s -> s.asMut()).toList()));
+						u.getFavouriteSongs().stream().map(Mutable::asMut).toList()));
+				break;
 			default:
 				break;
 			}
@@ -226,15 +226,15 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 
 		// Añadir playlists.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().stringToPersistents(playlistsStr)
-				.forEach(p -> user.addPlaylist(p));
+				.forEach(user::addPlaylist);
 
 		// Añadir cancioens recientes.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO().stringToPersistents(recentSongsStr)
-				.forEach(s -> user.addRecentSong(s));
+				.forEach(user::addRecentSong);
 
 		// Añadir canciones favoritas.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO().stringToPersistents(favouriteSongsStr)
-				.forEach(s -> user.addFavouriteSong(s));
+				.forEach(user::addFavouriteSong);
 
 		// Retorno del objeto.
 		return Optional.of(user);
@@ -246,8 +246,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 	@Override
 	public List<User.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.USER_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null)
-				.collect(Collectors.toUnmodifiableList());
+				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null).toList();
 	}
 
 	/**
@@ -272,11 +271,9 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		}
 
 		// Registro de playlists asociadas al usuario.
-		user.getPlaylists().forEach(p -> {
-			DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO()
-					// Debo registrar la versión interna de la playlist.
-					.register(p.asMut());
-		});
+		user.getPlaylists().forEach(p -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO()
+				// Debo registrar la versión interna de la playlist.
+				.register(p.asMut()));
 
 		// Creación de la entidad.
 		eUser = new Entidad();
@@ -289,15 +286,15 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				new Propiedad(Properties.PLAYLISTS.name(), DAO.persistentsToString(
 						// Necesito la versión interna de las playlist para
 						// poder obtener sus ids en persistencia.
-						user.getPlaylists().stream().map(p -> p.asMut()).toList())),
+						user.getPlaylists().stream().map(Mutable::asMut).toList())),
 				new Propiedad(Properties.RECENT_SONGS.name(), DAO.persistentsToString(
 						// Necesito la versión interna de las canciones para
 						// poder obtener sus ids en persistencia.
-						user.getRecentSongs().stream().map(s -> s.asMut()).toList())),
+						user.getRecentSongs().stream().map(Mutable::asMut).toList())),
 				new Propiedad(Properties.FAVOURITE_SONGS.name(), DAO.persistentsToString(
 						// Necesito la versión interna de las canciones para
 						// poder obtener sus ids en persistencia.
-						user.getFavouriteSongs().stream().map(p -> p.asMut()).toList())),
+						user.getFavouriteSongs().stream().map(Mutable::asMut).toList())),
 				new Propiedad(Properties.PREMIUM.name(), String.valueOf(user.isPremium()))));
 
 		// Registro de la entidad y establecimiento del id.

@@ -9,12 +9,12 @@ import com.google.common.base.Objects;
  * almacenada la ruta al fichero con dicha canción para que pueda ser localizada
  * y reproducida.
  */
-public sealed abstract class Song implements Mutable<Song.Internal> {
+public abstract sealed class Song implements Mutable<Song.Internal> {
 
 	/**
 	 * Constructor de canciones.
 	 */
-	public final static class Builder {
+	public static final class Builder {
 
 		private String author;
 		private String name;
@@ -86,11 +86,7 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 
 		private boolean validate() {
 			// Forzar a establecer los 3 parámtros.
-			if ((this.author == null) || (this.path == null) || (this.style == null)) {
-				return false;
-			}
-
-			return true;
+			return (this.author != null && this.path != null && this.style != null);
 		}
 	}
 
@@ -99,7 +95,7 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 	 * mutar el estado de la canción. Se exponen también los métodos necesarios para
 	 * la persistencia {@link Persistent}.
 	 */
-	public final static class Internal extends Song implements Persistent {
+	public static final class Internal extends Song implements Persistent {
 
 		private int id;
 		private boolean isRegistered;
@@ -144,13 +140,21 @@ public sealed abstract class Song implements Mutable<Song.Internal> {
 			this.id = id;
 			this.isRegistered = true;
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return super.equals(obj);
+		}
+
+		@Override
+		public int hashCode() {
+			return super.hashCode();
+		}
 	}
 
 	private final String author;
 	private final String name;
-
 	private final String path;
-
 	private final String style;
 
 	/**
