@@ -1,8 +1,8 @@
 package umu.tds.chord.model;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 */
 	public static final class Builder {
 
-		private LocalDate birthday;
+		private Date birthday;
 		private Set<Song> favouriteSongs;
 		private String hashedPassword;
 		private boolean isPremium;
@@ -53,7 +53,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 *
 		 * @return Instancia actual del builder.
 		 */
-		public Builder birthday(LocalDate birthday) {
+		public Builder birthday(Date birthday) {
 			this.birthday = birthday;
 			return this;
 		}
@@ -293,7 +293,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		}
 	}
 
-	private final LocalDate birthday;
+	private final Date birthday;
 	private final Set<Song> favouriteSongs;
 	private final String hashedPassword;
 	private boolean isPremium;
@@ -346,7 +346,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 *
 	 * @return Cumpleaños del usuario.
 	 */
-	public LocalDate getBirthday() {
+	public Date getBirthday() {
 		return birthday;
 	}
 
