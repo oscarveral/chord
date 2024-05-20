@@ -1,8 +1,8 @@
 package umu.tds.chord.model;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public enum UserRepository {
 	 * @return {@code false} Si el usuario ya estaba registrado o username es
 	 *         {@code null}. {@code true} en otro caso.
 	 */
-	public boolean addUser(String username, String password, Date birthday) {
+	public boolean addUser(String username, String password, LocalDate birthday) {
 
 		// El usuario no debe estar registrado. Validación de datos.
 		if (username == null || username.isBlank() || username.isEmpty() || password.isBlank() || password.isEmpty()
