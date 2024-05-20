@@ -1,6 +1,5 @@
 package umu.tds.chord.model;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
