@@ -1,5 +1,6 @@
 package umu.tds.chord.controller;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -8,6 +9,8 @@ import umu.tds.chord.component.BuscadorCanciones;
 import umu.tds.chord.component.Canciones;
 import umu.tds.chord.component.CargadorCanciones;
 import umu.tds.chord.model.SongRepository;
+import umu.tds.chord.model.User;
+import umu.tds.chord.model.UserRepository;
 
 /**
  * Controlador para la lógica de negocio. Expone la API que utilizará la
@@ -25,17 +28,94 @@ public enum Controller {
 	INSTANCE;
 
 	private BuscadorCanciones buscadorCanciones;
+	
+	private Optional<User> currentUser;
 
 	private Set<SongStatusListener> songStatusListeners;
 	private Set<UserStatusListener> userStatusListeners;
 
 	private Controller() {
+		registerCancionesListener();
 
+		currentUser = Optional.empty();
+		
 		userStatusListeners = new HashSet<>();
 		songStatusListeners = new HashSet<>();
-
-		registerCancionesListener();
 	}
+	
+	// ---------- Métodos del controlador. ----------
+	
+	/**
+	 * Método para registrar un nuevo usuario en la aplicación.
+	 * 
+	 * @param username Nombre del nuevo usuario.
+	 * @param password Contraseña del nuevo usuario.
+	 * @param birthday Cumpleaños del nuevo usuario.
+	 * 
+	 * @return {@code true} si hubo éxito en el registro del usuario. {@code 
+	 * false} en cualquier otro caso.
+	 */
+	public boolean register(String username, String password, LocalDate birthday) {
+		return UserRepository.INSTANCE.addUser(username, password, birthday);
+	}
+	
+	/**
+	 * Método para iniciar sesión en el controlador como un determinado usuario.
+	 * 
+	 * @param username Nombre de usuario.
+	 * @param password Contraseña del usuario.
+	 * 
+	 * @return {@code true} si no había un usuario con sesion iniciada y hubo 
+	 * éxito iniciando sesión con el usuario especificado. {@code false} si ya 
+	 * había un usuario con sesión iniciada o en cualquier otro caso de error.
+	 */
+	public boolean login(String username, String password) {
+		if (currentUser.isEmpty()) {
+			currentUser = UserRepository.INSTANCE.getUser(username, password);
+			return currentUser.isPresent();
+		}
+		return false;
+	}
+	
+	/**
+	 * Método para cerrar la sesión del usuario actual del controlador, 
+	 * actualizando toda su información en persistencia.
+	 * 
+	 * @return {@code true} si no había usuario con sesión iniciada o se pudo 
+	 * cerrar la sesión de forma satisfactoria. {@code false} si hubo algún 
+	 * error cerrando la sesión.
+	 * 
+	 * @implNote Un fallo de cierre de sesión abortará todo el proceso, 
+	 * manteniendo la sesión iniciada.
+	 */
+	public boolean logout() {
+		currentUser.ifPresent(u -> {
+			boolean updated = UserRepository.INSTANCE.updateUser(u);
+			if (updated) currentUser = Optional.empty();
+		});
+		return currentUser.isEmpty();
+	}
+	
+	/**
+	 * Método para eliminar la cuenta del usuario con la sesión iniciada 
+	 * actualmente. 
+	 * 
+	 * @return {@code true} si no había usuario con sesión iniciada o se pudo
+	 * cerrar la sesión y eliminar el usuario de forma satisfactoria. {@code 
+	 * false} si hubo algún error durante la eliminación.
+	 * 
+	 * @implNote Un fallo de eliminación abortará todo el proceso, manteniendo
+	 * la sesión iniciada.
+	 */
+	public boolean remove() {
+		currentUser.ifPresent(u -> {
+			boolean removed = UserRepository.INSTANCE.removeUser(u);
+			if (removed) currentUser = Optional.empty();
+		});
+		return currentUser.isEmpty();
+	}
+
+	// ---------- Cargador de canciones. ----------
 
 	/**
 	 * Método para iniciar la carga de canciones a partir de un fichero.
@@ -79,6 +159,8 @@ public enum Controller {
 		buscadorCanciones = CargadorCanciones.INSTANCE;
 		buscadorCanciones.addCancionesListener(e -> processSongData(e.getCanciones()));
 	}
+	
+	// ---------- Listeners. ----------
 
 	/**
 	 * Registra un listener de estado de canciones en el controlador.
@@ -114,5 +196,23 @@ public enum Controller {
 	 */
 	public void removeUserStatusListener(UserStatusListener l) {
 		userStatusListeners.remove(l);
+	}
+	
+	// ---------- Depuración. ----------
+	
+	/**
+	 * @apiNote ALERTA. Método de depuración.
+	 * 
+	 * Fuerza un reseteo del estado del controlador, vaciando las listas con los
+	 * listeners de eventos y quitando el usuario actual de forma forzada
+	 * actualizando sus datos en el caso de que hubiese cambios.
+	 */
+	public void clearControllerState() {
+		currentUser.ifPresent(u -> {
+			UserRepository.INSTANCE.updateUser(u);
+			currentUser = Optional.empty();
+		});
+		songStatusListeners.clear();
+		userStatusListeners.clear();
 	}
 }

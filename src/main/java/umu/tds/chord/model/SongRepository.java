@@ -62,7 +62,7 @@ public enum SongRepository {
 
 		// Persistencia.
 		boolean persistence = DAOFactory.getInstance().getSongDAO().register(song.asMut());
-
+		
 		// Fallo de registro en persistencia.
 		if (!persistence) {
 			return false;
@@ -112,7 +112,22 @@ public enum SongRepository {
 	public Set<Song> getSongs() {
 		return Collections.unmodifiableSet(this.songs);
 	}
-
+	
+	/**
+	 * Comprueba la existencia en el repositorio de una canción determinada.
+	 * 
+	 * @param name Nombre de la canción.
+	 * @param author Autor de la canción.
+	 * @param path Ruta de la canción.
+	 * @param style Estilo de la canción.
+	 * 
+	 * @return {@code true} si existe la canción especificada.
+	 */
+	public boolean existSong(String name, String author, String path, String style) {
+		Song song = new Song.Builder(name).author(author).path(path).style(style).build().get();
+		return songs.stream().anyMatch(s -> s.equals(song));
+	}
+	
 	/**
 	 * Retorna el set de estilos de las canciones del repositorio.
 	 *
@@ -121,7 +136,18 @@ public enum SongRepository {
 	public Set<String> getStyles() {
 		return Collections.unmodifiableSet(styles);
 	}
-
+	
+	/**
+	 * Comprueba la existencia en el repositorio de un estilo determinado.
+	 * 
+	 * @param style Estilo que se desea consultar.
+	 * 
+	 * @return {@code true} si existe el estilo especificado.
+	 */
+	public boolean existStyle(String style) {
+		return styles.contains(style);
+	}
+	
 	/**
 	 * Función para obtener el estilo comodín utilizado en las búsquedas
 	 *
@@ -148,8 +174,14 @@ public enum SongRepository {
 		}
 
 		// Eliminación de persistencia.
+		// Uso la versión de la canción del repositorio ya que se asegura que 
+		// tiene un id de persistencia asociado. Como Song hace override de 
+		// equals sería posible pasar como parámetro una canción igual pero no 
+		// registrada en persistencia. Habilitamos la posibilidad de
+		// realizar la construcción de canciones nuevas fuera del repositorio.
+		song = songs.stream().filter(song::equals).findFirst().get();
 		boolean persistence = DAOFactory.getInstance().getSongDAO().delete(song.asMut());
-
+		
 		// Eliminación de memoria.
 		if (persistence) {
 			songs.remove(song);
@@ -163,7 +195,8 @@ public enum SongRepository {
 				styles.remove(style);
 			}
 		}
-
+		
+		
 		return persistence;
 	}
 
@@ -177,7 +210,29 @@ public enum SongRepository {
 			u.getPlaylists().stream().map(Mutable::asMut)
 					// Eliminamos la canción de todas las playlists.
 					.forEach(p -> p.removeSong(s));
+			// Actualización de cada usuario.
 			UserRepository.INSTANCE.updateUser(u);
 		});
 	}
+	
+	// ---------- Depuración. ----------
+	
+	/**
+	 * @apiNote ALERTA. Método de depuración.
+	 * 
+	 * Fuerza un reseteo del estado del repositorio de canciones. Se eliminarán
+	 * todas las canciones de persistencia.
+	 */
+	public void clearSonRepositoryState() {
+		// Quitar todas las canciones.
+		songs.forEach(s -> {
+			removeSongFromUsers(s);
+			DAOFactory.getInstance().getSongDAO().delete(s.asMut());
+		});
+		songs.clear();
+		styles.clear();
+		styles.add(allStyles);
+	}
+	
+	
 }

@@ -13,17 +13,14 @@ public final class Launcher {
 	 *
 	 * @param args Argumentos del programa.
 	 */
-	public static void main(String[] _args) {
-		EventQueue.invokeLater(new Runnable() {
+	public static void main(String[] args) {
 
-			@Override
-			public void run() {
-				try {
-					@SuppressWarnings("unused")
-					Interface v = new Interface();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		EventQueue.invokeLater(() -> {
+			try {
+				Interface v = new Interface();
+				v.show();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		});
 	}
