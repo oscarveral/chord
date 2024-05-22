@@ -38,7 +38,7 @@ public enum UserRepository {
 	public boolean addUser(String username, String password, LocalDate birthday) {
 
 		// El usuario no debe estar registrado. Validación de datos.
-		if (username == null || username.isBlank() || username.isEmpty() || password.isBlank() || password.isEmpty()
+		if (username == null || username.isBlank() || username.isEmpty() || password.isEmpty()
 				|| users.containsKey(username)) {
 			return false;
 		}
