@@ -1,17 +1,29 @@
 package umu.tds.chord.ui;
 
-import java.awt.Frame;
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public final class Interface {
 
-	Frame ventana;
+	JFrame ventana;
 	
 	public Interface() {
 		initialize();
 	}
 	
 	private void initialize() {
-		ventana = new Frame("A");
+		ventana = new JFrame("A");
+		JPanel d = new JPanel();
+		d.setLayout(new BorderLayout());
+		d.add(new RegisterPanel(), BorderLayout.CENTER);
+		ventana.setLayout(new BorderLayout());
+		ventana.add(d, BorderLayout.CENTER);
+	    ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Diff con exit on close
+	    ventana.setSize(ventana.getPreferredSize());
+	    ventana.setLocationRelativeTo(null);
+	    ventana.pack();
 	}
 	
 	public void show() {
