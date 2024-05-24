@@ -148,7 +148,7 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 	@Override
 	public List<Song.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.SONG_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null) // Ignorar errores.
+				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar errores.
 				.toList();
 	}
 

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.Date;
 
 import javax.swing.JButton;
-import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 

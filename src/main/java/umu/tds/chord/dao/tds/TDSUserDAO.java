@@ -108,7 +108,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				p.setValor(String.valueOf(u.isPremium()));
 				break;
 			case BIRTHDAY:
-				p.setValor(u.getBirthday().toString());
+				p.setValor(u.getBirthday().toInstant().toString());
 				break;
 			case PLAYLISTS:
 
@@ -193,7 +193,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		if (!eUser.getNombre().equals(Properties.USER_ENTITY_TYPE.name())) {
 			return Optional.empty();
 		}
-
+		
 		// Propiedades primitivas que recuperar.
 		String userName = null;
 		String passwordHash = null;
@@ -209,6 +209,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		} catch (DateTimeParseException e) {
 			return Optional.empty();
 		}
+		
 
 		premium = Boolean.valueOf(persistence.recuperarPropiedadEntidad(eUser, Properties.PREMIUM.name()));
 
@@ -247,7 +248,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 	@Override
 	public List<User.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.USER_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null).toList();
+				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get).toList();
 	}
 
 	/**
@@ -283,7 +284,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		// Propiedades.
 		eUser.setPropiedades(Arrays.asList(new Propiedad(Properties.USER_NAME.name(), user.getUserName()),
 				new Propiedad(Properties.PASSWORD_HASH.name(), user.getHashedPassword()),
-				new Propiedad(Properties.BIRTHDAY.name(), user.getBirthday().toString()),
+				new Propiedad(Properties.BIRTHDAY.name(), user.getBirthday().toInstant().toString()),
 				new Propiedad(Properties.PLAYLISTS.name(), DAO.persistentsToString(
 						// Necesito la versión interna de las playlist para
 						// poder obtener sus ids en persistencia.

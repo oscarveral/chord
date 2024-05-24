@@ -164,7 +164,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 	@Override
 	public List<Playlist.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.PLAYLIST_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId()).orElse(null)).filter(u -> u != null) // Ignorar errores.
+				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar errores.
 				.toList();
 	}
 
