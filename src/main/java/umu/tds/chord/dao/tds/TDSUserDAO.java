@@ -1,8 +1,9 @@
 package umu.tds.chord.dao.tds;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -196,7 +197,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		// Propiedades primitivas que recuperar.
 		String userName = null;
 		String passwordHash = null;
-		LocalDate birthday = null;
+		Date birthday = null;
 		boolean premium = false;
 
 		// Recuperación de primitivas.
@@ -204,7 +205,7 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		passwordHash = persistence.recuperarPropiedadEntidad(eUser, Properties.PASSWORD_HASH.name());
 
 		try {
-			birthday = LocalDate.parse(persistence.recuperarPropiedadEntidad(eUser, Properties.BIRTHDAY.name()));
+			birthday = Date.from(Instant.parse(persistence.recuperarPropiedadEntidad(eUser, Properties.BIRTHDAY.name())));
 		} catch (DateTimeParseException e) {
 			return Optional.empty();
 		}

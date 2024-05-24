@@ -1,8 +1,8 @@
 package umu.tds.chord.model;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public enum UserRepository {
 	 * @return {@code false} Si el usuario ya estaba registrado o username es
 	 *         {@code null}. {@code true} en otro caso.
 	 */
-	public boolean addUser(String username, String password, LocalDate birthday) {
+	public boolean addUser(String username, String password, Date birthday) {
 
 		// El usuario no debe estar registrado. Validación de datos.
 		if (username == null || username.isBlank() || username.isEmpty() || password.isEmpty()
@@ -43,20 +43,17 @@ public enum UserRepository {
 			return false;
 		}
 
-		User user = new User.Builder(username).password(password).birthday(birthday).build().get();
-
+		Optional<User> optional = new User.Builder(username).password(password).birthday(birthday).build();		
+		if (optional.isEmpty()) return false;
+		
 		// Persistencia.
-		boolean persistence = DAOFactory.getInstance().getUserDAO().register(user.asMut());
-
-		// Fallo de registro en persistencia.
-		if (!persistence) {
-			return false;
+		User user = optional.get();
+		boolean result = DAOFactory.getInstance().getUserDAO().register(user.asMut());
+		// Registro en persistencia.
+		if (result) {
+			users.put(user.getUserName(), user);
 		}
-
-		// Registrar al usuario en memoria.
-		users.put(user.getUserName(), user);
-
-		return true;
+		return result;
 	}
 
 	/**

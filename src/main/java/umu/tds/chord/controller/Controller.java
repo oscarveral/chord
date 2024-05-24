@@ -1,6 +1,6 @@
 package umu.tds.chord.controller;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +55,7 @@ public enum Controller {
 	 * @return {@code true} si hubo éxito en el registro del usuario. {@code 
 	 * false} en cualquier otro caso.
 	 */
-	public boolean register(String username, String password, LocalDate birthday) {
+	public boolean register(String username, String password, Date birthday) {
 		return UserRepository.INSTANCE.addUser(username, password, birthday);
 	}
 	

@@ -2,7 +2,8 @@ package umu.tds.chord;
 
 import static org.junit.Assert.*;
 
-import java.time.LocalDate;
+import java.time.Instant;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -19,7 +20,7 @@ public class UserRepositoryTest {
 	private static final String transientTestPassword = "TransientTestPassword";
 	private static final String persistentTestUsername = "PersistentTestUsername";
 	private static final String persistentTestPassword = "PersistentTestPassword";
-	private static final LocalDate birthday = LocalDate.now();
+	private static final Date birthday = Date.from(Instant.now());
 	
 	private static final Playlist testPlaylist = PlaylistFactory.createPlaylist("TestPlaylist", "TestDescription").get();
 	
