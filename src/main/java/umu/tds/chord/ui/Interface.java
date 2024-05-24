@@ -17,7 +17,7 @@ public final class Interface {
 		ventana = new JFrame("A");
 		JPanel d = new JPanel();
 		d.setLayout(new BorderLayout());
-		d.add(new RegisterPanel(), BorderLayout.CENTER);
+		d.add(new LoginPanel(), BorderLayout.CENTER);
 		ventana.setLayout(new BorderLayout());
 		ventana.add(d, BorderLayout.CENTER);
 	    ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Diff con exit on close

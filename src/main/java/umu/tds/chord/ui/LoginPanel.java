@@ -3,73 +3,75 @@ package umu.tds.chord.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.Date;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.toedter.calendar.JDateChooser;
-
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.utils.ImageScaler;
 
-public class RegisterPanel extends JPanel {
+public class LoginPanel extends JPanel {
 
-	private static final long serialVersionUID = -5702881625651122753L;
-	private static final String registerText = "Registro de usuario";
+	private static final long serialVersionUID = -6517596456695550881L;
 	private static final String usernameText = "Nombre de usuario";
 	private static final String passwordText = "Contraseña";
-	private static final String confirmText = "Confirmar contraseña";
-	private static final String birthdayText = "Seleccionar cumpleaños";
-	private static final String createText = "Crear cuenta";
-	private static final String repeatedUser = "Nombre de usuario no disponible.";
-	private static final String sucessRegister = "Registro exitoso.";
+	private static final String loginText = "Iniciar sersión";
+	private static final String githubText = "Iniciar sesión con Github";
+	private static final String registerText = "Registro de usuarios";
+	private static final String logoPath = "/images/logo.png";
+	private static final String empty = "";
+	private static final String loginError= "Fallo de inicio de sesión.";
+	private static final int logoWidth = 648;
+	private static final int logoHeight = 205;
+	
 	
 	private TextField usernameField;
 	private PasswordField passwordField;
-	private PasswordField confirmField;
-	private DateField calendarField;
-	private ResponsiveButton create;
+	private ResponsiveButton login;
+	
+	
 	private AlertTextArea error;
 	
-	private RegisterVerifier verifier;
-		
-	public RegisterPanel() {		
+	private LoginVerifier verifier;
+	
+	public LoginPanel() {
 		setLayout(new GridBagLayout());
-				
-		initializeLabel();
+		
+		initializeLogo();
 		initializeUsernameField();
 		initializePasswordField();
-		initializeConfirmField();
-		initializeBirthday();
-		initializeCalendarField();
-		initializeCreate();
+		initializeLogin();
+		initializeGithub();
+		initializeRegister();
 		initializeError();
 		
-		initializeVerifier();
+		initializeLoginVerifier();
 		
 		setSize(getPreferredSize());
 	}
-
+	
 	// ---------- Interfaz. ----------
 	
-	private void initializeLabel() {
-		JLabel label = new JLabel(registerText);
+	private void initializeLogo() {
+		JLabel logo= new JLabel(ImageScaler.loadImageIcon(logoPath, logoWidth, logoHeight));
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
+		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(10, 10, 5, 10);
 		
-		add(label, constraints);
+		add(logo, constraints);
 	}
 	
 	private void initializeUsernameField() {
 		usernameField = new TextField(usernameText);
-
+		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 1;
+		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 10);
 		
@@ -82,69 +84,60 @@ public class RegisterPanel extends JPanel {
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 2;
+		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 10);
 
 		add(passwordField, constraints);
 	}
 	
-	private void initializeConfirmField() {
-		confirmField = new PasswordField(confirmText);
-
+	private void initializeLogin() {
+		login = new ResponsiveButton(loginText);
+		login.addActionListener(e -> login());
+		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 3;
+		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 10);
 
-		add(confirmField, constraints);
+		add(login, constraints);
 	}
 	
-	private void initializeBirthday() {
-		JLabel birthday = new JLabel(birthdayText);
+	private void initializeGithub() {
+		ResponsiveButton github = new ResponsiveButton(githubText);
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 4;
+		constraints.weightx = 1;
 		constraints.fill = GridBagConstraints.BOTH;
-		constraints.insets = new Insets(5, 10, 5, 10);
+		constraints.insets = new Insets(5, 10, 5, 5);
 
-		add(birthday, constraints);
+		add(github, constraints);
 	}
 	
-	private void initializeCalendarField() {
-		calendarField = new DateField();
-		
-		JDateChooser chooser = new JDateChooser(calendarField);
+	private void initializeRegister() {
+		ResponsiveButton register = new ResponsiveButton(registerText);
 		
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = 0;
-		constraints.gridy = 5;
+		constraints.gridx = 1;
+		constraints.gridy = 4;
+		constraints.weightx = 1;
 		constraints.fill = GridBagConstraints.BOTH;
-		constraints.insets = new Insets(5, 10, 5, 10);
+		constraints.insets = new Insets(5, 5, 5, 10);
 
-		add(chooser, constraints);
-	}
-	
-	private void initializeCreate() {
-		create = new ResponsiveButton(createText);
-		create.addActionListener(e -> register());
-		
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = 0;
-		constraints.gridy = 6;
-		constraints.fill = GridBagConstraints.BOTH;
-		constraints.insets = new Insets(5, 10, 5, 10);
-
-		add(create, constraints);
+		add(register, constraints);
 	}
 	
 	private void initializeError() {
 		error = new AlertTextArea();
-				
+		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
-		constraints.gridy = 7;
+		constraints.gridy = 5;
+		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 10, 10);
 
@@ -152,28 +145,25 @@ public class RegisterPanel extends JPanel {
 	}
 	
 	// ---------- Validación. ----------
-
-	private void initializeVerifier() {
-		verifier = new RegisterVerifier(create, error);
+	
+	private void initializeLoginVerifier() {
+		verifier = new LoginVerifier(login, error);
+		
 		verifier.setUsernameField(usernameField);
 		verifier.setPasswordField(passwordField);
-		verifier.setConfirmField(confirmField);
-		verifier.setCalendarField(calendarField);
 	}
 	
-	
 	// ---------- Comunicación con el controlador. ----------
-		
-	private void register() {
+
+	private void login() {
 		if (verifier.verify()) {
 			String username = verifier.getUsername();
 			String password = verifier.getPassword();
-			Date birthday = verifier.getBirthday();
 			
-			boolean res = Controller.INSTANCE.register(username, password, birthday);
-						
-			if (res) error.setSuccess(sucessRegister);
-			else error.setFail(repeatedUser); 
-		}		
+			boolean res = Controller.INSTANCE.login(username, password);
+			
+			if (res) error.setSuccess(empty);
+			else error.setFail(loginError);
+		}
 	}
 }
