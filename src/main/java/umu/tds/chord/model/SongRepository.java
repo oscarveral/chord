@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import umu.tds.chord.dao.DAOFactory;
@@ -46,10 +47,10 @@ public enum SongRepository {
 	 *         fallo con el servidio de persistencia. {@code true} en cualquier otro
 	 *         caso.
 	 */
-	public boolean addSong(String name, String author, String path, String sty) {
+	public Optional<Song> addSong(String name, String author, String path, String sty) {
 		if (name.isBlank() || name.isEmpty() || author.isBlank() || author.isEmpty() || path.isBlank() || path.isEmpty()
 				|| sty.isBlank() || sty.isEmpty()) {
-			return false;
+			return Optional.empty();
 		}
 
 		// Creación de la canción.
@@ -57,7 +58,7 @@ public enum SongRepository {
 
 		// Comprobación de duplicidad de la canción.
 		if (songs.contains(song)) {
-			return false;
+			return Optional.empty();
 		}
 
 		// Persistencia.
@@ -65,12 +66,12 @@ public enum SongRepository {
 		
 		// Fallo de registro en persistencia.
 		if (!persistence) {
-			return false;
+			return Optional.empty();
 		}
 
 		styles.add(sty);
 		songs.add(song);
-		return true;
+		return Optional.of(song);
 	}
 
 	/**

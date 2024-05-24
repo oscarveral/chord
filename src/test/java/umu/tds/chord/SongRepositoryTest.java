@@ -35,13 +35,13 @@ public class SongRepositoryTest {
 
 	@Test
 	public void testAddSong() {
-		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle);
+		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();
 		assertEquals(true, res1);
 		boolean res2 = SongRepository.INSTANCE.existSong(testSongName, testAuthorName, testPath, testStyle);
 		assertEquals(true, res2);
 		boolean res3 = SongRepository.INSTANCE.existStyle(testStyle);
 		assertEquals(true, res3);
-		boolean res4 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle);
+		boolean res4 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();
 		assertEquals(false, res4);
 	}
 
@@ -49,7 +49,7 @@ public class SongRepositoryTest {
 	public void testGetSearch() {
 		int size1 = SongRepository.INSTANCE.getSearch(testSongName, testAuthorName, testStyle).size();
 		assertEquals(0, size1);
-		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle);
+		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();
 		assertEquals(true, res1);
 		int size2 = SongRepository.INSTANCE.getSearch(testSongName, testAuthorName, testStyle).size();
 		assertEquals(1, size2);
@@ -61,7 +61,7 @@ public class SongRepositoryTest {
 
 	@Test
 	public void testRemoveSong() {
-		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle);
+		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();
 		assertEquals(true, res1);
 		boolean res2 = SongRepository.INSTANCE.removeSong(testSong);
 		assertEquals(true, res2);
