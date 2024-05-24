@@ -18,7 +18,7 @@ public class MapperCancionesXMLtoJava {
 			File file = new File(fichero);
 			canciones = (Canciones) u.unmarshal(file);
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return canciones;
 	}
