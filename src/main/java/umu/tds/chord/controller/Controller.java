@@ -134,11 +134,15 @@ public enum Controller {
 	 * @param c Opcional con el objeto {@link Canciones}.
 	 */
 	private void processSongData(Optional<Canciones> c) {
+		// Se crea un evento de estado de canciones.
+		SongStatusEvent e = new SongStatusEvent(this);
+		
 		// No hacer nada en fallo.
 		if (c.isEmpty()) {
+			e.setFailed(true);
+			songStatusListeners.forEach(l -> l.onSongLoad(e));
 			return;
 		}
-
 		// Añadir las canciones al repositorio.
 		Canciones canciones = c.get();
 		canciones.getCancion().forEach(s -> {
@@ -146,8 +150,12 @@ public enum Controller {
 			String author = s.getInterprete();
 			String url = s.getURL();
 			String style = s.getEstilo();
-			SongRepository.INSTANCE.addSong(name, author, url, style);
+			SongRepository.INSTANCE.addSong(name, author, url, style).ifPresentOrElse(e::addSong,
+					() -> e.setFailed(true));
 		});
+	
+		// Envío del evento.
+		songStatusListeners.forEach(l -> l.onSongLoad(e));
 	}
 
 	/**
