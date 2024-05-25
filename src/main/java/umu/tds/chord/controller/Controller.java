@@ -72,6 +72,10 @@ public enum Controller {
 	public boolean login(String username, String password) {
 		if (currentUser.isEmpty()) {
 			currentUser = UserRepository.INSTANCE.getUser(username, password);
+			currentUser.ifPresent(u -> {
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(l -> l.onUserLogin(e));
+			});
 			return currentUser.isPresent();
 		}
 		return false;
@@ -113,6 +117,17 @@ public enum Controller {
 			if (removed) currentUser = Optional.empty();
 		});
 		return currentUser.isEmpty();
+	}
+	
+	/**
+	 * Método para cambiar el estado premium del usuario actual.
+	 */
+	public void togglePremium() {
+		currentUser.ifPresent(u -> {
+			u.asMut().setPremium(!u.isPremium());
+			UserStatusEvent e = new UserStatusEvent(this, u);
+			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
+		});
 	}
 
 	// ---------- Cargador de canciones. ----------

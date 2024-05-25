@@ -8,4 +8,19 @@ import java.util.EventListener;
  */
 public interface UserStatusListener extends EventListener {
 
+	/**
+	 * Evento emitido al iniciar sesión el usuario.
+	 * 
+	 * @param e Evento de estado de usuario.
+	 */
+	public default void onUserLogin(UserStatusEvent e) {}
+	
+	/**
+	 * Evento emitido cuando se produce un cambio de los datos principales
+	 * asociados al usuario.
+	 * 
+	 * @param e Evento de estado de usuario.
+	 */
+	public default void onUserMetadataChange(UserStatusEvent e) {}
+	
 }
