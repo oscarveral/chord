@@ -23,4 +23,12 @@ public interface UserStatusListener extends EventListener {
 	 */
 	public default void onUserMetadataChange(UserStatusEvent e) {}
 	
+	/**
+	 * Evento emitido cuando se ha producido un cambio en la lista de playlists
+	 * del usuario.
+	 * 
+	 * @param e Evento de estado del usuario.
+	 */
+	public default void onPlaylistsListUpdate(UserStatusEvent e) {}
+	
 }
