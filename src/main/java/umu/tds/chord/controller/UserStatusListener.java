@@ -16,6 +16,13 @@ public interface UserStatusListener extends EventListener {
 	public default void onUserLogin(UserStatusEvent e) {}
 	
 	/**
+	 * Evento emitio al cerrar la sesión el usuario.
+	 * 
+	 * @param e Evento de estado de usuario.
+	 */
+	public default void onUserLogout(UserStatusEvent e) {}
+	
+	/**
 	 * Evento emitido cuando se produce un cambio de los datos principales
 	 * asociados al usuario.
 	 * 

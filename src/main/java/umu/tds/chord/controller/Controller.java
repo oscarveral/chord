@@ -95,7 +95,11 @@ public enum Controller {
 	public boolean logout() {
 		currentUser.ifPresent(u -> {
 			boolean updated = UserRepository.INSTANCE.updateUser(u);
-			if (updated) currentUser = Optional.empty();
+			if (updated) {
+				currentUser = Optional.empty();
+				UserStatusEvent e = new UserStatusEvent(this, null);
+				userStatusListeners.forEach(l -> l.onUserLogout(e));
+			}
 		});
 		return currentUser.isEmpty();
 	}

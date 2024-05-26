@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
@@ -16,6 +17,11 @@ public class ResponsiveButton extends JButton {
 		super(text);
 		
 		initializeActionMap();
+	}
+	
+	public ResponsiveButton(String text, ImageIcon icon) {
+		this(text);
+		setIcon(icon);
 	}
 	
 	private void initializeActionMap() {

@@ -132,6 +132,13 @@ public class UserInfoPanel extends JPanel {
 			public void onUserMetadataChange(UserStatusEvent e) {
 				onUserLogin(e);
 			}
+			
+			@Override
+			public void onUserLogout(UserStatusEvent e) {
+				userName.setText(templateUserName);
+				birthday.setText(templateBirthday);
+				premiumToggle.setSelected(false);
+			}
 		});
 	}
 	

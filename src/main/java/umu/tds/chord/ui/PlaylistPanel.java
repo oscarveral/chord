@@ -75,6 +75,11 @@ public class PlaylistPanel extends JPanel {
 				datos.setList(e.getUser().getPlaylists());
 			}
 			
+			@Override
+			public void onUserLogout(UserStatusEvent e) {
+				datos.clearList();
+			}
+			
 		});
 
 	}
@@ -104,6 +109,11 @@ public class PlaylistPanel extends JPanel {
 		public void setList(List<Playlist> playlists) {
 			this.playlists.clear();
 			this.playlists.addAll(playlists);
+			fireContentsChanged(this, 0, this.playlists.size());
+		}
+		
+		public void clearList() {
+			this.playlists.clear();
 			fireContentsChanged(this, 0, this.playlists.size());
 		}
 
