@@ -2,6 +2,8 @@ package umu.tds.chord;
 
 import static org.junit.Assert.*;
 
+import java.util.Optional;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,15 +49,19 @@ public class SongRepositoryTest {
 
 	@Test
 	public void testGetSearch() {
-		int size1 = SongRepository.INSTANCE.getSearch(testSongName, testAuthorName, testStyle).size();
+		Optional<String> name = Optional.of(testSongName);
+		Optional<String> author = Optional.of(testSongName);
+		Optional<String> style = Optional.of(testSongName);		
+		
+		int size1 = SongRepository.INSTANCE.getSearch(name, author, style).size();
 		assertEquals(0, size1);
 		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();
 		assertEquals(true, res1);
-		int size2 = SongRepository.INSTANCE.getSearch(testSongName, testAuthorName, testStyle).size();
+		int size2 = SongRepository.INSTANCE.getSearch(name, author, style).size();
 		assertEquals(1, size2);
 		boolean res2 = SongRepository.INSTANCE.removeSong(testSong);
 		assertEquals(true, res2);
-		int size3 = SongRepository.INSTANCE.getSearch(testSongName, testAuthorName, testStyle).size();
+		int size3 = SongRepository.INSTANCE.getSearch(name, author, style).size();
 		assertEquals(0, size3);
 	}
 

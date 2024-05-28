@@ -2,12 +2,14 @@ package umu.tds.chord.controller;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import umu.tds.chord.component.BuscadorCanciones;
 import umu.tds.chord.component.Canciones;
 import umu.tds.chord.component.CargadorCanciones;
+import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
@@ -27,6 +29,8 @@ public enum Controller {
 
 	INSTANCE;
 
+	private static final String adminUser = "admin";
+	
 	private BuscadorCanciones buscadorCanciones;
 	
 	private Optional<User> currentUser;
@@ -131,6 +135,87 @@ public enum Controller {
 			u.asMut().setPremium(!u.isPremium());
 			UserStatusEvent e = new UserStatusEvent(this, u);
 			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
+		});
+	}
+	
+	/**
+	 * Método para cambiar el estado de favorito de una canción para el usuario
+	 * actual.
+	 * 
+	 * @param s Canción para la que se desea cambiar el estado de favorito.
+	 */
+	public void toggleFavourite(Song s) {
+		currentUser.ifPresent(u -> {
+			boolean isFavourite = u.getFavouriteSongs().contains(s);
+			
+			if (isFavourite) u.asMut().removeFavouriteSong(s);
+			else u.asMut().addFavouriteSong(s);
+			
+			UserStatusEvent e = new UserStatusEvent(this, u);
+			
+			// Avisar a interesados.
+			userStatusListeners.forEach(l -> 
+				l.onFavouriteSongsUpdate(e)
+			);
+		});
+	}
+	
+	/**
+	 * Realiza una búsqueda de canciones a partir de los filtros proporcionados.
+	 * 
+	 * @param n Nombre de la canción.
+	 * @param a Autor de la canción.
+	 * @param f El usuario la ha marcado como favorita.
+	 * @param s Estilo de la canción.
+	 */
+	public void searchSongs(Optional<String> n, Optional<String> a, Optional<String> s, boolean f) {
+		// No se permiten búsquedas sin una sesión abierta.
+		if (!currentUser.isPresent()) return;
+		
+		// Buscar y eliminar las que no coincidan con el filtro de favorito.
+		List<Song> searched = SongRepository.INSTANCE.getSearch(n, a, s);
+		// Si se buscan favoritas eliminar las no favoritas.
+		if (f) searched.removeIf(song -> 
+			!currentUser.get().getFavouriteSongs().contains(song)
+		);
+				
+		// Pasar la infomración a los escuchadores interesados.
+		SongStatusEvent e = new SongStatusEvent(this);
+		e.setSongs(searched);
+		songStatusListeners.forEach(l -> l.onSongSearch(e));
+	}
+	
+	/**
+	 * Elimina la selección actual de canciones del repositorio.
+	 */
+	public void removeSongs(List<Song> list, String password) {
+		
+		boolean canDelete = currentUser.isPresent() && 
+							currentUser.get().getUserName().equals(adminUser) && 
+							currentUser.get().checkPassword(password);
+		
+		SongStatusEvent e = new SongStatusEvent(this);
+		
+		if (!canDelete) {
+			e.setFailed(true);
+			songStatusListeners.forEach(l -> l.onSongDelete(e));
+			return;
+		}
+				
+		// Eliminar canciones.
+		list.forEach(s -> {
+			if (SongRepository.INSTANCE.removeSong(s))
+				e.addSong(s);
+		});
+		
+		songStatusListeners.forEach(l -> l.onSongDelete(e));
+		
+		// Reenviar canciones favoritas. Han podido cambiar.
+		currentUser.ifPresent(u -> {
+			UserStatusEvent ev = new UserStatusEvent(this, u);
+			userStatusListeners.forEach(l -> 
+				l.onFavouriteSongsUpdate(ev)
+			);
 		});
 	}
 

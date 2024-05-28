@@ -1,6 +1,5 @@
 package umu.tds.chord.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,16 +17,18 @@ public enum SongRepository {
 
 	INSTANCE;
 
-	private final String allStyles;
+	public static final String ALL_STYLES = "Todos";
+	private static final String emptyFilter = "";
+	
 	private final Set<Song> songs;
 	private final Set<String> styles;
 
 	private SongRepository() {
 		songs = new HashSet<>();
 		styles = new HashSet<>();
-		allStyles = "Todos";
+		//ALL_STYLES = "Todos";
 
-		styles.add(allStyles);
+		styles.add(ALL_STYLES);
 
 		DAOFactory.getInstance().getSongDAO().recoverAll().forEach(s -> {
 			songs.add(s);
@@ -89,15 +90,15 @@ public enum SongRepository {
 	 * @implNote Cualquier parámetro nulo provocará la devolución de una lista
 	 *           vacía.
 	 */
-	public List<Song> getSearch(String name, String author, String sty) {
+	public List<Song> getSearch(Optional<String> n, Optional<String> a, Optional<String> s) {
 
-		if (name == null || author == null || sty == null) {
-			return new ArrayList<>();
-		}
-
+		String name = n.isPresent() ? n.get() : emptyFilter;
+		String author = n.isPresent() ? a.get() : emptyFilter;
+		String sty = s.isPresent() ? s.get() : ALL_STYLES;
+		
 		return songs.stream().filter(song -> song.getName().toLowerCase().contains(name.toLowerCase()))
 				.filter(song -> song.getAuthor().toLowerCase().contains(author.toLowerCase())).filter(song -> {
-					if (!sty.equals(allStyles)) {
+					if (!sty.equals(ALL_STYLES)) {
 						return song.getStyle().equals(sty);
 					}
 					return true;
@@ -155,7 +156,7 @@ public enum SongRepository {
 	 * @return
 	 */
 	public String getStyleWildcard() {
-		return allStyles;
+		return ALL_STYLES;
 	}
 
 	/**
@@ -232,7 +233,7 @@ public enum SongRepository {
 		});
 		songs.clear();
 		styles.clear();
-		styles.add(allStyles);
+		styles.add(ALL_STYLES);
 	}
 	
 	

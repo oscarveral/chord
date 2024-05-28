@@ -1,6 +1,7 @@
 package umu.tds.chord.controller;
 
 import java.util.EventObject;
+import java.util.Optional;
 
 import umu.tds.chord.model.User;
 
@@ -12,7 +13,7 @@ public class UserStatusEvent extends EventObject {
 
 	private static final long serialVersionUID = -2215463958884119904L;
 
-	private User user;
+	private Optional<User> user;
 	
 	/**
 	 * Constructor del evento.
@@ -23,7 +24,7 @@ public class UserStatusEvent extends EventObject {
 	public UserStatusEvent(Object source, User user) {
 		super(source);
 		
-		this.user = user;
+		this.user = Optional.ofNullable(user);
 	}
 	
 	/**
@@ -31,7 +32,7 @@ public class UserStatusEvent extends EventObject {
 	 * 
 	 * @return Usuario vinculado al evento.
 	 */
-	public User getUser() {
+	public Optional<User> getUser() {
 		return user;
 	}
 }

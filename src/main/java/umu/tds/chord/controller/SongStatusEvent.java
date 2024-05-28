@@ -47,6 +47,11 @@ public class SongStatusEvent extends EventObject{
 		songs.add(song);
 	}
 	
+	protected void setSongs(List<Song> list) {
+		songs.clear();
+		songs.addAll(list);
+	}
+	
 	/**
 	 * Indica que se ha producido un fallo.
 	 * 

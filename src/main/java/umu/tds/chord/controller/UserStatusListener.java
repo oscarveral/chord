@@ -38,4 +38,19 @@ public interface UserStatusListener extends EventListener {
 	 */
 	public default void onPlaylistsListUpdate(UserStatusEvent e) {}
 	
+	/**
+	 * Evento emitido cuando se ha producido un cambio en la lista de canciones 
+	 * favoritas del usuario.
+	 * 
+	 * @param e Evento de estado del usuario.
+	 */
+	public default void onFavouriteSongsUpdate(UserStatusEvent e) {}
+	
+	/**
+	 * Evento emitido cuando se ha producido un cambio en la lista de canciones
+	 * recientes del usuario.
+	 * 
+	 * @param e Evento de estado de usuario.
+	 */
+	public default void onRecentSongsUpdate(UserStatusEvent e) {}
 }
