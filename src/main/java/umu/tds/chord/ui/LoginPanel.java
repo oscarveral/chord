@@ -24,11 +24,9 @@ public class LoginPanel extends JPanel {
 	private static final int logoWidth = 648;
 	private static final int logoHeight = 205;
 	
-	
 	private TextField usernameField;
 	private PasswordField passwordField;
 	private ResponsiveButton login;
-	
 	
 	private AlertTextArea error;
 	
@@ -120,6 +118,9 @@ public class LoginPanel extends JPanel {
 	
 	private void initializeRegister() {
 		ResponsiveButton register = new ResponsiveButton(registerText);
+		register.addActionListener(e -> {
+			
+		});
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;

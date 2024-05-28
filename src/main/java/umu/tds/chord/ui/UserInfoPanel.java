@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
+import umu.tds.chord.ui.StateManager.UIEvents;
 
 public class UserInfoPanel extends JPanel {
 
@@ -29,42 +30,41 @@ public class UserInfoPanel extends JPanel {
 	private ResponsiveToggleButton premiumToggle;
 	private ResponsiveButton logoutButton;
 	private ResponsiveButton deleteAccountButton;
-	
+
 	public UserInfoPanel() {
-		
+
 		setLayout(new GridBagLayout());
-		
+
 		initializeUserName();
 		initializeBirthday();
 		initializePremiumToggle();
 		initializeLogoutButton();
 		initializeDeleteAccountButton();
-		
+
 		registerListeners();
-		
-		setBorder(BorderFactory.createTitledBorder
-				(BorderFactory.createLineBorder(Color.BLACK), userPanelTitle));		
+
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), userPanelTitle));
 	}
-	
+
 	// ---------- Interfaz. ----------
-	
+
 	private void initializeUserName() {
 		userName = new JLabel(templateUserName);
-		userName.setHorizontalAlignment(SwingConstants.LEFT);	
-		
+		userName.setHorizontalAlignment(SwingConstants.LEFT);
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(0, 10, 10, 10);
-		
+
 		add(userName, constraints);
 	}
-	
+
 	private void initializeBirthday() {
 		birthday = new JLabel(templateBirthday);
-		birthday.setHorizontalAlignment(SwingConstants.LEFT);	
-		
+		birthday.setHorizontalAlignment(SwingConstants.LEFT);
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 0;
@@ -75,64 +75,66 @@ public class UserInfoPanel extends JPanel {
 
 		add(birthday, constraints);
 	}
-	
+
 	private void initializePremiumToggle() {
 		premiumToggle = new ResponsiveToggleButton(premiumText);
 		premiumToggle.setSelected(false);
 		premiumToggle.addActionListener(e -> togglePremium());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 2;
 		constraints.gridy = 0;
 		constraints.insets = new Insets(0, 10, 10, 5);
 		constraints.fill = GridBagConstraints.BOTH;
-		
+
 		add(premiumToggle, constraints);
 	}
-	
+
 	private void initializeLogoutButton() {
 		logoutButton = new ResponsiveButton(logoutButtonText);
 		logoutButton.addActionListener(e -> logout());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 3;
 		constraints.gridy = 0;
 		constraints.insets = new Insets(0, 5, 10, 5);
 		constraints.fill = GridBagConstraints.BOTH;
-		
+
 		add(logoutButton, constraints);
 	}
-	
+
 	private void initializeDeleteAccountButton() {
 		deleteAccountButton = new ResponsiveButton(deleteAccButtonText);
 		deleteAccountButton.addActionListener(e -> remove());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 4;
 		constraints.gridy = 0;
 		constraints.insets = new Insets(0, 5, 10, 5);
 		constraints.fill = GridBagConstraints.BOTH;
-		
+
 		add(deleteAccountButton, constraints);
 	}
-	
+
 	// ---------- Comunicación con el controlador. ----------
-	
+
 	private void registerListeners() {
-		
+
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
-				userName.setText(e.getUser().getUserName());
-				birthday.setText(e.getUser().getBirthday().toString());
-				premiumToggle.setSelected(e.getUser().isPremium());
+				e.getUser().ifPresentOrElse(u -> {
+					userName.setText(u.getUserName());
+					birthday.setText(u.getBirthday().toString());
+					premiumToggle.setSelected(u.isPremium());
+				}, () -> onUserLogout(e));
 			}
-			
+
 			@Override
 			public void onUserMetadataChange(UserStatusEvent e) {
 				onUserLogin(e);
 			}
-			
+
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				userName.setText(templateUserName);
@@ -141,17 +143,19 @@ public class UserInfoPanel extends JPanel {
 			}
 		});
 	}
-	
+
 	private void logout() {
-		Controller.INSTANCE.logout();
+		if (Controller.INSTANCE.logout())
+			StateManager.INSTANCE.triggerEvent(UIEvents.LOGIN);
 	}
-	
+
 	private void remove() {
-		Controller.INSTANCE.remove();
+		if (Controller.INSTANCE.remove())
+			StateManager.INSTANCE.triggerEvent(UIEvents.LOGIN);
 	}
-	
+
 	private void togglePremium() {
 		Controller.INSTANCE.togglePremium();
 	}
-	
+
 }

@@ -29,6 +29,7 @@ public class TextField extends JTextField {
 	}
 
 	private void initializeText() {
+		empty = true;
 		silentTextChange(text, Color.GRAY);
 	}
 
@@ -85,5 +86,9 @@ public class TextField extends JTextField {
 	
 	public boolean isEmpty() {
 		return empty;
+	}
+	
+	public void reset() {
+		initializeText();
 	}
 }

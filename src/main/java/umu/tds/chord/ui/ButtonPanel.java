@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
+import umu.tds.chord.ui.StateManager.UIEvents;
 import umu.tds.chord.utils.ImageScaler;
 
 public class ButtonPanel extends JPanel {
@@ -68,6 +69,7 @@ public class ButtonPanel extends JPanel {
 		searchButton.setHorizontalAlignment(SwingConstants.LEFT);
 		searchButton.addActionListener(e -> {
 			playlistaPanelLayout.show(playlistPanelContainer, invisibleTag);
+			StateManager.INSTANCE.triggerEvent(UIEvents.SONG_SEARCH);
 		});
 
 		add(searchButton, constraints);
@@ -87,6 +89,7 @@ public class ButtonPanel extends JPanel {
 		playlistManagementButton.setHorizontalAlignment(SwingConstants.LEFT);
 		playlistManagementButton.addActionListener(e -> {
 			playlistaPanelLayout.show(playlistPanelContainer, playlistsTag);
+			StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLSITS_MNGMT);
 		});
 
 		add(playlistManagementButton, constraints);
@@ -106,6 +109,7 @@ public class ButtonPanel extends JPanel {
 		recentSongsButton.setHorizontalAlignment(SwingConstants.LEFT);
 		recentSongsButton.addActionListener(e -> {
 			playlistaPanelLayout.show(playlistPanelContainer, invisibleTag);
+			StateManager.INSTANCE.triggerEvent(UIEvents.RECENT_SONGS);
 		});
 
 		add(recentSongsButton, constraints);
@@ -125,6 +129,7 @@ public class ButtonPanel extends JPanel {
 		playlistsButton.setHorizontalAlignment(SwingConstants.LEFT);
 		playlistsButton.addActionListener(e -> {
 			playlistaPanelLayout.show(playlistPanelContainer, playlistsTag);
+			StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLIST);
 		});
 
 		add(playlistsButton, constraints);

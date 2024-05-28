@@ -30,6 +30,7 @@ public class PasswordField extends JPasswordField {
 	}
 
 	private void initializeText() {
+		empty = true;
 		silentTextChange(text, Color.GRAY, (char) 0);
 	}
 
@@ -87,5 +88,9 @@ public class PasswordField extends JPasswordField {
 	
 	public boolean isEmpty() {
 		return empty;
+	}
+	
+	public void reset() {
+		initializeText();
 	}
 }

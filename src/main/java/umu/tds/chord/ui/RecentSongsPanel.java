@@ -1,11 +1,15 @@
 package umu.tds.chord.ui;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -16,21 +20,21 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import umu.tds.chord.controller.Controller;
-import umu.tds.chord.controller.SongStatusEvent;
-import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.model.Song;
 
-public class SongListPanel extends JPanel {
+public class RecentSongsPanel extends JPanel {
 
-	private static final long serialVersionUID = 1281782779628796147L;
-
-	public SongListPanel() {
-		BorderLayout layout = new BorderLayout();
-		layout.setVgap(10);
-		setLayout(layout);
+	private static final long serialVersionUID = -4486884398599339204L;
+	private static final String title = "Canciones recientes";
+	
+	public RecentSongsPanel() {
+		setLayout(new GridBagLayout());
+		
 		initializeSongTable();
+		
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title));
 	}
 	
 	private void initializeSongTable() {
@@ -65,7 +69,15 @@ public class SongListPanel extends JPanel {
 		JScrollPane scrollPane = new JScrollPane(songTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		add(scrollPane, BorderLayout.CENTER);
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(10, 10, 10, 10);
+		
+		add(scrollPane, c);
 	}
 
 	// -------- Modelo de datos de la tabla --------
@@ -171,42 +183,27 @@ public class SongListPanel extends JPanel {
 
 				@Override
 				public void onUserLogin(UserStatusEvent e) {
-					e.getUser().ifPresent(u -> {
-						setFavourites(u.getFavouriteSongs());
-					});
+					onRecentSongsUpdate(e);
+					onFavouriteSongsUpdate(e);
 				}
 
 				@Override
 				public void onFavouriteSongsUpdate(UserStatusEvent e) {
-					onUserLogin(e);
+					e.getUser().ifPresent(u -> 
+						setFavourites(u.getFavouriteSongs())
+					);
+				}
+				
+				@Override
+				public void onRecentSongsUpdate(UserStatusEvent e) {
+					e.getUser().ifPresent(u -> 
+						setList(u.getRecentSongs())
+					);
 				}
 
 				@Override
 				public void onUserLogout(UserStatusEvent e) {
 					clearData();
-				}
-			});
-
-			Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
-
-				@Override
-				public void onSongLoad(SongStatusEvent e) {
-					if (!e.isFailed())
-						songs.addAll(e.getSongs());
-					fireTableDataChanged();
-				}
-
-				@Override
-				public void onSongDelete(SongStatusEvent e) {
-					if (!e.isFailed())
-						songs.removeAll(e.getSongs());
-					fireTableDataChanged();
-				}
-
-				@Override
-				public void onSongSearch(SongStatusEvent e) {
-					if (!e.isFailed())
-						setList(e.getSongs());
 				}
 			});
 		}
@@ -215,4 +212,5 @@ public class SongListPanel extends JPanel {
 			Controller.INSTANCE.toggleFavourite(s);
 		}
 	}
+	
 }

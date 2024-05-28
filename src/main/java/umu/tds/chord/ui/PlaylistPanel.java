@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -24,63 +26,47 @@ public class PlaylistPanel extends JPanel {
 	private static final String panelTitle = "Playlists";
 	private static final int scrollPaneBorder = 10;
 
-	private PlaylistListModel datos;
-	private JList<Playlist> lista;
-
 	public PlaylistPanel() {
 		BorderLayout layout = new BorderLayout();
 		setLayout(layout);
 
-		initializeDatos();
 		initializeLista();
-		initializeScrollPane();
-
-		registerControllerListeners();
 
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), panelTitle));
 	}
 
 	// -------- Interfaz. --------
 
-	private void initializeDatos() {
-		datos = new PlaylistListModel();
-	}
 
 	private void initializeLista() {
-		lista = new JList<>(datos);
+		PlaylistListModel datos = new PlaylistListModel();
+		JList<Playlist> lista = new JList<>(datos);
+		
 		lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lista.setOpaque(false);
+		lista.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
 
-	}
-
-	private void initializeScrollPane() {
+				// Evitar doble selección.
+				if (e.getValueIsAdjusting()) return;
+				
+				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+				
+				StateManager.INSTANCE.clearSelectedPlaylist();
+				
+		        if (!lsm.isSelectionEmpty()) {
+		        	Playlist p = datos.getElementAt(lsm.getMinSelectionIndex());
+		        	StateManager.INSTANCE.setSelectedPlaylist(p);
+		        }
+				
+			}
+		});
+		
 		JScrollPane scrollPane = new JScrollPane(lista);
 		scrollPane.setBorder(new EmptyBorder(scrollPaneBorder, scrollPaneBorder, scrollPaneBorder, scrollPaneBorder));
 		add(scrollPane, BorderLayout.CENTER);
-	}
-
-	// -------- Interacción con el controlador. --------
-
-	private void registerControllerListeners() {
-		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-
-			// En el inicio de sesión se debe cargar la lista de playlists.
-			@Override
-			public void onUserLogin(UserStatusEvent e) {
-				datos.setList(e.getUser().getPlaylists());
-			}
-			
-			@Override
-			public void onPlaylistsListUpdate(UserStatusEvent e) {
-				datos.setList(e.getUser().getPlaylists());
-			}
-			
-			@Override
-			public void onUserLogout(UserStatusEvent e) {
-				datos.clearList();
-			}
-			
-		});
 
 	}
 
@@ -94,6 +80,8 @@ public class PlaylistPanel extends JPanel {
 
 		public PlaylistListModel() {
 			playlists = new ArrayList<>();
+			
+			registerControllerListeners();
 		}
 
 		@Override
@@ -111,10 +99,37 @@ public class PlaylistPanel extends JPanel {
 			this.playlists.addAll(playlists);
 			fireContentsChanged(this, 0, this.playlists.size());
 		}
-		
+
 		public void clearList() {
 			this.playlists.clear();
 			fireContentsChanged(this, 0, this.playlists.size());
+		}
+
+		// -------- Interacción con el controlador. --------
+
+		private void registerControllerListeners() {
+			Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+
+				// En el inicio de sesión se debe cargar la lista de playlists.
+				@Override
+				public void onUserLogin(UserStatusEvent e) {
+					e.getUser().ifPresent(u -> {
+						setList(u.getPlaylists());
+					});
+				}
+
+				@Override
+				public void onPlaylistsListUpdate(UserStatusEvent e) {
+					onUserLogin(e);
+				}
+
+				@Override
+				public void onUserLogout(UserStatusEvent e) {
+					clearList();
+				}
+
+			});
+
 		}
 
 	}

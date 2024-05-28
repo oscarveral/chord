@@ -17,7 +17,7 @@ public final class Interface {
 		ventana = new JFrame("A");
 		JPanel d = new JPanel();
 		d.setLayout(new BorderLayout());
-		d.add(new ButtonPanel(), BorderLayout.CENTER);
+		d.add(new MainPanel(), BorderLayout.CENTER);
 		AlertDialog e = new AlertDialog();
 		ventana.setLayout(new BorderLayout());
 		ventana.add(d, BorderLayout.CENTER);
