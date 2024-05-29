@@ -93,7 +93,7 @@ public enum SongRepository {
 	public List<Song> getSearch(Optional<String> n, Optional<String> a, Optional<String> s) {
 
 		String name = n.isPresent() ? n.get() : emptyFilter;
-		String author = n.isPresent() ? a.get() : emptyFilter;
+		String author = a.isPresent() ? a.get() : emptyFilter;
 		String sty = s.isPresent() ? s.get() : ALL_STYLES;
 		
 		return songs.stream().filter(song -> song.getName().toLowerCase().contains(name.toLowerCase()))

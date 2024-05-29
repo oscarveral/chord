@@ -13,14 +13,15 @@ import javax.swing.SwingConstants;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
-import umu.tds.chord.ui.StateManager.UIEvents;
 
 public class UserInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = -8244977576836372669L;
 	private static final String userPanelTitle = "Usuario";
 	private static final String templateUserName = "<no user>";
+	private static final String userPre = "Usuario: ";
 	private static final String templateBirthday = "<no birthday>";
+	private static final String birthdayPre = "Cumpleaños: ";
 	private static final String premiumText = "Premium";
 	private static final String logoutButtonText = "Cerrar sesión";
 	private static final String deleteAccButtonText = "Eliminar cuenta";
@@ -124,8 +125,8 @@ public class UserInfoPanel extends JPanel {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				e.getUser().ifPresentOrElse(u -> {
-					userName.setText(u.getUserName());
-					birthday.setText(u.getBirthday().toString());
+					userName.setText(userPre + u.getUserName());
+					birthday.setText(birthdayPre + u.getPrintableBirthday());
 					premiumToggle.setSelected(u.isPremium());
 				}, () -> onUserLogout(e));
 			}
@@ -145,13 +146,11 @@ public class UserInfoPanel extends JPanel {
 	}
 
 	private void logout() {
-		if (Controller.INSTANCE.logout())
-			StateManager.INSTANCE.triggerEvent(UIEvents.LOGIN);
+		Controller.INSTANCE.logout();
 	}
 
 	private void remove() {
-		if (Controller.INSTANCE.remove())
-			StateManager.INSTANCE.triggerEvent(UIEvents.LOGIN);
+		Controller.INSTANCE.remove();
 	}
 
 	private void togglePremium() {

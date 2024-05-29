@@ -11,6 +11,7 @@ public class DateField extends JTextFieldDateEditor {
 	private static final String format = "dd/MM/yyyy";
 	private static final char dash = '-';
 	private static final char enter = '\n';
+	private static final String empty = "";
 	
 	public DateField() {
 		super(format, format, dash);
@@ -41,5 +42,9 @@ public class DateField extends JTextFieldDateEditor {
 					transferFocus();
 			}
 		});
+	}
+	
+	public void reset() {
+		setText(empty);
 	}
 }

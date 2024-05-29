@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.ui.StateManager.UIEvents;
 import umu.tds.chord.utils.ImageScaler;
 
 public class LoginPanel extends JPanel {
@@ -119,7 +120,7 @@ public class LoginPanel extends JPanel {
 	private void initializeRegister() {
 		ResponsiveButton register = new ResponsiveButton(registerText);
 		register.addActionListener(e -> {
-			
+			StateManager.INSTANCE.triggerEvent(UIEvents.REGISTER);
 		});
 		
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -154,6 +155,11 @@ public class LoginPanel extends JPanel {
 		verifier.setPasswordField(passwordField);
 	}
 	
+	public void refresh() {
+		verifier.refresh();
+		usernameField.requestFocus();
+	}
+	
 	// ---------- Comunicación con el controlador. ----------
 
 	private void login() {
@@ -162,8 +168,11 @@ public class LoginPanel extends JPanel {
 			String password = verifier.getPassword();
 			
 			boolean res = Controller.INSTANCE.login(username, password);
-			
-			if (res) error.setSuccess(empty);
+						
+			if (res) {
+				error.setSuccess(empty);
+				refresh();
+			}
 			else error.setFail(loginError);
 		}
 	}

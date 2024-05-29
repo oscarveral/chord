@@ -7,6 +7,8 @@ import java.util.Date;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -46,6 +48,7 @@ public class RegisterPanel extends JPanel {
 		initializeError();
 		
 		initializeVerifier();
+		initializeVisibilityListener();
 		
 		setSize(getPreferredSize());
 	}
@@ -149,6 +152,24 @@ public class RegisterPanel extends JPanel {
 		constraints.insets = new Insets(5, 10, 10, 10);
 
 		add(error, constraints);
+	}
+	
+	private void initializeVisibilityListener() {
+		// Limpiar la interfaz si se esconde este compoonente.
+		addAncestorListener(new AncestorListener() {
+			
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				verifier.refresh();
+				usernameField.requestFocus();
+			}
+			
+			@Override
+			public void ancestorMoved(AncestorEvent event) {}
+			
+			@Override
+			public void ancestorAdded(AncestorEvent event) {}
+		});
 	}
 	
 	// ---------- Validación. ----------

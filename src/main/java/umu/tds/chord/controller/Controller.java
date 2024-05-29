@@ -1,5 +1,6 @@
 package umu.tds.chord.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -122,7 +123,11 @@ public enum Controller {
 	public boolean remove() {
 		currentUser.ifPresent(u -> {
 			boolean removed = UserRepository.INSTANCE.removeUser(u);
-			if (removed) currentUser = Optional.empty();
+			if (removed) {
+				currentUser = Optional.empty();
+				UserStatusEvent e = new UserStatusEvent(this, null);
+				userStatusListeners.forEach(l -> l.onUserLogout(e));
+			}
 		});
 		return currentUser.isEmpty();
 	}
@@ -173,7 +178,7 @@ public enum Controller {
 		if (!currentUser.isPresent()) return;
 		
 		// Buscar y eliminar las que no coincidan con el filtro de favorito.
-		List<Song> searched = SongRepository.INSTANCE.getSearch(n, a, s);
+		List<Song> searched = new ArrayList<>(SongRepository.INSTANCE.getSearch(n, a, s));
 		// Si se buscan favoritas eliminar las no favoritas.
 		if (f) searched.removeIf(song -> 
 			!currentUser.get().getFavouriteSongs().contains(song)
@@ -218,6 +223,16 @@ public enum Controller {
 			);
 		});
 	}
+	
+	/**
+	 * Método para indicar al controlador que realice un envío inicial de datos
+	 * necesarios.
+	 */
+	public void ready() {
+		SongStatusEvent e = new SongStatusEvent(this);
+		SongRepository.INSTANCE.getSongs().forEach(e::addSong);
+		songStatusListeners.forEach(l -> l.onSongLoad(e));
+	}
 
 	// ---------- Cargador de canciones. ----------
 
@@ -254,10 +269,9 @@ public enum Controller {
 			String author = s.getInterprete();
 			String url = s.getURL();
 			String style = s.getEstilo();
-			SongRepository.INSTANCE.addSong(name, author, url, style).ifPresentOrElse(e::addSong,
-					() -> e.setFailed(true));
+			SongRepository.INSTANCE.addSong(name, author, url, style).ifPresent(e::addSong);
 		});
-	
+		
 		// Envío del evento.
 		songStatusListeners.forEach(l -> l.onSongLoad(e));
 	}

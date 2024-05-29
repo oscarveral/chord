@@ -94,4 +94,14 @@ public class RegisterVerifier extends LoginVerifier {
 	public Date getBirthday() {
 		return calendarField.getDate();
 	}
+	
+	
+	@Override
+	public void refresh() {
+		
+		super.refresh();
+		
+		confirmField.reset();
+		calendarField.reset();
+	}
 }

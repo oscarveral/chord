@@ -110,4 +110,12 @@ public class LoginVerifier {
 	public String getPassword() {
 		return String.valueOf(passwordField.getPassword());
 	}
+	
+	public void refresh() {
+		usernameField.reset();
+		passwordField.reset();
+		button.setEnabled(false);
+		button.setFocusable(false);
+		error.setSuccess(emptyString);
+	}
 }

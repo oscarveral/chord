@@ -165,13 +165,15 @@ public class SearchContainer extends JPanel {
 		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
 			@Override
 			public void onSongDelete(SongStatusEvent e) {
+				if (!e.isFailed()) deleteDialog.setVisible(false);
 				passInput.reset();
 			}
 		});
 	}
 	
 	private void deleteSelectedSongs(String password) {
-		if (!passInput.isEmpty()) StateManager.INSTANCE.removeSelectedSongs(password);
+		if (!passInput.isEmpty())
+			StateManager.INSTANCE.removeSelectedSongs(password);
 		passInput.reset();
 	}
 }

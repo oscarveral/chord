@@ -191,8 +191,9 @@ public class SongListPanel extends JPanel {
 
 				@Override
 				public void onSongLoad(SongStatusEvent e) {
-					if (!e.isFailed())
+					if (!e.isFailed()) {
 						songs.addAll(e.getSongs());
+					}
 					fireTableDataChanged();
 				}
 

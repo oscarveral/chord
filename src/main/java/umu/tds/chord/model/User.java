@@ -1,5 +1,7 @@
 package umu.tds.chord.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -15,6 +17,8 @@ import umu.tds.chord.utils.StringHasher;
  * de datos.
  */
 public abstract sealed class User implements Mutable<User.Internal> {
+	
+	private static final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 	/**
 	 * Clase constructora de usuarios.
@@ -348,6 +352,10 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 */
 	public Date getBirthday() {
 		return birthday;
+	}
+	
+	public String getPrintableBirthday() {
+        return printableDateFormat.format(birthday);  
 	}
 
 	/**

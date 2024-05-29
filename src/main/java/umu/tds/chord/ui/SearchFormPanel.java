@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.SongStatusEvent;
@@ -47,6 +49,23 @@ public class SearchFormPanel extends JPanel {
 	private void initializeTitleFilter() {
 		titleFilter = new TextField(titleFilterText);		
 		titleFilter.addActionListener(e -> search());
+		titleFilter.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				search();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				removeUpdate(e);
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				removeUpdate(e);
+			}
+		});
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
@@ -61,6 +80,23 @@ public class SearchFormPanel extends JPanel {
 	private void initializeInterpreterFilter() {
 		interpreterFilter = new TextField(interpreterFilterText);
 		interpreterFilter.addActionListener(e -> search());
+		interpreterFilter.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				search();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				removeUpdate(e);
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				removeUpdate(e);
+			}
+		});
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
@@ -89,6 +125,7 @@ public class SearchFormPanel extends JPanel {
 		
 		styleFilter = new JComboBox<>();		
 		styleFilter.addActionListener(e -> search());
+		styleFilter.addItem(SongRepository.ALL_STYLES);
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
@@ -160,18 +197,13 @@ public class SearchFormPanel extends JPanel {
 
 			@Override
 			public void onSongLoad(SongStatusEvent e) {
+				if (e.isFailed()) return;
 				e.getSongs().forEach(s -> styleFilter.addItem(s.getStyle()));
-				styleFilter.setSelectedItem(SongRepository.ALL_STYLES);
 			}
-			
-			@Override
-			public void onSongSearch(SongStatusEvent e) {
-				styleFilter.removeAllItems();
-				onSongLoad(e);
-			}
-			
+						
 			@Override
 			public void onSongDelete(SongStatusEvent e) {
+				if (e.isFailed()) return;
 				e.getSongs().forEach(s -> styleFilter.removeItem(s.getStyle()));
 				styleFilter.setSelectedItem(SongRepository.ALL_STYLES);
 			}

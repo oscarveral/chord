@@ -38,11 +38,6 @@ public class SongStatusEvent extends EventObject{
 		return songs;
 	}
 	
-	/**
-	 * Añade una canción a la lista de canciones del evento.
-	 * 
-	 * @param song Canción que se desea añadir.
-	 */
 	protected void addSong(Song song) {
 		songs.add(song);
 	}
