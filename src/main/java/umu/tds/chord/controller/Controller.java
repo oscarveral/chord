@@ -10,6 +10,8 @@ import java.util.Set;
 import umu.tds.chord.component.BuscadorCanciones;
 import umu.tds.chord.component.Canciones;
 import umu.tds.chord.component.CargadorCanciones;
+import umu.tds.chord.model.Playlist;
+import umu.tds.chord.model.PlaylistFactory;
 import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
 import umu.tds.chord.model.User;
@@ -232,6 +234,38 @@ public enum Controller {
 		SongStatusEvent e = new SongStatusEvent(this);
 		SongRepository.INSTANCE.getSongs().forEach(e::addSong);
 		songStatusListeners.forEach(l -> l.onSongLoad(e));
+	}
+	
+	/**
+	 * Método para crear una playlists para el usuario actual.
+	 * 
+	 * @param name Nombre de la playlists.
+	 * @param description Descripción de la playlist.
+	 */
+	public void createPlaylist(String name, String description) {
+		currentUser.ifPresent(u -> {
+			PlaylistFactory.createPlaylist(name, description).ifPresent(p -> {
+				u.asMut().addPlaylist(p);
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(l -> l.onPlaylistsListUpdate(e));
+			});
+			UserRepository.INSTANCE.updateUser(u);
+		});
+	}
+	
+	/**
+	 * Método para eliminar una playlists del usuario.
+	 * 
+	 * @param p Playlist que se desea eliminar.
+	 */
+	public void removePlaylist(Playlist p) {
+		currentUser.ifPresent(u -> {
+			if(u.asMut().removePlaylist(p)) {
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(l -> l.onPlaylistsListUpdate(e));
+				UserRepository.INSTANCE.updateUser(u);
+			}
+		});
 	}
 
 	// ---------- Cargador de canciones. ----------

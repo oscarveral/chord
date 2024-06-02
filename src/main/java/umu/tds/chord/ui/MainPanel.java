@@ -9,13 +9,19 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.UserStatusEvent;
+import umu.tds.chord.controller.UserStatusListener;
+
 public class MainPanel extends JPanel {
 
 	private static final long serialVersionUID = -6647430035952199870L;
 	private static final String invisibleTag = "invisible";
 	private static final String searchTag = "search";
-	private static final String recentSongsTab = "rececent";
-
+	private static final String mngmntTag=  "mngmt";
+	private static final String recentSongsTag = "recent";
+	private static final String playlistInfoTag = "pinfo";
+ 
 	private SongLoaderButton luz;
 	
 	private UserInfoPanel userInfo;
@@ -24,7 +30,9 @@ public class MainPanel extends JPanel {
 	private JPanel centerContainer;
 	private CardLayout centerLayout;
 	private SearchContainer searchPanel;
+	private PlaylistManagementPanel playlistMngmt;
 	private RecentSongsPanel recentSongsPanel;
+	private PlaylistInfoPanel playlistInfo;
 	
 	public MainPanel() {	
 		BorderLayout layout = new BorderLayout();
@@ -35,6 +43,7 @@ public class MainPanel extends JPanel {
 		initializeCenterContainer();
 		initializeButtons();
 		initializeNorth();
+		registerControllerListener();
 						
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
@@ -43,14 +52,18 @@ public class MainPanel extends JPanel {
 	
 	private void initializeCenterContainer() {
 		searchPanel = new SearchContainer();
+		playlistMngmt = new PlaylistManagementPanel();
 		recentSongsPanel = new RecentSongsPanel();
+		playlistInfo = new PlaylistInfoPanel();
 		
 		centerLayout = new CardLayout();
 		centerContainer = new JPanel(centerLayout);
 		centerContainer.setFocusable(true);
 		centerContainer.add(new JPanel(), invisibleTag);
 		centerContainer.add(searchPanel, searchTag);
-		centerContainer.add(recentSongsPanel, recentSongsTab);
+		centerContainer.add(playlistMngmt, mngmntTag);
+		centerContainer.add(recentSongsPanel, recentSongsTag);
+		centerContainer.add(playlistInfo, playlistInfoTag);
 		centerLayout.show(centerContainer, invisibleTag);
 		
 		add(centerContainer, BorderLayout.CENTER);
@@ -91,14 +104,23 @@ public class MainPanel extends JPanel {
 	}
 	
 	public void showPlaylistsMngmt() {
-		centerLayout.show(centerContainer, invisibleTag);
+		centerLayout.show(centerContainer, mngmntTag);
 	}
 	
 	public void showRecentSongs() {
-		centerLayout.show(centerContainer, recentSongsTab);
+		centerLayout.show(centerContainer, recentSongsTag);
 	}
 	
 	public void showPlaylist() {
-		centerLayout.show(centerContainer, invisibleTag);
+		centerLayout.show(centerContainer, playlistInfoTag);
+	}
+	
+	private void registerControllerListener() {
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+			@Override
+			public void onUserLogout(UserStatusEvent e) {
+				centerLayout.show(centerContainer, invisibleTag);
+			}
+		});
 	}
 }

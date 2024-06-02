@@ -248,4 +248,25 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	public String toString() {
 		return name;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (obj == null) {
+			return false;
+		}
+		if (this == obj) {
+			return true;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		
+		return this.asMut().equals(obj);
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.asMut().hashCode();
+	}
 }

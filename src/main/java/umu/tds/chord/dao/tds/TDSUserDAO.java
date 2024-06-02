@@ -2,12 +2,11 @@ package umu.tds.chord.dao.tds;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import beans.Entidad;
 import beans.Propiedad;
@@ -114,27 +113,27 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 
 				// Recuperar playlists guardadas.
 				String playlistsStr = p.getValor();
-				Set<Playlist.Internal> oldPlaylists = new HashSet<>(DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
+				List<Playlist.Internal> oldPlaylists = new ArrayList<>(DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().stringToPersistents(playlistsStr));
 
 				// Crear un set con ids actuales de las playlists.
-				Set<Playlist.Internal> newPlaylists = new HashSet<>(
+				List<Playlist.Internal> newPlaylists = new ArrayList<>(
 						u.getPlaylists().stream().map(Mutable::asMut).toList());
 
 				// Obtener y registrar nuevas playlist
-				Set<Playlist.Internal> createdPlaylists = new HashSet<>(newPlaylists);
+				List<Playlist.Internal> createdPlaylists = new ArrayList<>(newPlaylists);
 				createdPlaylists.removeAll(oldPlaylists);
 				createdPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().register(playlist));
 
 				// Eliminar playlists que ya no están presentes.
-				Set<Playlist.Internal> removedPlaylists = new HashSet<>(oldPlaylists);
+				List<Playlist.Internal> removedPlaylists = new ArrayList<>(oldPlaylists);
 				removedPlaylists.removeAll(newPlaylists);
 				removedPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().delete(playlist));
 
 				// Actualizamos el resto de playlists.
-				Set<Playlist.Internal> updatePlaylists = new HashSet<>(newPlaylists);
+				List<Playlist.Internal> updatePlaylists = new ArrayList<>(newPlaylists);
 				updatePlaylists.retainAll(oldPlaylists);
 				updatePlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().modify(playlist));

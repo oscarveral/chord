@@ -48,26 +48,33 @@ public class PlaylistPanel extends JPanel {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-
 				// Evitar doble selección.
 				if (e.getValueIsAdjusting()) return;
-				
-				ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-				
-				StateManager.INSTANCE.clearSelectedPlaylist();
-				
-		        if (!lsm.isSelectionEmpty()) {
-		        	Playlist p = datos.getElementAt(lsm.getMinSelectionIndex());
-		        	StateManager.INSTANCE.setSelectedPlaylist(p);
-		        }
-				
+				Playlist p = lista.getSelectedValue();
+				StateManager.INSTANCE.setSelectedPlaylist(p);
+			}
+		});
+		
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+			@Override
+			public void onPlaylistsListUpdate(UserStatusEvent e) {
+				lista.clearSelection();
+			}
+			
+			@Override
+			public void onUserLogin(UserStatusEvent e) {
+				onPlaylistsListUpdate(e);
+			}
+			
+			@Override
+			public void onUserLogout(UserStatusEvent e) {
+				onPlaylistsListUpdate(e);
 			}
 		});
 		
 		JScrollPane scrollPane = new JScrollPane(lista);
 		scrollPane.setBorder(new EmptyBorder(scrollPaneBorder, scrollPaneBorder, scrollPaneBorder, scrollPaneBorder));
 		add(scrollPane, BorderLayout.CENTER);
-
 	}
 
 	// -------- Modelo de datos de la lista. --------

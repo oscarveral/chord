@@ -103,7 +103,7 @@ public class UserRepositoryTest {
 		UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).ifPresent(u -> {
 			int res5 = u.getPlaylists().size();
 			assertEquals(1, res5);
-			u.asMut().removePlaylist(res5 - 1);
+			u.asMut().removePlaylist(u.getPlaylist(res5 - 1));
 			boolean res6 = UserRepository.INSTANCE.updateUser(u);
 			assertEquals(true, res6);
 			int res7 = u.getPlaylists().size();

@@ -29,17 +29,20 @@ public enum StateManager {
 	
 	private Optional<Interface> callbackInterface;
 	private Optional<MainPanel> callbackMainPanel;
+	private Optional<PlaylistInfoPanel> callbackPlaylistInfo;
 	
 	private StateManager() {
 		selectedPlaylist = Optional.empty();
 		selectedSongs = new ArrayList<>();
 		callbackMainPanel = Optional.empty();
+		callbackPlaylistInfo = Optional.empty();
 		
 		registerControllerListeners();
 	}
 	
 	public void setSelectedPlaylist(Playlist p) {
 		selectedPlaylist = Optional.ofNullable(p);
+		selectedPlaylist.ifPresent(s -> callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(s)));
 	}
 	
 	public void clearSelectedSongs() {
@@ -54,12 +57,23 @@ public enum StateManager {
 		Controller.INSTANCE.removeSongs(selectedSongs, password);
 	}
 	
+	public void removeSelectedPlaylist() {
+		selectedPlaylist.ifPresent(p -> {
+			Controller.INSTANCE.removePlaylist(p);
+			callbackPlaylistInfo.ifPresent(c -> c.clearSelectedPlaylist());
+		});
+	}
+	
 	public void setCallbackMainPanel(MainPanel p) {
 		callbackMainPanel = Optional.ofNullable(p);
 	}
 	
 	public void setCallbackInterface(Interface i) {
 		callbackInterface = Optional.ofNullable(i);
+	}
+	
+	public void setCallbackPlaylistInfo(PlaylistInfoPanel p) {
+		callbackPlaylistInfo = Optional.ofNullable(p);
 	}
 	
 	public void clearSelectedPlaylist() {

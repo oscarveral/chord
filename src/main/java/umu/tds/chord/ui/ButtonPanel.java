@@ -1,6 +1,5 @@
 package umu.tds.chord.ui;
 
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,9 +10,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import umu.tds.chord.controller.Controller;
-import umu.tds.chord.controller.UserStatusEvent;
-import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.ui.StateManager.UIEvents;
 import umu.tds.chord.utils.ImageScaler;
 
@@ -30,11 +26,6 @@ public class ButtonPanel extends JPanel {
 	private static final String playlistManagementButtonIconPath = "/images/playlist_edit_icon.png";
 	private static final String recentSongsButtonIconPath = "/images/recent_songs_icon.png";
 	private static final String playlistsButtonIconPath = "/images/playlist_icon.png";
-	private static final String invisibleTag = "invisible";
-	private static final String playlistsTag = "playlists";
-
-	private JPanel playlistPanelContainer;
-	private CardLayout playlistaPanelLayout;
 	
 	public ButtonPanel() {
 		GridBagLayout layout = new GridBagLayout();
@@ -46,8 +37,6 @@ public class ButtonPanel extends JPanel {
 		initializePlaylistsButton();
 		initializePlaylistsPanel();
 		
-		registerControllerListener();
-											
 		setBorder(BorderFactory.createTitledBorder
 				(BorderFactory.createLineBorder(Color.BLACK), buttonMenuTitle));
 	}
@@ -67,10 +56,7 @@ public class ButtonPanel extends JPanel {
 
 		ResponsiveButton searchButton = new ResponsiveButton(searchButtonText, icon);
 		searchButton.setHorizontalAlignment(SwingConstants.LEFT);
-		searchButton.addActionListener(e -> {
-			playlistaPanelLayout.show(playlistPanelContainer, invisibleTag);
-			StateManager.INSTANCE.triggerEvent(UIEvents.SONG_SEARCH);
-		});
+		searchButton.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.SONG_SEARCH));
 
 		add(searchButton, constraints);
 	}
@@ -87,10 +73,7 @@ public class ButtonPanel extends JPanel {
 
 		ResponsiveButton playlistManagementButton = new ResponsiveButton(playlistManagementButtonText, icon);
 		playlistManagementButton.setHorizontalAlignment(SwingConstants.LEFT);
-		playlistManagementButton.addActionListener(e -> {
-			playlistaPanelLayout.show(playlistPanelContainer, playlistsTag);
-			StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLSITS_MNGMT);
-		});
+		playlistManagementButton.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLSITS_MNGMT));
 
 		add(playlistManagementButton, constraints);
 	}
@@ -107,10 +90,7 @@ public class ButtonPanel extends JPanel {
 
 		ResponsiveButton recentSongsButton = new ResponsiveButton(recentSongsButtonText, icon);
 		recentSongsButton.setHorizontalAlignment(SwingConstants.LEFT);
-		recentSongsButton.addActionListener(e -> {
-			playlistaPanelLayout.show(playlistPanelContainer, invisibleTag);
-			StateManager.INSTANCE.triggerEvent(UIEvents.RECENT_SONGS);
-		});
+		recentSongsButton.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.RECENT_SONGS));
 
 		add(recentSongsButton, constraints);
 	}
@@ -127,10 +107,7 @@ public class ButtonPanel extends JPanel {
 
 		ResponsiveButton playlistsButton = new ResponsiveButton(playlistsButtonText, icon);
 		playlistsButton.setHorizontalAlignment(SwingConstants.LEFT);
-		playlistsButton.addActionListener(e -> {
-			playlistaPanelLayout.show(playlistPanelContainer, playlistsTag);
-			StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLIST);
-		});
+		playlistsButton.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.PLAYLIST));
 
 		add(playlistsButton, constraints);
 	}
@@ -145,25 +122,8 @@ public class ButtonPanel extends JPanel {
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.anchor = GridBagConstraints.PAGE_END;
 
-		playlistaPanelLayout = new CardLayout();
-		playlistPanelContainer = new JPanel(playlistaPanelLayout);
 		PlaylistPanel playlistsPanel = new PlaylistPanel();
-		playlistPanelContainer.add(new JPanel(), invisibleTag);
-		playlistPanelContainer.add(playlistsPanel, playlistsTag);
 
-		add(playlistPanelContainer, constraints);
-	}
-	
-	// -------- Interacción con el controlador. --------
-
-	private void registerControllerListener() {
-		// Escuchar eventos para establecer la interfaz de forma acorde.
-		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-		
-			@Override
-			public void onUserLogout(UserStatusEvent e) {
-				playlistaPanelLayout.show(playlistPanelContainer, invisibleTag);
-			}
-		});
+		add(playlistsPanel, constraints);
 	}
 }

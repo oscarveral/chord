@@ -5,27 +5,26 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
-public class TextField extends JTextField {
+public class ResponsiveTextArea extends JTextArea {
 
-	private static final long serialVersionUID = -3748838447365458226L;
+	private static final long serialVersionUID = -5208136966223256316L;
 	private static final String error = "Unsupported";
 
 	private final String text;
 	private boolean empty;
 
-	public TextField(String text) {
+	public ResponsiveTextArea(String text) {
 		this.text = text;
 		this.empty = true;
 
 		initializeText();
 		initializeFocusListener();
 		initializeDocumentListener();
-		initializeActionListener();
 	}
 
 	private void initializeText() {
@@ -69,13 +68,6 @@ public class TextField extends JTextField {
 			public void changedUpdate(DocumentEvent e) {
 				throw new RuntimeException(error);
 			}
-		});
-	}
-	
-	private void initializeActionListener() {
-		addActionListener(e -> {
-			if (isFocusOwner())
-				transferFocus();
 		});
 	}
 	

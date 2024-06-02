@@ -263,13 +263,12 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * Elimina una playlist de la lista de playlists del usuario. Véase
 		 * {@link Playlist}.
 		 *
-		 * @param index Índice en la lista de playlists de la playlist que se desea
-		 *              eliminar.
+		 * @param p Playlist que se desea eliminar de la lista.
 		 *
-		 * @return Playlist eliminada de la lista.
+		 * @return Resultado de la eliminación.
 		 */
-		public Playlist removePlaylist(int index) {
-			return super.playlists.remove(index);
+		public boolean removePlaylist(Playlist p) {
+			return super.playlists.remove(p);
 		}
 
 		/**
