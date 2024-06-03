@@ -56,19 +56,15 @@ public class PlaylistPanel extends JPanel {
 		});
 		
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+			
 			@Override
-			public void onPlaylistsListUpdate(UserStatusEvent e) {
+			public void onUserLogin(UserStatusEvent e) {
 				lista.clearSelection();
 			}
 			
 			@Override
-			public void onUserLogin(UserStatusEvent e) {
-				onPlaylistsListUpdate(e);
-			}
-			
-			@Override
 			public void onUserLogout(UserStatusEvent e) {
-				onPlaylistsListUpdate(e);
+				lista.clearSelection();
 			}
 		});
 		

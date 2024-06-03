@@ -267,6 +267,42 @@ public enum Controller {
 			}
 		});
 	}
+	
+	/**
+	 * Añade las canciones de la lista proporcionada a la playlist proporcionada
+	 * si esta pertenece al usuario con la sesión actual.
+	 * 
+	 * @param p Playlists a la que se añadirán las canciones.
+	 * @param l Lista de canciones que se desean añadir.
+	 */
+	public void addSongsPlaylist(Playlist p, List<Song> l) {
+		currentUser.ifPresent(u -> {
+			if (u.getPlaylists().contains(p)) {
+				l.stream().forEach(s -> p.asMut().addSong(s));
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(li -> li.onPlaylistsListUpdate(e));
+				UserRepository.INSTANCE.updateUser(u);
+			}
+		});
+	}
+	
+	/**
+	 * Elimina las canciones de la lista proporcionada a la playlist proporcionada
+	 * si esta pertenece al usuario con la sesión actual.
+	 * 
+	 * @param p Playlists de la que se eliminarán las canciones.
+	 * @param l Lista de canciones que se desean eliminar.
+	 */
+	public void removeSongsPlaylist(Playlist p, List<Song> l) {
+		currentUser.ifPresent(u -> {
+			if (u.getPlaylists().contains(p)) {
+				l.stream().forEach(s -> p.asMut().removeSong(s));
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(li -> li.onPlaylistsListUpdate(e));
+				UserRepository.INSTANCE.updateUser(u);
+			}
+		});	
+	}
 
 	// ---------- Cargador de canciones. ----------
 

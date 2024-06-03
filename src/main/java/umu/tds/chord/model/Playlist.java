@@ -107,8 +107,8 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		 *
 		 * @param song Canción que se desea añadir.
 		 */
-		public void addSong(Song song) {
-			super.songs.add(song);
+		public boolean addSong(Song song) {
+			return super.songs.add(song);
 		}
 
 		@Override

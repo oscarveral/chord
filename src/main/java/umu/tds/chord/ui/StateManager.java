@@ -80,6 +80,18 @@ public enum StateManager {
 		selectedPlaylist = Optional.empty();
 	}
 	
+	public void addSelectedSongsToSelectedPlaylist() {
+		selectedPlaylist.ifPresent(p -> {
+			Controller.INSTANCE.addSongsPlaylist(p, selectedSongs);
+		});
+	}
+	
+	public void removeSelectedSongsFromSelectedPlaylist() {
+		selectedPlaylist.ifPresent(p -> {
+			Controller.INSTANCE.removeSongsPlaylist(p, selectedSongs);
+		});
+	}
+	
 	public void triggerEvent(UIEvents e) {
 		switch (e) {
 		case SONG_SEARCH:
@@ -117,11 +129,11 @@ public enum StateManager {
 			
 			@Override
 			public void onPlaylistsListUpdate(UserStatusEvent e) {
-				e.getUser().ifPresent(u -> {
+				if (e.getUser().isPresent()) {
 					selectedPlaylist.ifPresent(p -> {
-						if (!u.getPlaylists().contains(p))	selectedPlaylist = Optional.empty();	
+						callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(p));
 					});
-				});
+				}
 			}
 		});
 		

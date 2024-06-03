@@ -28,11 +28,13 @@ public class RecentSongsPanel extends JPanel {
 
 	private static final long serialVersionUID = -4486884398599339204L;
 	private static final String title = "Canciones recientes";
+	private static final String addText = "Añadir canciones seleccionadas a la playlist seleccionada";
 	
 	public RecentSongsPanel() {
 		setLayout(new GridBagLayout());
 		
 		initializeSongTable();
+		initializeAddSongsButton();
 		
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title));
 	}
@@ -75,9 +77,26 @@ public class RecentSongsPanel extends JPanel {
 		c.weightx = 1;
 		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(10, 10, 10, 10);
+		c.insets = new Insets(10, 10, 7, 10);
 		
 		add(scrollPane, c);
+	}
+	
+	private void initializeAddSongsButton() {
+		ResponsiveButton addSongs = new ResponsiveButton(addText);
+		addSongs.addActionListener(e -> addSongs());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(0, 10, 10, 10);
+		
+		add(addSongs ,c);
+	}
+	
+	private void addSongs() {
+		StateManager.INSTANCE.addSelectedSongsToSelectedPlaylist();
 	}
 
 	// -------- Modelo de datos de la tabla --------

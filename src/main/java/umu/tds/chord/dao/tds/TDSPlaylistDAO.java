@@ -1,5 +1,6 @@
 package umu.tds.chord.dao.tds;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -145,8 +146,8 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 		String recentSongsStr = persistence.recuperarPropiedadEntidad(ePlaylist, Properties.SONGS.name());
 
 		// Añadir canciones.
-		List<Song> songs = DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO()
-				.stringToPersistents(recentSongsStr).stream().map(s -> (Song) s).toList();
+		List<Song> songs = new ArrayList<>(DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO()
+				.stringToPersistents(recentSongsStr).stream().map(s -> (Song) s).toList());
 
 		// Creación de la playlist
 		Playlist.Internal p = new Playlist.Builder(name).description(description).songs(songs).build().get().asMut();

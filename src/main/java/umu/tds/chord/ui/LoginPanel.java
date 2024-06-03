@@ -110,7 +110,7 @@ public class LoginPanel extends JPanel {
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 4;
-		constraints.weightx = 1;
+		//constraints.weightx = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 5);
 
@@ -126,7 +126,7 @@ public class LoginPanel extends JPanel {
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 4;
-		constraints.weightx = 1;
+		//constraints.weightx = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 5, 5, 10);
 

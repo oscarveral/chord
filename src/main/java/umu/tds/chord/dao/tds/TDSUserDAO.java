@@ -116,27 +116,22 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 				List<Playlist.Internal> oldPlaylists = new ArrayList<>(DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().stringToPersistents(playlistsStr));
 
-				// Crear un set con ids actuales de las playlists.
+				// Crear lista con ids actuales de las playlists.
 				List<Playlist.Internal> newPlaylists = new ArrayList<>(
 						u.getPlaylists().stream().map(Mutable::asMut).toList());
 
-				// Obtener y registrar nuevas playlist
-				List<Playlist.Internal> createdPlaylists = new ArrayList<>(newPlaylists);
-				createdPlaylists.removeAll(oldPlaylists);
-				createdPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
-						.getPlaylistDAO().register(playlist));
-
+				newPlaylists.forEach(playlist -> {
+					// Las ya registradas son ignoradas por el dao.
+					DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().register(playlist);
+					DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().modify(playlist);
+				});
+				
 				// Eliminar playlists que ya no están presentes.
 				List<Playlist.Internal> removedPlaylists = new ArrayList<>(oldPlaylists);
 				removedPlaylists.removeAll(newPlaylists);
 				removedPlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
 						.getPlaylistDAO().delete(playlist));
-
-				// Actualizamos el resto de playlists.
-				List<Playlist.Internal> updatePlaylists = new ArrayList<>(newPlaylists);
-				updatePlaylists.retainAll(oldPlaylists);
-				updatePlaylists.forEach(playlist -> DAOFactory.getInstance(DAOImplementation.TDS_FAMILY)
-						.getPlaylistDAO().modify(playlist));
+				
 
 				p.setValor(DAO.persistentsToString(
 						// Necesito la versión interna de las playlist para

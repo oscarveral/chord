@@ -24,11 +24,13 @@ public class PlaylistInfoPanel extends JPanel {
 	private static final String namePreText = "Nombre: ";
 	private static final String placeHolder = "No seleccionado";
 	private static final String descPreText = "Descripción.";
+	private static final String deleteText = "Quitar canciones seleccionadas";
 	
 	private JLabel name;
 	private JLabel descPre;
 	private ResponsiveTextArea desc;
 	private PlaylistSongList songs;
+	private ResponsiveButton deleteSongs;
 	
 	public PlaylistInfoPanel() {
 		setLayout(new GridBagLayout());
@@ -37,6 +39,7 @@ public class PlaylistInfoPanel extends JPanel {
 		initializeDescPre();
 		initializeDesc();
 		initializeSongs();
+		initializeDeleteSongs();
 		
 		registerControllerListener();
 		
@@ -102,9 +105,26 @@ public class PlaylistInfoPanel extends JPanel {
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1;
 		c.weighty = 0.7;
-		c.insets = new Insets(5, 10, 10, 10);
+		c.insets = new Insets(5, 10, 5, 10);
 		
 		add(songs, c);
+	}
+	
+	private void initializeDeleteSongs() {
+		deleteSongs = new ResponsiveButton(deleteText);
+		deleteSongs.addActionListener(e -> deleteSongs());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 4;
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(5, 10, 10, 10);
+		
+		add(deleteSongs, c);
+	}
+	
+	private void deleteSongs() {
+		StateManager.INSTANCE.removeSelectedSongsFromSelectedPlaylist();
 	}
 	
 	public void setSelectedPlaylist(Playlist p) {

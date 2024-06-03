@@ -31,6 +31,7 @@ public class SearchContainer extends JPanel {
 	private static final String passInputText = "Introduce tu contraseña";
 	private static final String deleteConfirmTitle = "Permiso requerido";
 	private static final String confirmDelete = "Confirmar eliminación";
+	private static final String addToPlaylistText = "Añadir canciones seleccionadas a la playlist seleccionada";
 
 	private SearchFormPanel searchPanel;
 	private JPanel buttonsPanel;
@@ -40,6 +41,7 @@ public class SearchContainer extends JPanel {
 	private JLabel label;
 	private PasswordField passInput;
 	private ResponsiveButton confirm;
+	private ResponsiveButton addToPlaylist;
 
 	public SearchContainer() {
 		BorderLayout layout = new BorderLayout();
@@ -47,6 +49,7 @@ public class SearchContainer extends JPanel {
 
 		initializeSearchPanel();
 		initializeButtons();
+		initializeAddToPlaylist();
 
 		registerControllerListeners();
 
@@ -81,7 +84,7 @@ public class SearchContainer extends JPanel {
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.weightx = 1;
-		constraints.insets = new Insets(0, 10, 10, 10);
+		constraints.insets = new Insets(0, 10, 5, 10);
 		constraints.fill = GridBagConstraints.BOTH;
 
 		buttonsPanel.add(deleteButton, constraints);
@@ -159,6 +162,20 @@ public class SearchContainer extends JPanel {
 		deleteDialog.setResizable(false);
 		deleteDialog.setVisible(false);
 	}
+	
+	private void initializeAddToPlaylist() {
+		addToPlaylist = new ResponsiveButton(addToPlaylistText);
+		addToPlaylist.addActionListener(e -> addSongs());
+		
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.weightx = 1;
+		constraints.insets = new Insets(5, 10, 10, 10);
+		constraints.fill = GridBagConstraints.BOTH;
+		
+		buttonsPanel.add(addToPlaylist, constraints);
+	}
 
 	private void registerControllerListeners() {
 		// Escuchar fallos y éxitos de eliminación.
@@ -175,5 +192,9 @@ public class SearchContainer extends JPanel {
 		if (!passInput.isEmpty())
 			StateManager.INSTANCE.removeSelectedSongs(password);
 		passInput.reset();
+	}
+	
+	private void addSongs() {
+		StateManager.INSTANCE.addSelectedSongsToSelectedPlaylist();
 	}
 }
