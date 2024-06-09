@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.Player;
 import umu.tds.chord.controller.SongStatusEvent;
 import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -143,5 +144,13 @@ public enum StateManager {
 				if (!e.isFailed()) selectedSongs.retainAll(e.getSongs());
 			}
 		});
+	}
+	
+	public void reproduceSelectedPlaylist() {
+		selectedPlaylist.ifPresent(Player.INSTANCE::play);
+	}
+	
+	public void addSelelectedSongsToQueue() {
+		Player.INSTANCE.addCola(selectedSongs);
 	}
 }

@@ -211,7 +211,7 @@ public enum SongRepository {
 			u.removeRecentSong(s);
 			u.getPlaylists().stream().map(Mutable::asMut)
 					// Eliminamos la canción de todas las playlists.
-					.forEach(p -> p.removeSong(s));
+					.forEach(p -> p.removeAll(s));
 			// Actualización de cada usuario.
 			UserRepository.INSTANCE.updateUser(u);
 		});

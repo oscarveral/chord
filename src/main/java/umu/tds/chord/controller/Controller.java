@@ -40,7 +40,7 @@ public enum Controller {
 
 	private Set<SongStatusListener> songStatusListeners;
 	private Set<UserStatusListener> userStatusListeners;
-
+	
 	private Controller() {
 		registerCancionesListener();
 
@@ -106,6 +106,7 @@ public enum Controller {
 				currentUser = Optional.empty();
 				UserStatusEvent e = new UserStatusEvent(this, null);
 				userStatusListeners.forEach(l -> l.onUserLogout(e));
+				Player.INSTANCE.clearState();
 			}
 		});
 		return currentUser.isEmpty();
@@ -129,6 +130,7 @@ public enum Controller {
 				currentUser = Optional.empty();
 				UserStatusEvent e = new UserStatusEvent(this, null);
 				userStatusListeners.forEach(l -> l.onUserLogout(e));
+				Player.INSTANCE.clearState();
 			}
 		});
 		return currentUser.isEmpty();
@@ -164,6 +166,19 @@ public enum Controller {
 			userStatusListeners.forEach(l -> 
 				l.onFavouriteSongsUpdate(e)
 			);
+		});
+	}
+	
+	/**
+	 * Añade una canción a la lista de recientes del usuario.
+	 * 
+	 * @param s Canción que se desea añadir.
+	 */
+	protected void addRecentSong(Song s) {
+		currentUser.ifPresent(u -> {
+			u.asMut().addRecentSong(s);
+			UserStatusEvent e = new UserStatusEvent(this, u);
+			userStatusListeners.forEach(l -> l.onRecentSongsUpdate(e));
 		});
 	}
 	

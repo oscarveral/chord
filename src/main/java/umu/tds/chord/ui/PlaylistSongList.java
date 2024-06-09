@@ -11,6 +11,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -65,6 +67,20 @@ public class PlaylistSongList extends JPanel {
 		JScrollPane scrollPane = new JScrollPane(songTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+		addAncestorListener(new AncestorListener() {
+			
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				songTable.clearSelection();
+			}
+			
+			@Override
+			public void ancestorMoved(AncestorEvent event) {}
+			
+			@Override
+			public void ancestorAdded(AncestorEvent event) {}
+		});
+		
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	

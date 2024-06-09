@@ -33,6 +33,7 @@ public class MainPanel extends JPanel {
 	private PlaylistManagementPanel playlistMngmt;
 	private RecentSongsPanel recentSongsPanel;
 	private PlaylistInfoPanel playlistInfo;
+	private ReproductionPanel reproduction;
 	
 	public MainPanel() {	
 		BorderLayout layout = new BorderLayout();
@@ -43,6 +44,7 @@ public class MainPanel extends JPanel {
 		initializeCenterContainer();
 		initializeButtons();
 		initializeNorth();
+		initializeReproduction();
 		registerControllerListener();
 						
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -113,6 +115,11 @@ public class MainPanel extends JPanel {
 	
 	public void showPlaylist() {
 		centerLayout.show(centerContainer, playlistInfoTag);
+	}
+	
+	private void initializeReproduction() {
+		reproduction = new ReproductionPanel();
+		add(reproduction, BorderLayout.SOUTH);
 	}
 	
 	private void registerControllerListener() {

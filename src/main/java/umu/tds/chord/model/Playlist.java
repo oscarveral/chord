@@ -168,12 +168,23 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		/**
 		 * Método para eliminar una canción de la lista según el índice dado.
 		 *
-		 * @param index Indice de la canción de la lista que se desea eliminar.
+		 * @param song Canción de la lista que se desea eliminar.
 		 *
 		 * @return Canción eliminada de la lista.
 		 */
 		public boolean removeSong(Song song) {
 			return super.songs.remove(song);
+		}
+		
+		/**
+		 * Elimina de la playlist todas las instancias de la canción dada.
+		 * 
+		 * @param song Canción que se desea purgar de la playlist.
+		 * 
+		 * @return Resultado de la operación.
+		 */
+		public boolean removeAll(Song song) {
+			return super.songs.removeIf(s -> s.equals(song));
 		}
 	}
 
@@ -242,6 +253,15 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	 */
 	public List<Song> getSongs() {
 		return Collections.unmodifiableList(songs);
+	}
+	
+	/**
+	 * Comprueba si la playlist está vacía.
+	 * 
+	 * @return Estado de vacío de la playlist.
+	 */
+	public boolean isEmpty() {
+		return songs.isEmpty();
 	}
 
 	@Override
