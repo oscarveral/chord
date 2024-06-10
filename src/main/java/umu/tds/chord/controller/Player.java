@@ -30,6 +30,7 @@ public enum Player {
 
 	private Set<PlayStatusListener> playStatusListeners;
 	
+	
 	private Player() {
 		cola = new ArrayDeque<>();
 		playlist = Optional.empty();
@@ -72,6 +73,7 @@ public enum Player {
 			Media media = new Media(mp3.toFile().toURI().toString());
 			// Se añade el nuevo reproductor.
 			player = Optional.of(new MediaPlayer(media));
+			player.ifPresent(p -> p.setOnEndOfMedia(this::siguiente));
 			// Actualizar estado de controladores.
 			currentSong = Optional.of(s);
 			Controller.INSTANCE.addRecentSong(s);

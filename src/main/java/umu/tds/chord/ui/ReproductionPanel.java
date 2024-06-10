@@ -10,7 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.PlayStatusListener;
@@ -31,6 +30,7 @@ public class ReproductionPanel extends JPanel {
 	private static final String nextIconPath = "/images/next.png";
 	private static final String lastIconPath = "/images/previous.png";
 	private static final String currentSongTemplate = "No se está reproduciendo nada";
+	private static final String currentPlaylistTemplate = "No se está reproduciendo de ninguna playlist.";
 	private static final String title = "Reproductor";
 	private static final int iconSize = 20;
 	
@@ -42,7 +42,7 @@ public class ReproductionPanel extends JPanel {
 	private ResponsiveButton next;
 	private ResponsiveButton last;
 	private JLabel currentSong;
-	private JProgressBar progreso;
+	private JLabel currentPlaylist;
 	
 	private JPanel container;
 	private JPanel center;
@@ -121,7 +121,6 @@ public class ReproductionPanel extends JPanel {
 		initializeNext();
 		initializeLast();
 		initializeCurrentSong();
-		initializeProgreso();
 		
 		container.add(center, BorderLayout.CENTER);
 	}
@@ -198,20 +197,8 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeCurrentSong() {
 		currentSong = new JLabel(currentSongTemplate);
+		currentPlaylist = new JLabel(currentPlaylistTemplate);
 	
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.gridwidth = 5;
-		c.insets = new Insets(5, 0, 5, 0);
-		c.fill = GridBagConstraints.BOTH;
-		
-		center.add(currentSong, c);
-	}
-	
-	private void initializeProgreso() {
-		progreso = new JProgressBar();
-		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 2;
@@ -219,7 +206,15 @@ public class ReproductionPanel extends JPanel {
 		c.insets = new Insets(5, 0, 10, 0);
 		c.fill = GridBagConstraints.BOTH;
 		
-		center.add(progreso, c);
+		GridBagConstraints d = new GridBagConstraints();
+		d.gridx = 0;
+		d.gridy = 1;
+		d.gridwidth = 5;
+		d.insets = new Insets(5, 0, 5, 0);
+		d.fill = GridBagConstraints.BOTH;
+		
+		center.add(currentSong, c);
+		center.add(currentPlaylist, d);
 	}
 	
 	private void registerControllerListener() {
@@ -228,7 +223,6 @@ public class ReproductionPanel extends JPanel {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				currentSong.setText(currentSongTemplate);
-				progreso.setValue(0);
 			}
 			
 			@Override
@@ -242,10 +236,10 @@ public class ReproductionPanel extends JPanel {
 			@Override
 			public void onSongReproduction(SongPlayEvent e) {
 				currentSong.setText(currentSongTemplate);
-				e.getSong().ifPresent(s -> {
-					currentSong.setText(s.getName() + " - " + s.getAuthor() + " - " + s.getStyle());
-				});
-				
+				e.getSong().ifPresent(s ->
+					currentSong.setText(s.getName() + " - " + s.getAuthor() + " - " + s.getStyle())
+				);
+				e.getPlaylist().ifPresent(p -> currentPlaylist.setText("Playlist: " + p.getName()));
 			}
 		});
 	}
