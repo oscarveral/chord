@@ -381,7 +381,7 @@ public enum Controller {
 			GitHub g = GitHubBuilder.fromPropertyFile(githubPropertiesPath).build();
 			if (g.isCredentialValid()) {
 				
-				String username = "gitbub/" + g.getMyself().getLogin();
+				String username = "github/" + g.getMyself().getLogin();
 				String pass = String.valueOf(g.getMyself().getId());
 				Date birth = g.getMyself().getCreatedAt();
 
