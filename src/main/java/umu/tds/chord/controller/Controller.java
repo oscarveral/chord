@@ -1,12 +1,16 @@
 package umu.tds.chord.controller;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -363,6 +367,31 @@ public enum Controller {
 				return;
 			}
 		});
+	}
+	
+	/**
+	 * Inicia sesión en github utilizando un fichero github.properties.
+	 * 
+	 * @param githubPropertiesPath Ruta al fichero github.properties.
+	 * 
+	 * @return Resultado de inicio de sesión.
+	 */
+	public boolean githubLogin(String githubPropertiesPath) {
+		try {
+			GitHub g = GitHubBuilder.fromPropertyFile(githubPropertiesPath).build();
+			if (g.isCredentialValid()) {
+				
+				String username = "gitbub/" + g.getMyself().getLogin();
+				String pass = String.valueOf(g.getMyself().getId());
+				Date birth = g.getMyself().getCreatedAt();
+
+				// Se crea el usuario si no existía.
+				UserRepository.INSTANCE.addUser(username, pass, birth);
+				return login(username, pass);
+			}
+		} catch (IOException e) {}
+		
+		return false;
 	}
 
 	// ---------- Cargador de canciones. ----------

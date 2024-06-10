@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -64,6 +65,7 @@ public class ToolBar extends JMenuBar {
 	}
 	
 	private void genPDF() {
+		UIManager.put("FileChooser.readOnly", Boolean.FALSE);
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser.setMultiSelectionEnabled(false);

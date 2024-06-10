@@ -3,9 +3,15 @@ package umu.tds.chord.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.ui.StateManager.UIEvents;
@@ -22,6 +28,9 @@ public class LoginPanel extends JPanel {
 	private static final String logoPath = "/images/logo.png";
 	private static final String empty = "";
 	private static final String loginError= "Fallo de inicio de sesión.";
+	private static final String openFileDialogTitle = "Selecciona credenciales de GitHub";
+	private static final String fileExtensionDesc = "Fichero Properties (*.properties)";
+	private static final String fileExtension = ".properties";
 	private static final int logoWidth = 648;
 	private static final int logoHeight = 205;
 	
@@ -32,6 +41,8 @@ public class LoginPanel extends JPanel {
 	private AlertTextArea error;
 	
 	private LoginVerifier verifier;
+	
+	private JFileChooser chooser;
 	
 	public LoginPanel() {
 		setLayout(new GridBagLayout());
@@ -105,12 +116,14 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private void initializeGithub() {
+		initializeFileChooser();
+		
 		ResponsiveButton github = new ResponsiveButton(githubText);
+		github.addActionListener(e -> githubLogin());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 4;
-		//constraints.weightx = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 5);
 
@@ -146,6 +159,28 @@ public class LoginPanel extends JPanel {
 		add(error, constraints);
 	}
 	
+	private void initializeFileChooser() {
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+		chooser = new JFileChooser();
+		chooser.setMultiSelectionEnabled(false);
+		chooser.setFileHidingEnabled(false);
+		chooser.setDialogTitle(openFileDialogTitle);
+		chooser.setFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return fileExtensionDesc;
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory()) return true;
+				String filename = f.getName().toLowerCase();
+				return filename.endsWith(fileExtension);
+			}
+		});
+	}
+	
 	// ---------- Validación. ----------
 	
 	private void initializeLoginVerifier() {
@@ -174,6 +209,24 @@ public class LoginPanel extends JPanel {
 				refresh();
 			}
 			else error.setFail(loginError);
+		}
+	}
+	
+	private void githubLogin() {
+		int res = chooser.showOpenDialog(SwingUtilities.getWindowAncestor(chooser));
+		if (res == JFileChooser.APPROVE_OPTION) {
+			// Obtener la ruta del fichero seleccionado.
+			File f = chooser.getSelectedFile();
+			try {
+				String path = f.getCanonicalPath();
+				if(!Controller.INSTANCE.githubLogin(path)) error.setFail(loginError);
+				else { 
+					error.setSuccess(empty);
+					refresh();
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }
