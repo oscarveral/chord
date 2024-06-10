@@ -44,13 +44,13 @@ public final class Interface {
 		layout = new CardLayout();
 		container = new JPanel(layout);
 		
-		initializeFrame();
+		initializeFrame();		
 		initializeLogin();
 		initializeMain();
 		initializeRegister();
 		
 		ventana.setContentPane(container);
-		
+
 		registerControllerListener();
 		
 		Controller.INSTANCE.ready();
@@ -63,10 +63,12 @@ public final class Interface {
 		Rectangle defaultBounds = new Rectangle(100, 100, 800, 600);
 		ImageIcon icono = ImageScaler.loadImageIcon(iconPath, 20, 20);
 		
+		ventana.setJMenuBar(new ToolBar());
 		ventana.setTitle(title);
 		ventana.setBounds(defaultBounds);
 		ventana.setMinimumSize(minSize);
 		ventana.setIconImage(icono.getImage());
+		ventana.setSize(ventana.getPreferredSize());
 		ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		ventana.addWindowListener(new WindowAdapter() {
 			

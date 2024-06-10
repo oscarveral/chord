@@ -46,7 +46,7 @@ public class MainPanel extends JPanel {
 		initializeNorth();
 		initializeReproduction();
 		registerControllerListener();
-						
+								
 		setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
 		StateManager.INSTANCE.setCallbackMainPanel(this);
@@ -84,14 +84,14 @@ public class MainPanel extends JPanel {
 	
 		GridBagConstraints c1 = new GridBagConstraints();
 		c1.gridx = 0;
-		c1.gridy = 0;
+		c1.gridy = 1;
 		c1.weightx = 1.0;
 		c1.weighty = 1.0;
 		c1.fill = GridBagConstraints.BOTH;
 		
 		GridBagConstraints c2 = new GridBagConstraints();
 		c2.gridx = 1;
-		c2.gridy = 0;
+		c2.gridy = 1;
 		c2.fill= GridBagConstraints.BOTH;
 		c2.insets = new Insets(10, 10, 10, 5);
 		

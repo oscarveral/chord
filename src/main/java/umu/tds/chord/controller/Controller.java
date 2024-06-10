@@ -1,11 +1,18 @@
 package umu.tds.chord.controller;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.ListItem;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import umu.tds.chord.component.BuscadorCanciones;
 import umu.tds.chord.component.Canciones;
@@ -33,6 +40,7 @@ public enum Controller {
 	INSTANCE;
 
 	private static final String adminUser = "admin";
+	private static final String pdfTitle = "Chord. Resumen del usuario ";
 	
 	private BuscadorCanciones buscadorCanciones;
 	
@@ -317,6 +325,44 @@ public enum Controller {
 				UserRepository.INSTANCE.updateUser(u);
 			}
 		});	
+	}
+	
+	/**
+	 * Genera un PDF resumen con las playlist y canciones del usuario.
+	 * 
+	 * @param path Ruta donde se creará el fichero PDF.
+	 */
+	public void genPDF(String path) {
+		currentUser.ifPresent(u -> {
+			if (!u.isPremium()) return;
+			try {
+				FileOutputStream fichero = new FileOutputStream(path + "/" + u.getUserName() + ".pdf");
+				Document documento = new Document();
+				PdfWriter.getInstance(documento, fichero);
+				documento.open();
+				documento.addCreationDate();
+				documento.addAuthor(u.getUserName());
+				documento.addCreator(u.getUserName());
+				documento.addTitle(pdfTitle + u.getUserName());
+				documento.add(new Paragraph(pdfTitle + u.getUserName()));
+				com.itextpdf.text.List playlistList = new com.itextpdf.text.List();
+				u.getPlaylists().forEach(p -> {
+					ListItem pla = new ListItem(new Paragraph("Playlist: " + p.getName()));
+					com.itextpdf.text.List lista = new com.itextpdf.text.List(true);
+					p.getSongs().forEach(s -> {
+						ListItem i = new ListItem(s.getName() + " - " + s.getAuthor() + " - " + s.getStyle());
+						i.setAlignment(Element.ALIGN_JUSTIFIED);
+						lista.add(i);
+					});
+					pla.add(lista);
+					playlistList.add(pla);			
+				});
+				documento.add(playlistList);
+				documento.close();
+			} catch (Exception e) {
+				return;
+			}
+		});
 	}
 
 	// ---------- Cargador de canciones. ----------

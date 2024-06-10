@@ -223,6 +223,7 @@ public class ReproductionPanel extends JPanel {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				currentSong.setText(currentSongTemplate);
+				currentPlaylist.setText(currentPlaylistTemplate);
 			}
 			
 			@Override
