@@ -37,6 +37,8 @@ public final class Interface {
 	private RegisterPanel register;
 	private JDialog registerDialog;
 	
+	private ToolBar tools;
+	
 	public Interface() {
 		
 		StateManager.INSTANCE.setCallbackInterface(this);
@@ -63,7 +65,8 @@ public final class Interface {
 		Rectangle defaultBounds = new Rectangle(100, 100, 800, 600);
 		ImageIcon icono = ImageScaler.loadImageIcon(iconPath, 20, 20);
 		
-		ventana.setJMenuBar(new ToolBar());
+		tools = new ToolBar();
+		
 		ventana.setTitle(title);
 		ventana.setBounds(defaultBounds);
 		ventana.setMinimumSize(minSize);
@@ -114,12 +117,16 @@ public final class Interface {
 		ventana.setVisible(true);
 	}
 	
-	public void showMainPanel() {
+	public void showMainPanel() {		
+		ventana.setJMenuBar(tools);
+		ventana.validate();
 		layout.show(container, mainTag);
 		main.requestFocus();
 	}
 	
 	public void showLoginPanel() {
+		ventana.setJMenuBar(null);
+		ventana.validate();
 		layout.show(container, loginTag);
 		login.requestFocus();
 	}
