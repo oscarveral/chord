@@ -128,6 +128,7 @@ public class UserInfoPanel extends JPanel {
 					userName.setText(userPre + u.getUserName());
 					birthday.setText(birthdayPre + u.getPrintableBirthday());
 					premiumToggle.setSelected(u.isPremium());
+					premiumToggle.setText("<html>"+premiumText+"<br />"+u.getPremiumCost()+"€</html>");
 				}, () -> onUserLogout(e));
 			}
 
@@ -140,6 +141,7 @@ public class UserInfoPanel extends JPanel {
 			public void onUserLogout(UserStatusEvent e) {
 				userName.setText(templateUserName);
 				birthday.setText(templateBirthday);
+				premiumToggle.setText(premiumText);
 				premiumToggle.setSelected(false);
 			}
 		});

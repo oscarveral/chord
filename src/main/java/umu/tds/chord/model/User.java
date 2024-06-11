@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import umu.tds.chord.model.discount.Discount;
+import umu.tds.chord.model.discount.DiscountFactory;
+import umu.tds.chord.model.discount.DiscountFactory.Type;
 import umu.tds.chord.utils.StringHasher;
 
 /**
@@ -19,6 +22,7 @@ import umu.tds.chord.utils.StringHasher;
 public abstract sealed class User implements Mutable<User.Internal> {
 	
 	private static final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	private static final double premiumBaseCost = 30.0;
 
 	/**
 	 * Clase constructora de usuarios.
@@ -32,6 +36,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		private List<Playlist> playlists;
 		private List<Song> recentSongs;
 		private String username;
+		private Discount discount;
 
 		/**
 		 * Crea un nuevo builder de usuarios especificando el nombre de usuario. Se
@@ -48,6 +53,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 			this.recentSongs = new ArrayList<>();
 			this.favouriteSongs = new HashSet<>();
 			this.isPremium = false;
+			this.discount = DiscountFactory.createDiscount(Type.NONE);
 		}
 
 		/**
@@ -148,6 +154,18 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 */
 		public Builder recentSongs(List<Song> recentSongs) {
 			this.recentSongs = recentSongs;
+			return this;
+		}
+		
+		/**
+		 * Establece el descuento que está utilizando el usuario.
+		 * 
+		 * @param discount Descuento que se aplicará para el usuario.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder discount(Discount discount) {
+			this.discount = discount;
 			return this;
 		}
 
@@ -294,6 +312,15 @@ public abstract sealed class User implements Mutable<User.Internal> {
 			super.isPremium = premium;
 			return super.isPremium;
 		}
+		
+		/**
+		 * Establece el descuento que aplicar al usuario.
+		 * 
+		 * @param discount Descuento que se desea asignar al usuario.
+		 */
+		public void setDiscount(Discount discount) {
+			super.discount = discount;
+		}
 	}
 
 	private final Date birthday;
@@ -303,6 +330,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	private final List<Playlist> playlists;
 	private final List<Song> recentSongs;
 	private final String username;
+	private Discount discount;
 
 	/**
 	 * Constructor de usuarios.
@@ -318,6 +346,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		this.recentSongs = builder.recentSongs;
 		this.favouriteSongs = builder.favouriteSongs;
 		this.isPremium = builder.isPremium;
+		this.discount = builder.discount;
 	}
 
 	/**
@@ -425,5 +454,24 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	 */
 	public boolean isPremium() {
 		return isPremium;
+	}
+	
+	/**
+	 * Obtiene el descuento actual aplicado al usuario.
+	 * 
+	 * @return Descuento del usuario.
+	 */
+	public Discount getDiscount() {
+		return discount;
+	}
+	
+	/**
+	 * Obtiene el precio del premium para el usuario.
+	 * 
+	 * @return Precio del premium del usuario.
+	 */
+	public double getPremiumCost() {
+		if (discount.aplicable(this)) return discount.getDiscountFactor() * premiumBaseCost;
+		return premiumBaseCost;
 	}
 }

@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
+import umu.tds.chord.model.discount.DiscountFactory.Type;
 
 public class ToolBar extends JMenuBar {
 
@@ -20,12 +21,21 @@ public class ToolBar extends JMenuBar {
 	private static final String utilidadesText = "Utilidades";
 	private static final String genPDF = "Generar PDF";
 	private static final String openFileDialogTitle = "Seleccionar ruta de destino";
+	private static final String discountsText = "Aplicar descuento";
+	private static final String noneDiscountText = "Ninguno";
+	private static final String elderDiscountText = "Descuento del 50% para mayores de 65 años";
+	private static final String temporaryDiscountText = "Descuento del 20% durante 3 meses";
 	
 	private JMenu utilidades;
 	private JMenuItem pdf;
+	private JMenu discounts;
+	private JMenuItem noneDiscount;
+	private JMenuItem elderDiscount;
+	private JMenuItem temporaryDiscount;
 	
 	public ToolBar() {
 		initializeUtilities();
+		initializeDiscounts();
 		
 		registerControllerListeners();
 	}
@@ -39,11 +49,41 @@ public class ToolBar extends JMenuBar {
 		add(utilidades);
 	}
 	
+	private void initializeDiscounts() {
+		discounts = new JMenu(discountsText);
+		noneDiscount = new JMenuItem(noneDiscountText);
+		noneDiscount.addActionListener(e -> applyDiscount(Type.NONE));
+		elderDiscount = new JMenuItem(elderDiscountText);
+		elderDiscount.addActionListener(e -> applyDiscount(Type.ELDER));
+		temporaryDiscount = new JMenuItem(temporaryDiscountText);
+		temporaryDiscount.addActionListener(e -> applyDiscount(Type.TEMPORARY));
+		discounts.add(noneDiscount);
+		discounts.add(elderDiscount);
+		discounts.add(temporaryDiscount);
+		add(discounts);
+	}
+	
 	private void registerControllerListeners() {
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
-				e.getUser().ifPresent(u -> setPDFGenerationStatus(u.isPremium()));
+				resetDiscounts();
+				e.getUser().ifPresent(u -> {
+					setPDFGenerationStatus(u.isPremium());	
+					switch (u.getDiscount().getType()) {
+					case NONE:
+						noneDiscount.setEnabled(false);
+						break;
+					case ELDER:
+						elderDiscount.setEnabled(false);
+						break;
+					case TEMPORARY:
+						temporaryDiscount.setEnabled(false);
+						break;
+					default:
+						throw new IllegalArgumentException("Unexpected value.");
+					}
+				});
 			}
 			
 			@Override
@@ -83,5 +123,15 @@ public class ToolBar extends JMenuBar {
 				e1.printStackTrace();
 			}
 		}		
+	}
+	
+	private void applyDiscount(Type t) {
+		Controller.INSTANCE.changeUserDiscount(t);
+	}
+	
+	private void resetDiscounts() {
+		noneDiscount.setEnabled(true);
+		elderDiscount.setEnabled(true);
+		temporaryDiscount.setEnabled(true);
 	}
 }

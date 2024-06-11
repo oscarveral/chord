@@ -27,6 +27,8 @@ import umu.tds.chord.model.Song;
 import umu.tds.chord.model.SongRepository;
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
+import umu.tds.chord.model.discount.Discount;
+import umu.tds.chord.model.discount.DiscountFactory;
 
 /**
  * Controlador para la lógica de negocio. Expone la API que utilizará la
@@ -392,6 +394,20 @@ public enum Controller {
 		} catch (IOException e) {}
 		
 		return false;
+	}
+	
+	/**
+	 * Método para cambiar el descuento que se desea aplicar a usuario.
+	 * 
+	 * @param t Tipo de descuento que aplicar al usuario.
+	 */
+	public void changeUserDiscount(DiscountFactory.Type t) {
+		currentUser.ifPresent(u -> {
+			Discount d = DiscountFactory.createDiscount(t);
+			u.asMut().setDiscount(d);
+			UserStatusEvent e = new UserStatusEvent(this, u);
+			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
+		});
 	}
 
 	// ---------- Cargador de canciones. ----------
