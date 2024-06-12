@@ -23,7 +23,8 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	
 	private static final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	private static final double premiumBaseCost = 30.0;
-
+	private static final int maxRecentSongs = 100;
+	
 	/**
 	 * Clase constructora de usuarios.
 	 */
@@ -224,6 +225,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * @param recentSong Canción que se desea añadir a la lista.
 		 */
 		public void addRecentSong(Song recentSong) {
+			if (super.recentSongs.size() == maxRecentSongs) super.recentSongs.remove(0);
 			super.recentSongs.add(recentSong);
 		}
 
