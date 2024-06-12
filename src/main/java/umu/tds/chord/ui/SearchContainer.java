@@ -3,6 +3,8 @@ package umu.tds.chord.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,8 +21,10 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.Player;
 import umu.tds.chord.controller.SongStatusEvent;
 import umu.tds.chord.controller.SongStatusListener;
+import umu.tds.chord.model.Song;
 
 public class SearchContainer extends JPanel {
 
@@ -32,6 +36,7 @@ public class SearchContainer extends JPanel {
 	private static final String deleteConfirmTitle = "Permiso requerido";
 	private static final String confirmDelete = "Confirmar eliminación";
 	private static final String addToPlaylistText = "Añadir canciones seleccionadas a la playlist seleccionada";
+	private static final String reproduceSearchText = "Reproducir búsqueda";
 
 	private SearchFormPanel searchPanel;
 	private JPanel buttonsPanel;
@@ -42,6 +47,9 @@ public class SearchContainer extends JPanel {
 	private PasswordField passInput;
 	private ResponsiveButton confirm;
 	private ResponsiveButton addToPlaylist;
+	private ResponsiveButton reproduceSearch;
+	
+	private List<Song> searched = new ArrayList<>();
 
 	public SearchContainer() {
 		BorderLayout layout = new BorderLayout();
@@ -50,6 +58,7 @@ public class SearchContainer extends JPanel {
 		initializeSearchPanel();
 		initializeButtons();
 		initializeAddToPlaylist();
+		inititalizeReproduceSearch();
 
 		registerControllerListeners();
 
@@ -84,6 +93,7 @@ public class SearchContainer extends JPanel {
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.weightx = 1;
+		constraints.gridwidth = 2;
 		constraints.insets = new Insets(0, 10, 5, 10);
 		constraints.fill = GridBagConstraints.BOTH;
 
@@ -170,11 +180,25 @@ public class SearchContainer extends JPanel {
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 1;
-		constraints.weightx = 1;
-		constraints.insets = new Insets(5, 10, 10, 10);
+		constraints.weightx = 0.5;
+		constraints.insets = new Insets(5, 10, 10, 5);
 		constraints.fill = GridBagConstraints.BOTH;
 		
 		buttonsPanel.add(addToPlaylist, constraints);
+	}
+	
+	private void inititalizeReproduceSearch() {
+		reproduceSearch = new ResponsiveButton(reproduceSearchText);
+		reproduceSearch.addActionListener(e -> reproduceSearch());
+		
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.weightx = 0.5;
+		constraints.insets = new Insets(5, 5, 10, 10);
+		constraints.fill = GridBagConstraints.BOTH;
+		
+		buttonsPanel.add(reproduceSearch, constraints);
 	}
 
 	private void registerControllerListeners() {
@@ -184,6 +208,12 @@ public class SearchContainer extends JPanel {
 			public void onSongDelete(SongStatusEvent e) {
 				if (!e.isFailed()) deleteDialog.setVisible(false);
 				passInput.reset();
+			}
+			
+			@Override
+			public void onSongSearch(SongStatusEvent e) {
+				searched.clear();
+				searched.addAll(e.getSongs());
 			}
 		});
 	}
@@ -196,5 +226,9 @@ public class SearchContainer extends JPanel {
 	
 	private void addSongs() {
 		StateManager.INSTANCE.addSelectedSongsToSelectedPlaylist();
+	}
+	
+	private void reproduceSearch() {
+		Player.INSTANCE.playVirtualPlaylist(searched);
 	}
 }

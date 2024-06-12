@@ -16,12 +16,15 @@ import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import umu.tds.chord.model.Playlist;
+import umu.tds.chord.model.PlaylistFactory;
 import umu.tds.chord.model.Song;
 
 public enum Player {
 
 	INSTANCE;
 		
+	private static final String virtualName = "Búsqueda";
+	
 	private Queue<Song> cola;
 	private Optional<Song> currentSong;
 	private int index;
@@ -143,14 +146,14 @@ public enum Player {
 		
 		// Si la cola está vacía reproduce la siguiente de la playlist actual.
 		if (cola.isEmpty()) {
-			playlist.ifPresent(p -> {
+			playlist.ifPresentOrElse(p -> {
 				index += 1;
 				if (adjustIndex()) {
 					currentSong = Optional.of(p.getSong(index));
 					currentSong.ifPresent(this::cargar);
 					player.ifPresent(MediaPlayer::play);
 				}
-			});			
+			}, () -> endReproduction());			
 		}
 		// Si la cola no está vacía se reproduce de la cola.
 		else {
@@ -229,5 +232,27 @@ public enum Player {
 	 */
 	public void removePlayStatusListener(PlayStatusListener l) {
 		playStatusListeners.remove(l);
+	}
+	
+	/**
+	 * Establece el estado del reproductor al finalizar la reproducción.
+	 */
+	private void endReproduction() {
+		currentSong = Optional.empty();
+		player.ifPresent(MediaPlayer::dispose);
+		notifyState(false);
+	}
+	
+	/**
+	 * Reproduce una lista de canciones como una playlist virtual cuyo nombre es
+	 * {@link Player#virtualName}.
+	 * 
+	 * @param l Lista de canciones que reproducir.
+	 */
+	public void playVirtualPlaylist(List<Song> l) {
+		PlaylistFactory.createPlaylist(virtualName, virtualName).ifPresent(p -> {
+			l.forEach(s -> p.asMut().addSong(s));
+			play(p);
+		});
 	}
 }
