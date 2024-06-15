@@ -213,7 +213,7 @@ public class LoginPanel extends JPanel {
 	}
 	
 	private void githubLogin() {
-		int res = chooser.showOpenDialog(SwingUtilities.getWindowAncestor(chooser));
+		int res = chooser.showOpenDialog(SwingUtilities.getWindowAncestor(this));
 		if (res == JFileChooser.APPROVE_OPTION) {
 			// Obtener la ruta del fichero seleccionado.
 			File f = chooser.getSelectedFile();

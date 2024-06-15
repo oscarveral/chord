@@ -112,7 +112,7 @@ public class ToolBar extends JMenuBar {
 		fileChooser.setFileHidingEnabled(false);
 		fileChooser.setDialogTitle(openFileDialogTitle);
 		
-		int res = fileChooser.showOpenDialog(SwingUtilities.getWindowAncestor(fileChooser));
+		int res = fileChooser.showOpenDialog(SwingUtilities.getWindowAncestor(this));
 		if (res == JFileChooser.APPROVE_OPTION) {
 			// Obtener la ruta del directorio seleccionado.
 			File f = fileChooser.getSelectedFile();

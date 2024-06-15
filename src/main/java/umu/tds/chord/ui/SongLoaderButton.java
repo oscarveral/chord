@@ -56,7 +56,7 @@ public class SongLoaderButton extends Luz {
 			// Un cambio de encendido debe permitir solicitar la carga
 			// de nuevas canciones.
 			if (e.getNewEncendido() != e.getOldEncendido()) {
-				int res = fileChooser.showOpenDialog(SwingUtilities.getWindowAncestor(fileChooser));
+				int res = fileChooser.showOpenDialog(SwingUtilities.getWindowAncestor(this));
 				if (res == JFileChooser.APPROVE_OPTION) {
 					// Obtener la ruta del fichero seleccionado.
 					File f = fileChooser.getSelectedFile();

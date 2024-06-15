@@ -108,6 +108,7 @@ public final class Interface {
 		registerDialog.setAlwaysOnTop(true);				
 		registerDialog.setTitle(registerTitle);
 		registerDialog.setContentPane(register);
+		registerDialog.setIconImage(ImageScaler.loadImageIcon(iconPath, 20, 20).getImage());
 		registerDialog.pack();
 		registerDialog.setResizable(false);
 		registerDialog.setVisible(false);

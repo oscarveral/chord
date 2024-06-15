@@ -25,6 +25,7 @@ import umu.tds.chord.controller.Player;
 import umu.tds.chord.controller.SongStatusEvent;
 import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.model.Song;
+import umu.tds.chord.utils.ImageScaler;
 
 public class SearchContainer extends JPanel {
 
@@ -37,6 +38,8 @@ public class SearchContainer extends JPanel {
 	private static final String confirmDelete = "Confirmar eliminación";
 	private static final String addToPlaylistText = "Añadir a playlist";
 	private static final String reproduceSearchText = "Reproducir búsqueda";
+	private static final String iconPath = "/images/icon.png";
+	private static final int iconSize = 20;
 
 	private SearchFormPanel searchPanel;
 	private JPanel buttonsPanel;
@@ -103,6 +106,7 @@ public class SearchContainer extends JPanel {
 	private void initializeDeleteDialog() {
 
 		deleteDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), true);
+		deleteDialog.setIconImage( ImageScaler.loadImageIcon(iconPath, iconSize, iconSize).getImage());
 
 		panel = new JPanel();
 
