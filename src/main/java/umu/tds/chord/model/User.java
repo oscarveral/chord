@@ -2,9 +2,11 @@ package umu.tds.chord.model;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +37,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		private String hashedPassword;
 		private boolean isPremium;
 		private List<Playlist> playlists;
-		private List<Song> recentSongs;
+		private Deque<Song> recentSongs;
 		private String username;
 		private Discount discount;
 
@@ -51,7 +53,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 			this.hashedPassword = null;
 			this.birthday = null;
 			this.playlists = new ArrayList<>();
-			this.recentSongs = new ArrayList<>();
+			this.recentSongs = new ArrayDeque<>();
 			this.favouriteSongs = new HashSet<>();
 			this.isPremium = false;
 			this.discount = DiscountFactory.createDiscount(Type.NONE);
@@ -154,7 +156,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * @return Instancia actual del builder.
 		 */
 		public Builder recentSongs(List<Song> recentSongs) {
-			this.recentSongs = recentSongs;
+			recentSongs.forEach(s -> this.recentSongs.addLast(s));
 			return this;
 		}
 		
@@ -225,8 +227,8 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * @param recentSong Canción que se desea añadir a la lista.
 		 */
 		public void addRecentSong(Song recentSong) {
-			if (super.recentSongs.size() == maxRecentSongs) super.recentSongs.remove(0);
-			super.recentSongs.add(recentSong);
+			if (super.recentSongs.size() == maxRecentSongs) super.recentSongs.pollLast();
+			super.recentSongs.addFirst(recentSong);
 		}
 
 		/**
@@ -330,7 +332,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	private final String hashedPassword;
 	private boolean isPremium;
 	private final List<Playlist> playlists;
-	private final List<Song> recentSongs;
+	private final Deque<Song> recentSongs;
 	private final String username;
 	private Discount discount;
 
@@ -419,25 +421,13 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	}
 
 	/**
-	 * Método para obtener una canción reciente del usuario.
-	 *
-	 * @param index Índice de la canción deseada en la lista de canciones recientes.
-	 *
-	 * @return Canción de la lista de canciones recientes correspondiente al índice
-	 *         dado.
-	 */
-	public Song getRecentSong(int index) {
-		return recentSongs.get(index);
-	}
-
-	/**
 	 * Método para obtener una lista no modificable de las canciones recientes del
 	 * usuario.
 	 *
 	 * @return Lista no modificable de las canciones recientes.
 	 */
 	public List<Song> getRecentSongs() {
-		return Collections.unmodifiableList(recentSongs);
+		return Collections.unmodifiableList(new ArrayList<>(recentSongs));
 	}
 
 	/**

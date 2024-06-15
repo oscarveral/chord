@@ -18,6 +18,7 @@ import umu.tds.chord.dao.DAOFactory.DAOImplementation;
 import umu.tds.chord.model.Mutable;
 import umu.tds.chord.model.Persistent;
 import umu.tds.chord.model.Playlist;
+import umu.tds.chord.model.Song;
 import umu.tds.chord.model.User;
 import umu.tds.chord.model.discount.Discount;
 import umu.tds.chord.model.discount.DiscountFactory;
@@ -225,26 +226,26 @@ public enum TDSUserDAO implements DAO<User.Internal> {
 		
 		Discount discount = DiscountFactory.createDiscount(discountStart, discountEnd, discountType);
 		
-		// Creación de la representación interna del usuario.
-		User.Internal user = new User.Builder(userName).hashedPassword(passwordHash).premium(premium).birthday(birthday).discount(discount)
-				.build().get().asMut();
-
-		// Establecimiento de id y carga en la pool.
-		user.registerId(id);
-		TDSPoolDAO.addPersistent(user.asMut());
-
 		// Obtención de las cadenas con los objetos referenciados.
 		String playlistsStr = persistence.recuperarPropiedadEntidad(eUser, Properties.PLAYLISTS.name());
 		String recentSongsStr = persistence.recuperarPropiedadEntidad(eUser, Properties.RECENT_SONGS.name());
 		String favouriteSongsStr = persistence.recuperarPropiedadEntidad(eUser, Properties.FAVOURITE_SONGS.name());
 
+		// Añadir cancioens recientes.
+		List<Song> recentSongs = DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO().stringToPersistents(recentSongsStr)
+				.stream().map(s -> (Song) s).toList();
+		
+		// Creación de la representación interna del usuario.
+		User.Internal user = new User.Builder(userName).hashedPassword(passwordHash).premium(premium).birthday(birthday).discount(discount).recentSongs(recentSongs)
+				.build().get().asMut();
+
+		// Establecimiento de id y carga en la pool.
+		user.registerId(id);
+		TDSPoolDAO.addPersistent(user.asMut());
+		
 		// Añadir playlists.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getPlaylistDAO().stringToPersistents(playlistsStr)
 				.forEach(user::addPlaylist);
-
-		// Añadir cancioens recientes.
-		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO().stringToPersistents(recentSongsStr)
-				.forEach(user::addRecentSong);
 
 		// Añadir canciones favoritas.
 		DAOFactory.getInstance(DAOImplementation.TDS_FAMILY).getSongDAO().stringToPersistents(favouriteSongsStr)
