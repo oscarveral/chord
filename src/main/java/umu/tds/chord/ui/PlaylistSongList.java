@@ -1,6 +1,8 @@
 package umu.tds.chord.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +40,8 @@ public class PlaylistSongList extends JPanel {
 	private void initializeSongTable() {
 		datos = new SongTableModel();
 		JTable songTable = new JTable(datos);
-
+		
+		songTable.setAutoCreateRowSorter(true);
 		songTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		songTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -56,10 +59,20 @@ public class PlaylistSongList extends JPanel {
 
 				if (!lsm.isSelectionEmpty())
 					for (int i : lsm.getSelectedIndices()) {
-						Song s = datos.getList().get(i);
+						int index = songTable.getRowSorter().convertRowIndexToModel(i);
+						Song s = datos.getList().get(index);
 						StateManager.INSTANCE.addSelectedSong(s);
 					}
 
+			}
+		});
+		songTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable table = (JTable) e.getSource();
+				if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+					StateManager.INSTANCE.reproduceFirstSelectedSong();
+				}
 			}
 		});
 

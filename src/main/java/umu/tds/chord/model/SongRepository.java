@@ -217,6 +217,23 @@ public enum SongRepository {
 		});
 	}
 	
+	/**
+	 * Método para actualizar los valores de una canción en persistencia.
+	 * 
+	 * @param s Canción que se desea actualizar.
+	 * 
+	 * @return Resultado de la operación.
+	 */
+	public boolean updateSong(Song s) {
+		if (s == null || !songs.contains(s)) return false;
+		boolean persistence  = DAOFactory.getInstance().getSongDAO().modify(s.asMut());
+		if (!persistence) {
+			removeSongFromUsers(s);
+			removeSong(s);
+		}
+		return persistence;
+	}
+ 	
 	// ---------- Depuración. ----------
 	
 	/**

@@ -55,6 +55,9 @@ public final class Interface {
 
 		registerControllerListener();
 		
+		ventana.setSize(ventana.getPreferredSize());
+		ventana.setMinimumSize(ventana.getPreferredSize());
+		
 		Controller.INSTANCE.ready();
 	}
 	
@@ -86,11 +89,13 @@ public final class Interface {
 		            "Salir",
 		            JOptionPane.YES_NO_OPTION);
 		 
-		        if (result == JOptionPane.YES_OPTION)
+		        if (result == JOptionPane.YES_OPTION) {
 		        	forceLogout();
 		            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		        }
 		    }
-		});	}
+		});	
+	}
 	
 	private void initializeLogin() {
 		login = new LoginPanel();

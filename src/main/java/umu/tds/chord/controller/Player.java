@@ -54,53 +54,63 @@ public enum Player {
 	}
 	
 	/**
-	 * Carga una canción dada estableciendo el reproductor de canciones.
+	 * Reproduce una canción dada con prioridad sobre lo que suena actualmente.
 	 * 
-	 * @param s Canción que se desea cargar.
+	 * @param s Canción que se desea reproducir.
 	 */
-	private void cargar(Song s) {
-		// Desechado del reproductor y canción antigua.
+	public void reproducePriority(Song s) {
+		currentSong = Optional.ofNullable(s);
+		loadCurrentSong();
+		player.ifPresent(MediaPlayer::play);
+	}
+	
+	/**
+	 * Carga una canción dada estableciendo el reproductor de canciones.
+	 * Realiza toda la gestión de estado de reproducción.
+	 */
+	private void loadCurrentSong() {
+		// Desechado del reproductor antiguo.
 		player.ifPresent(MediaPlayer::dispose);
-		currentSong = Optional.empty();
-		try {
-			// Crear la ruta a la canción.
-			Path mp3 = Path.of(System.getProperty("java.io.tmpdir"), String.valueOf(Integer.toUnsignedLong(s.hashCode())) + ".mp3");
-			// Descarga de la canción si no existe.
-			if (!Files.exists(mp3)) {
-				mp3 = Files.createFile(mp3);
-				URL uri = new URL(s.getPath());
-				InputStream stream = uri.openStream();
-				Files.copy(stream, mp3, StandardCopyOption.REPLACE_EXISTING);
+		// Si se ha especificado canción, se debe cargar.
+		currentSong.ifPresent(s -> {
+			try {
+				// Crear la ruta a la canción.
+				Path mp3 = Path.of(System.getProperty("java.io.tmpdir"), String.valueOf(Integer.toUnsignedLong(s.hashCode())) + ".mp3");
+				// Descarga de la canción si no existe.
+				if (!Files.exists(mp3)) {
+					mp3 = Files.createFile(mp3);
+					URL uri = new URL(s.getPath());
+					InputStream stream = uri.openStream();
+					Files.copy(stream, mp3, StandardCopyOption.REPLACE_EXISTING);
+				}
+				// Crear el medio que se reproducirá.
+				Media media = new Media(mp3.toFile().toURI().toString());
+				// Se añade el nuevo reproductor.
+				player = Optional.of(new MediaPlayer(media));
+				player.ifPresent(p -> p.setOnEndOfMedia(this::siguiente));
+				// Actualizar estado de controladores.
+				Controller.INSTANCE.incrementSongReproduction(s);
+				Controller.INSTANCE.addRecentSong(s);
+			} 
+			catch (Exception e1) {
+				// En caso de fallo opcional vacío.
+				player = Optional.empty();
+				currentSong = Optional.empty();
 			}
-			// Crear el medio que se reproducirá.
-			Media media = new Media(mp3.toFile().toURI().toString());
-			// Se añade el nuevo reproductor.
-			player = Optional.of(new MediaPlayer(media));
-			player.ifPresent(p -> p.setOnEndOfMedia(this::siguiente));
-			// Actualizar estado de controladores.
-			currentSong = Optional.of(s);
-			Controller.INSTANCE.addRecentSong(s);
-			notifyState(true);
-			
-		} 
-		catch (Exception e1) {
-			// En caso de fallo opcional vacío.
-			player = Optional.empty();
-			notifyState(false);
-		}
+		});
+		
+		// Notificar el estado de reproducción de forma incondicional.
+		notifyState();
 	}
 	
 	/**
 	 * Notificación de actualización de estado de reproducción de canciones.
-	 * 
-	 * @param success Exito de carga de canción.
 	 */
-	private void notifyState(boolean success) {
+	private void notifyState() {
 		// Notificar con canción y playlist actual.
-		SongPlayEvent e = new SongPlayEvent(this);
+		PlayerStatusEvent e = new PlayerStatusEvent(this);
 		currentSong.ifPresent(e::setSong);
 		playlist.ifPresent(e::setPlaylist);
-		e.setFailed(!success);
 		playStatusListeners.forEach(l -> l.onSongReproduction(e));
 	}
 	
@@ -113,12 +123,11 @@ public enum Player {
 	public void play(Playlist p) {
 		index = 0;
 		playlist = Optional.ofNullable(p);
-		if (adjustIndex()) {
-			playlist.ifPresent(pl -> {
-				currentSong = Optional.of(p.getSong(index));
-				currentSong.ifPresent(this::cargar);
-				player.ifPresent(MediaPlayer::play);
-			});
+		if (isValidPlaylist()) {
+			adjustIndex();
+			currentSong = Optional.of(playlist.get().getSong(index));
+			loadCurrentSong();
+			player.ifPresent(MediaPlayer::play);
 		}
 	}
 	
@@ -141,27 +150,24 @@ public enum Player {
 	 * playlist si la cola estaba vacía.
 	 */
 	public void siguiente() {
-		
 		currentSong = Optional.empty();
-		
 		// Si la cola está vacía reproduce la siguiente de la playlist actual.
 		if (cola.isEmpty()) {
 			playlist.ifPresentOrElse(p -> {
-				index += 1;
-				if (adjustIndex()) {
+				if (isValidPlaylist()) {
+					index += 1;
+					adjustIndex();
 					currentSong = Optional.of(p.getSong(index));
-					currentSong.ifPresent(this::cargar);
+					loadCurrentSong();
 					player.ifPresent(MediaPlayer::play);
 				}
-			}, () -> endReproduction());			
+			}, this::endReproduction);			
 		}
 		// Si la cola no está vacía se reproduce de la cola.
 		else {
 			currentSong = Optional.of(cola.poll());
-			currentSong.ifPresent(s -> {
-				cargar(s);
-				player.ifPresent(MediaPlayer::play);
-			});
+			loadCurrentSong();
+			player.ifPresent(MediaPlayer::play);
 		}
 	}
 	
@@ -170,32 +176,26 @@ public enum Player {
 	 */
 	public void anterior() {
 		currentSong = Optional.empty();
-		
 		// Si la cola está vacía reproduce la anterior de la playlist actual.
-		playlist.ifPresent(p -> {
+		if (isValidPlaylist()) {
 			index -= 1;
-			if (adjustIndex()) {
-				currentSong = Optional.of(p.getSong(index));
-				currentSong.ifPresent(this::cargar);
-				player.ifPresent(MediaPlayer::play);
-			}
-		});			
+			adjustIndex();
+			currentSong = Optional.of(playlist.get().getSong(index));
+			loadCurrentSong();
+			player.ifPresent(MediaPlayer::play);
+		}		
 	}
 	
-	/**
-	 * Ajusta el índice de la canción que debe sonar actualmente según 
-	 * la presencia y tamaño de la playlist.
-	 * 
-	 * @return {@code true} si es posible reproducir una canción de la playlist
-	 * con el índice ajustado.
-	 */
-	private boolean adjustIndex() {
-		if (playlist.isEmpty()) return false;
+	private void adjustIndex() {
 		int size = playlist.get().getSongs().size();
-		if (size == 0) return false;
 		index = index >= size ? 0 : index;
 		index = index < 0 ? size -1 : index;
-		return true;
+	}
+	
+	private boolean isValidPlaylist() {
+		if (playlist.isEmpty()) return false;
+		int size = playlist.get().getSongs().size();
+		return size != 0;
 	}
 	
 	/**
@@ -240,7 +240,7 @@ public enum Player {
 	private void endReproduction() {
 		currentSong = Optional.empty();
 		player.ifPresent(MediaPlayer::dispose);
-		notifyState(false);
+		notifyState();
 	}
 	
 	/**

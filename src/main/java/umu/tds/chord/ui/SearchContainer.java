@@ -35,7 +35,7 @@ public class SearchContainer extends JPanel {
 	private static final String passInputText = "Introduce tu contraseña";
 	private static final String deleteConfirmTitle = "Permiso requerido";
 	private static final String confirmDelete = "Confirmar eliminación";
-	private static final String addToPlaylistText = "Añadir canciones seleccionadas a la playlist seleccionada";
+	private static final String addToPlaylistText = "Añadir a playlist";
 	private static final String reproduceSearchText = "Reproducir búsqueda";
 
 	private SearchFormPanel searchPanel;
@@ -232,3 +232,4 @@ public class SearchContainer extends JPanel {
 		Player.INSTANCE.playVirtualPlaylist(searched);
 	}
 }
+

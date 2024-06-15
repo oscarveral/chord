@@ -27,7 +27,7 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 	 * Enumerado de todas las propiedades que tiene una entidad canción.
 	 */
 	private enum Properties {
-		AUTHOR, NAME, PATH, SONG_ENTITY_TYPE, STYLE,
+		AUTHOR, NAME, PATH, SONG_ENTITY_TYPE, STYLE, REPRODUCCIONES
 	}
 
 	private final ServicioPersistencia persistence = FactoriaServicioPersistencia.getInstance()
@@ -85,7 +85,10 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 
 			switch (Properties.valueOf(p.getNombre())) {
 			// No se puden mutar las canciones.
-			case NAME, AUTHOR, PATH, STYLE:
+			case NAME, AUTHOR, PATH, STYLE: break;
+			case REPRODUCCIONES:
+				p.setValor(String.valueOf(s.getReproducciones()));
+				break;
 			default:
 				break;
 			}
@@ -127,14 +130,16 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 		String author = null;
 		String path = null;
 		String style = null;
+		int reproducciones = 0;
 
 		name = persistence.recuperarPropiedadEntidad(eSong, Properties.NAME.name());
 		author = persistence.recuperarPropiedadEntidad(eSong, Properties.AUTHOR.name());
 		path = persistence.recuperarPropiedadEntidad(eSong, Properties.PATH.name());
 		style = persistence.recuperarPropiedadEntidad(eSong, Properties.STYLE.name());
+		reproducciones = Integer.valueOf(persistence.recuperarPropiedadEntidad(eSong, Properties.REPRODUCCIONES.name()));
 
 		// Construcción y registro.
-		Song.Internal s = new Song.Builder(name).author(author).path(path).style(style).build().get().asMut();
+		Song.Internal s = new Song.Builder(name).author(author).path(path).style(style).reproducciones(reproducciones).build().get().asMut();
 
 		s.registerId(id);
 		TDSPoolDAO.addPersistent(s);
@@ -181,7 +186,8 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 		eSong.setPropiedades(Arrays.asList(new Propiedad(Properties.NAME.name(), s.getName()),
 				new Propiedad(Properties.AUTHOR.name(), s.getAuthor()),
 				new Propiedad(Properties.PATH.name(), s.getPath()),
-				new Propiedad(Properties.STYLE.name(), s.getStyle())));
+				new Propiedad(Properties.STYLE.name(), s.getStyle()),
+				new Propiedad(Properties.REPRODUCCIONES.name(), String.valueOf(s.getReproducciones()))));
 
 		// Registro.
 		eSong = persistence.registrarEntidad(eSong);

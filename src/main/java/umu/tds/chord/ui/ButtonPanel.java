@@ -10,6 +10,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.UserStatusEvent;
+import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.ui.StateManager.UIEvents;
 import umu.tds.chord.utils.ImageScaler;
 
@@ -26,6 +29,10 @@ public class ButtonPanel extends JPanel {
 	private static final String playlistManagementButtonIconPath = "/images/playlist_edit_icon.png";
 	private static final String recentSongsButtonIconPath = "/images/recent_songs_icon.png";
 	private static final String playlistsButtonIconPath = "/images/playlist_icon.png";
+	private static final String masReproducidasText = "Canciones más reproducidas";
+	private static final String masReproducidasIconPath = "/images/most.png";
+	
+	private ResponsiveButton masReproducidas;
 	
 	public ButtonPanel() {
 		GridBagLayout layout = new GridBagLayout();
@@ -36,6 +43,9 @@ public class ButtonPanel extends JPanel {
 		initializeRecentSongsButton();
 		initializePlaylistsButton();
 		initializePlaylistsPanel();
+		initializeMasReproducidas();
+		
+		registerControllerListener();
 		
 		setBorder(BorderFactory.createTitledBorder
 				(BorderFactory.createLineBorder(Color.BLACK), buttonMenuTitle));
@@ -115,7 +125,7 @@ public class ButtonPanel extends JPanel {
 	private void initializePlaylistsPanel() {
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
-		constraints.gridy = 3;
+		constraints.gridy = 5;
 		constraints.weightx = 1.0;
 		constraints.weighty = 1.0;
 		constraints.insets = new Insets(35, 10, 10, 10);
@@ -125,5 +135,48 @@ public class ButtonPanel extends JPanel {
 		PlaylistPanel playlistsPanel = new PlaylistPanel();
 
 		add(playlistsPanel, constraints);
+	}
+	
+	private void initializeMasReproducidas() {
+		ImageIcon icon = ImageScaler.loadImageIcon(masReproducidasIconPath, iconSize, iconSize);
+
+		masReproducidas = new ResponsiveButton(masReproducidasText, icon);
+		masReproducidas.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.MAS_REPRODUCIDAS));
+		
+		GridBagConstraints masReproducidasC = new GridBagConstraints();
+		masReproducidasC.gridx = 0;
+		masReproducidasC.gridy = 4;
+		masReproducidasC.insets = new Insets(0, 10, 0, 10);
+		masReproducidasC.fill = GridBagConstraints.HORIZONTAL;
+		masReproducidasC.anchor = GridBagConstraints.PAGE_START;
+		
+		add(masReproducidas, masReproducidasC);
+	}
+	
+	private void registerControllerListener() {
+		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
+		
+			@Override
+			public void onUserLogin(UserStatusEvent e) {
+				e.getUser().ifPresent(u -> {
+					masReproducidas.setEnabled(false);
+					masReproducidas.setFocusable(false);
+					if (u.isPremium()) {
+						masReproducidas.setEnabled(true);
+						masReproducidas.setFocusable(true);
+					}
+				});
+			}
+			
+			@Override
+			public void onUserLogout(UserStatusEvent e) {
+				onUserLogin(e);
+			}
+			
+			@Override
+			public void onUserMetadataChange(UserStatusEvent e) {
+				onUserLogin(e);
+			}
+		});
 	}
 }

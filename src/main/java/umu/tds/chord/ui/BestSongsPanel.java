@@ -1,9 +1,7 @@
 package umu.tds.chord.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -24,21 +22,25 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.PlayStatusListener;
+import umu.tds.chord.controller.Player;
+import umu.tds.chord.controller.PlayerStatusEvent;
+import umu.tds.chord.controller.SongStatusEvent;
+import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.model.Song;
 
-public class RecentSongsPanel extends JPanel {
+public class BestSongsPanel extends JPanel {
 
-	private static final long serialVersionUID = -4486884398599339204L;
-	private static final String title = "Canciones recientes";
-	private static final String addText = "Añadir canciones seleccionadas a la playlist seleccionada";
+	private static final long serialVersionUID = -4746920264323689567L;
+	private static final String title = "Canciones más reproducidas";
 	
-	public RecentSongsPanel() {
-		setLayout(new GridBagLayout());
-		
+	public BestSongsPanel() {
+		BorderLayout layout = new BorderLayout();
+		layout.setVgap(10);
+		setLayout(layout);
 		initializeSongTable();
-		initializeAddSongsButton();
 		
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), title));
 	}
@@ -81,9 +83,13 @@ public class RecentSongsPanel extends JPanel {
 				}
 			}
 		});
+
+		// Lo incluimos todo dentro de un panel deslizable.
+		JScrollPane scrollPane = new JScrollPane(songTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
 		
 		addAncestorListener(new AncestorListener() {
-			
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {
 				songTable.clearSelection();
@@ -95,37 +101,8 @@ public class RecentSongsPanel extends JPanel {
 			@Override
 			public void ancestorAdded(AncestorEvent event) {}
 		});
-
-		// Lo incluimos todo dentro de un panel deslizable.
-		JScrollPane scrollPane = new JScrollPane(songTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(10, 10, 7, 10);
 		
-		add(scrollPane, c);
-	}
-	
-	private void initializeAddSongsButton() {
-		ResponsiveButton addSongs = new ResponsiveButton(addText);
-		addSongs.addActionListener(e -> addSongs());
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 1;
-		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(0, 10, 10, 10);
-		
-		add(addSongs ,c);
-	}
-	
-	private void addSongs() {
-		StateManager.INSTANCE.addSelectedSongsToSelectedPlaylist();
+		add(scrollPane, BorderLayout.CENTER);
 	}
 
 	// -------- Modelo de datos de la tabla --------
@@ -134,7 +111,7 @@ public class RecentSongsPanel extends JPanel {
 
 		private static final long serialVersionUID = 9064674061310096123L;
 
-		private static final String[] columnNames = { "Título", "Intérprete", "Estilo", "Favorito" };
+		private static final String[] columnNames = { "Título", "Intérprete", "Estilo", "Favorito", "Reproducciones" };
 
 		private List<Song> songs;
 		private Set<Song> favourites;
@@ -158,6 +135,8 @@ public class RecentSongsPanel extends JPanel {
 				return s.getStyle();
 			case 3:
 				return favourites.contains(s);
+			case 4:
+				return s.getReproducciones();
 			default:
 				throw new IllegalArgumentException("Unexpected value: " + col);
 			}
@@ -168,6 +147,8 @@ public class RecentSongsPanel extends JPanel {
 			switch (columnIndex) {
 			case 3:
 				return Boolean.class;
+			case 4:
+				return Integer.class;
 			default:
 				return String.class;
 
@@ -211,7 +192,7 @@ public class RecentSongsPanel extends JPanel {
 			this.songs.addAll(songs);
 			fireTableDataChanged();
 		}
-
+	
 		public void setFavourites(Set<Song> favourites) {
 			this.favourites.clear();
 			this.favourites.addAll(favourites);
@@ -231,27 +212,50 @@ public class RecentSongsPanel extends JPanel {
 
 				@Override
 				public void onUserLogin(UserStatusEvent e) {
-					onRecentSongsUpdate(e);
-					onFavouriteSongsUpdate(e);
+					e.getUser().ifPresent(u -> {
+						setFavourites(u.getFavouriteSongs());
+					});
 				}
 
 				@Override
 				public void onFavouriteSongsUpdate(UserStatusEvent e) {
-					e.getUser().ifPresent(u -> 
-						setFavourites(u.getFavouriteSongs())
-					);
-				}
-				
-				@Override
-				public void onRecentSongsUpdate(UserStatusEvent e) {
-					e.getUser().ifPresent(u -> 
-						setList(u.getRecentSongs())
-					);
+					onUserLogin(e);
 				}
 
 				@Override
 				public void onUserLogout(UserStatusEvent e) {
 					clearData();
+				}
+			});
+
+			Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
+
+				@Override
+				public void onSongLoad(SongStatusEvent e) {
+					if (!e.isFailed()) {
+						songs.addAll(e.getSongs());
+					}
+					fireTableDataChanged();
+				}
+
+				@Override
+				public void onSongDelete(SongStatusEvent e) {
+					if (!e.isFailed())
+						songs.removeAll(e.getSongs());
+					fireTableDataChanged();
+				}
+
+				@Override
+				public void onSongSearch(SongStatusEvent e) {
+					if (!e.isFailed())
+						setList(e.getSongs());
+				}
+			});
+			
+			Player.INSTANCE.registerPlayStatusListener(new PlayStatusListener() {
+				@Override
+				public void onSongReproduction(PlayerStatusEvent e) {
+					fireTableDataChanged();
 				}
 			});
 		}

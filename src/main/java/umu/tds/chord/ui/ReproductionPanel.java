@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.PlayStatusListener;
 import umu.tds.chord.controller.Player;
-import umu.tds.chord.controller.SongPlayEvent;
+import umu.tds.chord.controller.PlayerStatusEvent;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
 import umu.tds.chord.utils.ImageScaler;
@@ -235,7 +235,7 @@ public class ReproductionPanel extends JPanel {
 		Player.INSTANCE.registerPlayStatusListener(new PlayStatusListener() {
 		
 			@Override
-			public void onSongReproduction(SongPlayEvent e) {
+			public void onSongReproduction(PlayerStatusEvent e) {
 				currentSong.setText(currentSongTemplate);
 				e.getSong().ifPresent(s ->
 					currentSong.setText(s.getName() + " - " + s.getAuthor() + " - " + s.getStyle())

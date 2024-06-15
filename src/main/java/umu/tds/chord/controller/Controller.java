@@ -409,6 +409,16 @@ public enum Controller {
 			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
 		});
 	}
+	
+	/**
+	 * Incrementa en 1 las reproducciones de la canción seleccionada.
+	 * 
+	 * @param s Canción a la que se le desean incrementar las reproducciones.
+	 */
+	protected void incrementSongReproduction(Song s) {
+		s.asMut().addReproduccion();
+		SongRepository.INSTANCE.updateSong(s);
+	}
 
 	// ---------- Cargador de canciones. ----------
 

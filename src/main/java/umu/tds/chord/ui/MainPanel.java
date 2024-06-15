@@ -21,6 +21,7 @@ public class MainPanel extends JPanel {
 	private static final String mngmntTag=  "mngmt";
 	private static final String recentSongsTag = "recent";
 	private static final String playlistInfoTag = "pinfo";
+	private static final String reproListTag = "reproList";
  
 	private SongLoaderButton luz;
 	
@@ -33,7 +34,10 @@ public class MainPanel extends JPanel {
 	private PlaylistManagementPanel playlistMngmt;
 	private RecentSongsPanel recentSongsPanel;
 	private PlaylistInfoPanel playlistInfo;
+	private BestSongsPanel reproducList;
 	private ReproductionPanel reproduction;
+	
+	private String currentCard;
 	
 	public MainPanel() {	
 		BorderLayout layout = new BorderLayout();
@@ -57,6 +61,7 @@ public class MainPanel extends JPanel {
 		playlistMngmt = new PlaylistManagementPanel();
 		recentSongsPanel = new RecentSongsPanel();
 		playlistInfo = new PlaylistInfoPanel();
+		reproducList = new BestSongsPanel();
 		
 		centerLayout = new CardLayout();
 		centerContainer = new JPanel(centerLayout);
@@ -66,7 +71,10 @@ public class MainPanel extends JPanel {
 		centerContainer.add(playlistMngmt, mngmntTag);
 		centerContainer.add(recentSongsPanel, recentSongsTag);
 		centerContainer.add(playlistInfo, playlistInfoTag);
+		centerContainer.add(reproducList, reproListTag);
+		
 		centerLayout.show(centerContainer, invisibleTag);
+		currentCard = invisibleTag;
 		
 		add(centerContainer, BorderLayout.CENTER);
 	}
@@ -103,18 +111,27 @@ public class MainPanel extends JPanel {
 	
 	public void showSearch() {
 		centerLayout.show(centerContainer, searchTag);
+		currentCard = searchTag;
 	}
 	
 	public void showPlaylistsMngmt() {
 		centerLayout.show(centerContainer, mngmntTag);
+		currentCard = mngmntTag;
 	}
 	
 	public void showRecentSongs() {
 		centerLayout.show(centerContainer, recentSongsTag);
+		currentCard = recentSongsTag;
 	}
 	
 	public void showPlaylist() {
 		centerLayout.show(centerContainer, playlistInfoTag);
+		currentCard = playlistInfoTag;
+	}
+	
+	public void showMasReproducidas() {
+		centerLayout.show(centerContainer, reproListTag);
+		currentCard = reproListTag;
 	}
 	
 	private void initializeReproduction() {
@@ -127,6 +144,16 @@ public class MainPanel extends JPanel {
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				centerLayout.show(centerContainer, invisibleTag);
+			}
+			
+			@Override
+			public void onUserMetadataChange(UserStatusEvent e) {
+				e.getUser().ifPresent(u -> {
+					if (!u.isPremium() && currentCard.equals(reproListTag)) {
+						centerLayout.show(centerContainer, invisibleTag);
+						currentCard = invisibleTag;
+					}
+				});
 			}
 		});
 	}

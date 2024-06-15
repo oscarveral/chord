@@ -1,7 +1,10 @@
 package umu.tds.chord.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +21,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import umu.tds.chord.controller.Controller;
+import umu.tds.chord.controller.PlayStatusListener;
+import umu.tds.chord.controller.Player;
+import umu.tds.chord.controller.PlayerStatusEvent;
 import umu.tds.chord.controller.SongStatusEvent;
 import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -39,6 +45,7 @@ public class SongListPanel extends JPanel {
 		SongTableModel datos = new SongTableModel();
 		JTable songTable = new JTable(datos);
 
+		songTable.setAutoCreateRowSorter(true);
 		songTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		songTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
@@ -56,13 +63,23 @@ public class SongListPanel extends JPanel {
 
 				if (!lsm.isSelectionEmpty())
 					for (int i : lsm.getSelectedIndices()) {
-						Song s = datos.getList().get(i);
+						int index = songTable.getRowSorter().convertRowIndexToModel(i);
+						Song s = datos.getList().get(index);
 						StateManager.INSTANCE.addSelectedSong(s);
 					}
 
 			}
 		});
-
+		songTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JTable table = (JTable) e.getSource();
+				if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+					StateManager.INSTANCE.reproduceFirstSelectedSong();
+				}
+			}
+		});
+		
 		// Lo incluimos todo dentro de un panel deslizable.
 		JScrollPane scrollPane = new JScrollPane(songTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -163,12 +180,6 @@ public class SongListPanel extends JPanel {
 			return this.songs;
 		}
 
-		public void setList(List<Song> songs) {
-			this.songs.clear();
-			this.songs.addAll(songs);
-			fireTableDataChanged();
-		}
-
 		public void setFavourites(Set<Song> favourites) {
 			this.favourites.clear();
 			this.favourites.addAll(favourites);
@@ -211,6 +222,7 @@ public class SongListPanel extends JPanel {
 					if (!e.isFailed()) {
 						songs.addAll(e.getSongs());
 					}
+					Collections.sort(songs, (a, b) -> a.getReproducciones() - b.getReproducciones());					
 					fireTableDataChanged();
 				}
 
@@ -220,11 +232,13 @@ public class SongListPanel extends JPanel {
 						songs.removeAll(e.getSongs());
 					fireTableDataChanged();
 				}
-
+			});
+			
+			Player.INSTANCE.registerPlayStatusListener(new PlayStatusListener() {
 				@Override
-				public void onSongSearch(SongStatusEvent e) {
-					if (!e.isFailed())
-						setList(e.getSongs());
+				public void onSongReproduction(PlayerStatusEvent e) {
+					Collections.sort(songs, (a, b) -> a.getReproducciones() - b.getReproducciones());
+					fireTableDataChanged();
 				}
 			});
 		}

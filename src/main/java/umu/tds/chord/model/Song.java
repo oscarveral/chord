@@ -20,6 +20,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 		private String name;
 		private String path;
 		private String style;
+		private int reproducciones;
 
 		/**
 		 * Crea un nuevo builder de canciones estableciendo el nombre de la canción. Se
@@ -32,6 +33,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 			this.author = null;
 			this.path = null;
 			this.style = null;
+			this.reproducciones = 0;
 		}
 
 		/**
@@ -81,6 +83,18 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 		 */
 		public Builder style(String style) {
 			this.style = style;
+			return this;
+		}
+		
+		/**
+		 * Establece las reproducciones de la canción.
+		 * 
+		 * @param reproducciones Cantidad de reproducciones.
+		 * 
+		 * @return Instancia actual del builder.
+		 */
+		public Builder reproducciones(int reproducciones) {
+			this.reproducciones = reproducciones;
 			return this;
 		}
 
@@ -140,6 +154,13 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 			this.id = id;
 			this.isRegistered = true;
 		}
+		
+		/**
+		 * Incrementa en 1 la cantidad de reproducciones de la canción.
+		 */
+		public void addReproduccion() {
+			super.reproducciones += 1;
+		}
 
 		@Override
 		public boolean equals(Object obj) {
@@ -156,6 +177,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 	private final String name;
 	private final String path;
 	private final String style;
+	private int reproducciones;
 
 	/**
 	 * Constructor de canciones inmutables.
@@ -167,6 +189,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 		this.author = builder.author;
 		this.path = builder.path;
 		this.style = builder.style;
+		this.reproducciones = builder.reproducciones;
 	}
 
 	/**
@@ -239,5 +262,14 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 	public int hashCode() {
 		// Helper de la libreria de Google.
 		return Objects.hashCode(this.name, this.author, this.path, this.style);
+	}
+	
+	/**
+	 * Obtiene la cantidad de reproducciones de la canción.
+	 * 
+	 * @return Reproducciones de la canción.
+	 */
+	public int getReproducciones() {
+		return reproducciones;
 	}
 }

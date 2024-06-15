@@ -12,6 +12,6 @@ public interface PlayStatusListener extends EventListener {
 	 * 
 	 * @param e Evento de reproducción de canción.
 	 */
-	public default void onSongReproduction(SongPlayEvent e) {}
+	public default void onSongReproduction(PlayerStatusEvent e) {}
 
 }

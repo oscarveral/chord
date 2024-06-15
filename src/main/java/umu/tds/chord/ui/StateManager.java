@@ -22,6 +22,7 @@ public enum StateManager {
 		PLAYLSITS_MNGMT,
 		RECENT_SONGS,
 		PLAYLIST,
+		MAS_REPRODUCIDAS,
 		REGISTER,
 	}
 	
@@ -110,6 +111,9 @@ public enum StateManager {
 		case REGISTER:
 			callbackInterface.ifPresent(t -> t.showRegisterPanel());
 			break;
+		case MAS_REPRODUCIDAS:
+			callbackMainPanel.ifPresent(t -> t.showMasReproducidas());
+			break;
 		default:
 			break;
 		}
@@ -152,5 +156,10 @@ public enum StateManager {
 	
 	public void addSelelectedSongsToQueue() {
 		Player.INSTANCE.addCola(selectedSongs);
+	}
+	
+	public void reproduceFirstSelectedSong() {
+		if (selectedSongs.isEmpty()) return;
+		Player.INSTANCE.reproducePriority(selectedSongs.get(0));
 	}
 }
