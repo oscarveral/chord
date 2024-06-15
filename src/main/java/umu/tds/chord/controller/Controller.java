@@ -419,6 +419,23 @@ public enum Controller {
 		s.asMut().addReproduccion();
 		SongRepository.INSTANCE.updateSong(s);
 	}
+	
+	/**
+	 * Actualiza la información de una playlist del usuario.
+	 * 
+	 * @param p Playlist que se desea actualizar.
+	 * @param n Nuevo nombre de la playlist.
+	 * @param d Nueva descripción de la playlist.
+	 */
+	public void updatePlaylist(Playlist p, String n, String d) {
+		currentUser.ifPresent(u -> {
+			if (PlaylistFactory.updatePlaylist(p, n, d)) {
+				UserRepository.INSTANCE.updateUser(u);	
+				UserStatusEvent e = new UserStatusEvent(this, u);
+				userStatusListeners.forEach(l -> l.onPlaylistsListUpdate(e));
+			}
+		});
+	}
 
 	// ---------- Cargador de canciones. ----------
 

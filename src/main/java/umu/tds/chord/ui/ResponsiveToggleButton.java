@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
@@ -14,7 +15,11 @@ public class ResponsiveToggleButton extends JToggleButton{
 
 	public ResponsiveToggleButton(String text) {
 		super(text);
-		
+		initializeActionMap();
+	}
+	
+	public ResponsiveToggleButton(Icon icon) {
+		super(icon);
 		initializeActionMap();
 	}
 	

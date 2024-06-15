@@ -229,7 +229,7 @@ public class SearchContainer extends JPanel {
 	}
 	
 	private void reproduceSearch() {
-		Player.INSTANCE.playVirtualPlaylist(searched);
+		Player.INSTANCE.loadPlaylisy(searched);
 	}
 }
 

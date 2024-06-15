@@ -92,6 +92,13 @@ public class TextField extends JTextField {
 		return empty;
 	}
 	
+	@Override
+	public void setText(String t) {
+		super.setText(t);
+		setForeground(Color.GRAY);
+		if (!empty) setForeground(Color.BLACK);
+	}
+	
 	public void reset() {
 		initializeText();
 	}

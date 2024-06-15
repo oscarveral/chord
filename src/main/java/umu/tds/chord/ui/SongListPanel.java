@@ -21,9 +21,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import umu.tds.chord.controller.Controller;
-import umu.tds.chord.controller.PlayStatusListener;
-import umu.tds.chord.controller.Player;
-import umu.tds.chord.controller.PlayerStatusEvent;
 import umu.tds.chord.controller.SongStatusEvent;
 import umu.tds.chord.controller.SongStatusListener;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -230,14 +227,6 @@ public class SongListPanel extends JPanel {
 				public void onSongDelete(SongStatusEvent e) {
 					if (!e.isFailed())
 						songs.removeAll(e.getSongs());
-					fireTableDataChanged();
-				}
-			});
-			
-			Player.INSTANCE.registerPlayStatusListener(new PlayStatusListener() {
-				@Override
-				public void onSongReproduction(PlayerStatusEvent e) {
-					Collections.sort(songs, (a, b) -> a.getReproducciones() - b.getReproducciones());
 					fireTableDataChanged();
 				}
 			});

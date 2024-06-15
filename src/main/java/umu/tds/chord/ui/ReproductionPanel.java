@@ -29,6 +29,7 @@ public class ReproductionPanel extends JPanel {
 	private static final String stopIconPath = "/images/stop.png";
 	private static final String nextIconPath = "/images/next.png";
 	private static final String lastIconPath = "/images/previous.png";
+	private static final String randomIconPath = "/images/random.png";
 	private static final String currentSongTemplate = "No se está reproduciendo nada";
 	private static final String currentPlaylistTemplate = "No se está reproduciendo de ninguna playlist.";
 	private static final String title = "Reproductor";
@@ -41,6 +42,7 @@ public class ReproductionPanel extends JPanel {
 	private ResponsiveButton stop;
 	private ResponsiveButton next;
 	private ResponsiveButton last;
+	private ResponsiveToggleButton random;
 	private JLabel currentSong;
 	private JLabel currentPlaylist;
 	
@@ -120,6 +122,7 @@ public class ReproductionPanel extends JPanel {
 		initializeStop();
 		initializeNext();
 		initializeLast();
+		initializeRandom();
 		initializeCurrentSong();
 		
 		container.add(center, BorderLayout.CENTER);
@@ -202,19 +205,33 @@ public class ReproductionPanel extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 2;
-		c.gridwidth = 5;
+		c.gridwidth = 6;
 		c.insets = new Insets(5, 0, 10, 0);
 		c.fill = GridBagConstraints.BOTH;
 		
 		GridBagConstraints d = new GridBagConstraints();
 		d.gridx = 0;
 		d.gridy = 1;
-		d.gridwidth = 5;
+		d.gridwidth = 6;
 		d.insets = new Insets(5, 0, 5, 0);
 		d.fill = GridBagConstraints.BOTH;
 		
 		center.add(currentSong, c);
 		center.add(currentPlaylist, d);
+	}
+	
+	private void initializeRandom() {
+		Icon i = ImageScaler.loadImageIcon(randomIconPath, iconSize, iconSize);
+		random = new ResponsiveToggleButton(i);
+		random.addActionListener(e -> Player.INSTANCE.setRandomMode(random.isSelected()));
+	
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 5;
+		c.gridy = 0;
+		c.insets = new Insets(5, 0, 5, 0);
+		c.fill = GridBagConstraints.BOTH;
+
+		center.add(random, c);
 	}
 	
 	private void registerControllerListener() {
@@ -224,6 +241,7 @@ public class ReproductionPanel extends JPanel {
 			public void onUserLogin(UserStatusEvent e) {
 				currentSong.setText(currentSongTemplate);
 				currentPlaylist.setText(currentPlaylistTemplate);
+				random.setSelected(false);
 			}
 			
 			@Override

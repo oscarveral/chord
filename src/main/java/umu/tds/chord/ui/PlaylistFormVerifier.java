@@ -10,12 +10,16 @@ public class PlaylistFormVerifier {
 	private TextField name;
 	private ResponsiveTextArea desc;
 	private ResponsiveButton submit;
+	private ResponsiveButton update;
 
-	public PlaylistFormVerifier(ResponsiveButton button) {
-		submit = button;
+	public PlaylistFormVerifier(ResponsiveButton submit, ResponsiveButton update) {
+		this.submit = submit;
+		this.update = update;
 		
-		submit.setEnabled(false);
-		submit.setFocusable(false);
+		this.submit.setEnabled(false);
+		this.submit.setFocusable(false);
+		this.update.setEnabled(false);
+		this.update.setFocusable(false);
 	}
 	
 	public void setNameField(TextField name) {
@@ -66,6 +70,8 @@ public class PlaylistFormVerifier {
 		boolean res = !name.isEmpty() && !desc.isEmpty();
 		submit.setEnabled(res);
 		submit.setFocusable(res);
+		update.setEnabled(res);
+		update.setFocusable(res);
 		return res;
 	}
 	
@@ -74,5 +80,7 @@ public class PlaylistFormVerifier {
 		desc.reset();
 		submit.setEnabled(false);
 		submit.setFocusable(false);
+		update.setEnabled(false);
+		update.setFocusable(false);
 	}
 }

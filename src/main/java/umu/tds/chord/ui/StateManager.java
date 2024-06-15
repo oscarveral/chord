@@ -32,19 +32,24 @@ public enum StateManager {
 	private Optional<Interface> callbackInterface;
 	private Optional<MainPanel> callbackMainPanel;
 	private Optional<PlaylistInfoPanel> callbackPlaylistInfo;
+	private Optional<PlaylistFormPanel> callbackPlaylistForm;
 	
 	private StateManager() {
 		selectedPlaylist = Optional.empty();
 		selectedSongs = new ArrayList<>();
 		callbackMainPanel = Optional.empty();
 		callbackPlaylistInfo = Optional.empty();
+		callbackPlaylistForm = Optional.empty();
 		
 		registerControllerListeners();
 	}
 	
 	public void setSelectedPlaylist(Playlist p) {
 		selectedPlaylist = Optional.ofNullable(p);
-		selectedPlaylist.ifPresent(s -> callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(s)));
+		selectedPlaylist.ifPresent(s -> {
+			callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(s));
+			callbackPlaylistForm.ifPresent(c -> c.setSelectedPlaylist(s));
+		});
 	}
 	
 	public void clearSelectedSongs() {
@@ -78,8 +83,13 @@ public enum StateManager {
 		callbackPlaylistInfo = Optional.ofNullable(p);
 	}
 	
+	public void setCallbackPlaylistForm(PlaylistFormPanel p) {
+		callbackPlaylistForm = Optional.ofNullable(p);
+	}
+	
 	public void clearSelectedPlaylist() {
 		selectedPlaylist = Optional.empty();
+		callbackPlaylistInfo.ifPresent(c -> c.clearSelectedPlaylist());
 	}
 	
 	public void addSelectedSongsToSelectedPlaylist() {
@@ -151,7 +161,11 @@ public enum StateManager {
 	}
 	
 	public void reproduceSelectedPlaylist() {
-		selectedPlaylist.ifPresent(Player.INSTANCE::play);
+		selectedPlaylist.ifPresent(Player.INSTANCE::loadPlaylist);
+	}
+	
+	public void updateSelectedPlaylist(String name, String desc) {
+		selectedPlaylist.ifPresent(p -> Controller.INSTANCE.updatePlaylist(p, name, desc));
 	}
 	
 	public void addSelelectedSongsToQueue() {
@@ -160,6 +174,6 @@ public enum StateManager {
 	
 	public void reproduceFirstSelectedSong() {
 		if (selectedSongs.isEmpty()) return;
-		Player.INSTANCE.reproducePriority(selectedSongs.get(0));
+		Player.INSTANCE.reproduce(selectedSongs.get(0));
 	}
 }

@@ -6,11 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.application.Platform;
 import javafx.scene.media.Media;
@@ -25,52 +27,42 @@ public enum Player {
 		
 	private static final String virtualName = "Búsqueda";
 	
-	private Queue<Song> cola;
-	private Optional<Song> currentSong;
-	private int index;
-	private Optional<Playlist> playlist;
-	private Optional<MediaPlayer> player;
+	private Deque<Song> cola;
+	private Deque<Song> log;
 
+	private Optional<Song> currentSong;
+	private Optional<Playlist> playlist;
+	private Optional<MediaPlayer> reproductor;
+	
 	private Set<PlayStatusListener> playStatusListeners;
 	
+	private boolean randomMode;
 	
 	private Player() {
 		cola = new ArrayDeque<>();
+		log = new ArrayDeque<>();
+
 		playlist = Optional.empty();
 		currentSong = Optional.empty();
-		player = Optional.empty();
+		reproductor = Optional.empty();
 		playStatusListeners = new HashSet<>();
+		randomMode = false;
 
 		Platform.startup(() -> {});
 	}
 	
-	/**
-	 * Añade la lista de canciones proporcionadas a la cola.
-	 * 
-	 * @param l Lista de canciones que se desean añardir a la cola.
-	 */
-	public void addCola(List<Song> l) {
-		cola.addAll(l);
+	private void notifyState() {
+		// Notificar con canción y playlist actual.
+		PlayerStatusEvent e = new PlayerStatusEvent(this);
+		currentSong.ifPresent(e::setSong);
+		playlist.ifPresent(e::setPlaylist);
+		playStatusListeners.forEach(l -> l.onSongReproduction(e));
 	}
 	
-	/**
-	 * Reproduce una canción dada con prioridad sobre lo que suena actualmente.
-	 * 
-	 * @param s Canción que se desea reproducir.
-	 */
-	public void reproducePriority(Song s) {
-		currentSong = Optional.ofNullable(s);
-		loadCurrentSong();
-		player.ifPresent(MediaPlayer::play);
-	}
-	
-	/**
-	 * Carga una canción dada estableciendo el reproductor de canciones.
-	 * Realiza toda la gestión de estado de reproducción.
-	 */
-	private void loadCurrentSong() {
+	private void loadSong() {
 		// Desechado del reproductor antiguo.
-		player.ifPresent(MediaPlayer::dispose);
+		reproductor.ifPresent(MediaPlayer::dispose);
+		reproductor = Optional.empty();
 		// Si se ha especificado canción, se debe cargar.
 		currentSong.ifPresent(s -> {
 			try {
@@ -86,63 +78,111 @@ public enum Player {
 				// Crear el medio que se reproducirá.
 				Media media = new Media(mp3.toFile().toURI().toString());
 				// Se añade el nuevo reproductor.
-				player = Optional.of(new MediaPlayer(media));
-				player.ifPresent(p -> p.setOnEndOfMedia(this::siguiente));
-				// Actualizar estado de controladores.
-				Controller.INSTANCE.incrementSongReproduction(s);
-				Controller.INSTANCE.addRecentSong(s);
+				reproductor = Optional.of(new MediaPlayer(media));
+				reproductor.ifPresent(p -> p.setOnEndOfMedia(this::siguiente));
 			} 
-			catch (Exception e1) {
-				// En caso de fallo opcional vacío.
-				player = Optional.empty();
-				currentSong = Optional.empty();
-			}
+			catch (Exception e1) {}
 		});
+	}
+	
+	private void fillCola() {
+		playlist.ifPresent(p -> {
+			int size = p.getSongs().size();
+			if (size == 0) return;
+			// En modo aleatorio se randomiza el orden.
+			if (randomMode) {
+				List<Song> tmp = new ArrayList<>(p.getSongs());
+				tmp.sort((s1, s2) -> ThreadLocalRandom.current().nextInt());
+				tmp.forEach(s -> cola.addLast(s));
+				return;
+			}
+			// Por defecto se añaden todas las canciones.
+			p.getSongs().forEach(s -> cola.addLast(s));
+		});
+	}
+	
+	private void clearCola() {
+		// Limpiar la cola de la playlist actual implica eliminar desde el final
+		// una canción por cada una que tenga la playlist.
+		playlist.ifPresent(play -> {
+			play.getSongs().forEach(s -> cola.pollLast());
+		});
+	}
+	
+	private void endReproduction() {
+		currentSong = Optional.empty();
+		reproductor.ifPresent(MediaPlayer::dispose);
+		notifyState();
+	}
+	
+	protected void clearState() {
+		cola.clear();
+		playlist = Optional.empty();
+		currentSong = Optional.empty();
+		reproductor.ifPresent(MediaPlayer::dispose);
+		reproductor = Optional.empty();
+		randomMode = false;
+		log.clear();
+		notifyState();
+	}
 		
-		// Notificar el estado de reproducción de forma incondicional.
+	/**
+	 * Reproduce una canción dada con prioridad sobre lo que suena actualmente.
+	 * 
+	 * @param s Canción que se desea reproducir.
+	 */
+	public void reproduce(Song s) {
+		currentSong = Optional.ofNullable(s);
+		loadSong();
+		reproductor.ifPresent(p -> {
+			p.play();
+			Controller.INSTANCE.incrementSongReproduction(s);
+			Controller.INSTANCE.addRecentSong(s);
+		});
 		notifyState();
 	}
 	
 	/**
-	 * Notificación de actualización de estado de reproducción de canciones.
-	 */
-	private void notifyState() {
-		// Notificar con canción y playlist actual.
-		PlayerStatusEvent e = new PlayerStatusEvent(this);
-		currentSong.ifPresent(e::setSong);
-		playlist.ifPresent(e::setPlaylist);
-		playStatusListeners.forEach(l -> l.onSongReproduction(e));
-	}
-	
-	/**
-	 * Establece la playlist dada como playlis que se debe reproducir y empieza
-	 * la reproducción de sus canciones desde el principio.
+	 * Establece la playlist dada como playlis que se debe reproducir y agrega
+	 * sus canciones a la cola actual de reproducción.
 	 * 
 	 * @param p Playlist que se desea reproducir.
 	 */
-	public void play(Playlist p) {
-		index = 0;
-		playlist = Optional.ofNullable(p);
-		if (isValidPlaylist()) {
-			adjustIndex();
-			currentSong = Optional.of(playlist.get().getSong(index));
-			loadCurrentSong();
-			player.ifPresent(MediaPlayer::play);
-		}
+	public void loadPlaylist(Playlist p) {
+		// Se quitan los datos de la playlist anterior y se cargan los nuevos.
+		clearCola();
+		playlist = Optional.ofNullable(PlaylistFactory.clonePlaylist(p).get());	
+		fillCola();
+		// Si no hay nada sonado debe sonar la siguiente canción.
+		if (reproductor.isEmpty()) siguiente();
+		notifyState();
+	}
+	
+	/**
+	 * Reproduce una lista de canciones como una playlist virtual cuyo nombre es
+	 * {@link Player#virtualName}.
+	 * 
+	 * @param l Lista de canciones que reproducir.
+	 */
+	public void loadPlaylisy(List<Song> l) {
+		PlaylistFactory.createPlaylist(virtualName, virtualName).ifPresent(p -> {
+			l.forEach(s -> p.asMut().addSong(s));
+			loadPlaylist(p);
+		});
 	}
 	
 	/**
 	 * Pausa la reproducción de la canción actual.
 	 */
 	public void pausar() {
-		player.ifPresent(MediaPlayer::pause);
+		reproductor.ifPresent(MediaPlayer::pause);
 	}
 	
 	/**
 	 * Reanuda la reproducción de la canción actual.
 	 */
 	public void reanudar() {
-		player.ifPresent(MediaPlayer::play);
+		reproductor.ifPresent(MediaPlayer::play);
 	}
 	
 	/**
@@ -150,52 +190,22 @@ public enum Player {
 	 * playlist si la cola estaba vacía.
 	 */
 	public void siguiente() {
-		currentSong = Optional.empty();
-		// Si la cola está vacía reproduce la siguiente de la playlist actual.
+		currentSong.ifPresent(s -> log.addLast(s));
 		if (cola.isEmpty()) {
-			playlist.ifPresentOrElse(p -> {
-				if (isValidPlaylist()) {
-					index += 1;
-					adjustIndex();
-					currentSong = Optional.of(p.getSong(index));
-					loadCurrentSong();
-					player.ifPresent(MediaPlayer::play);
-				}
-			}, this::endReproduction);			
+			fillCola();
 		}
-		// Si la cola no está vacía se reproduce de la cola.
-		else {
-			currentSong = Optional.of(cola.poll());
-			loadCurrentSong();
-			player.ifPresent(MediaPlayer::play);
-		}
-	}
-	
+		reproduce(cola.pollFirst());
+	}	
 	/**
 	 * Reproduce la canción anterior de la playlist.
 	 */
 	public void anterior() {
-		currentSong = Optional.empty();
-		// Si la cola está vacía reproduce la anterior de la playlist actual.
-		if (isValidPlaylist()) {
-			index -= 1;
-			adjustIndex();
-			currentSong = Optional.of(playlist.get().getSong(index));
-			loadCurrentSong();
-			player.ifPresent(MediaPlayer::play);
-		}		
-	}
-	
-	private void adjustIndex() {
-		int size = playlist.get().getSongs().size();
-		index = index >= size ? 0 : index;
-		index = index < 0 ? size -1 : index;
-	}
-	
-	private boolean isValidPlaylist() {
-		if (playlist.isEmpty()) return false;
-		int size = playlist.get().getSongs().size();
-		return size != 0;
+		currentSong.ifPresent(s -> cola.addFirst(s));
+		if (log.isEmpty()) {
+			endReproduction();	
+			return;
+		}
+		reproduce(log.pollLast());
 	}
 	
 	/**
@@ -203,18 +213,31 @@ public enum Player {
 	 * dicha canción cuando se continue la reproducción.
 	 */
 	public void stop() {
-		player.ifPresent(MediaPlayer::stop);
+		reproductor.ifPresent(MediaPlayer::stop);
 	}
 	
 	/**
-	 * Resetea el estado del reproductor.
+	 * Añade la lista de canciones proporcionadas a la cola.
+	 * 
+	 * @param l Lista de canciones que se desean añardir a la cola.
 	 */
-	protected void clearState() {
-		cola.clear();
-		playlist = Optional.empty();
-		currentSong = Optional.empty();
-		player = Optional.empty();
+	public void addCola(List<Song> l) {
+		l.forEach(s -> cola.addFirst(s));
+		if (reproductor.isEmpty()) siguiente();
+		notifyState();
 	}
+	
+	/**
+	 * Establece el modo aleatorio de reproducción.
+	 * 
+	 * @param random Nuevo modo aleatorio.
+	 */
+	public void setRandomMode(boolean random) {
+		// Refrescar los datos de la playlist en la cola.
+		clearCola();
+		randomMode = random;
+		fillCola();
+ 	}
 	
 	/**
 	 * Registra un listener de estado de reproducción.
@@ -232,27 +255,5 @@ public enum Player {
 	 */
 	public void removePlayStatusListener(PlayStatusListener l) {
 		playStatusListeners.remove(l);
-	}
-	
-	/**
-	 * Establece el estado del reproductor al finalizar la reproducción.
-	 */
-	private void endReproduction() {
-		currentSong = Optional.empty();
-		player.ifPresent(MediaPlayer::dispose);
-		notifyState();
-	}
-	
-	/**
-	 * Reproduce una lista de canciones como una playlist virtual cuyo nombre es
-	 * {@link Player#virtualName}.
-	 * 
-	 * @param l Lista de canciones que reproducir.
-	 */
-	public void playVirtualPlaylist(List<Song> l) {
-		PlaylistFactory.createPlaylist(virtualName, virtualName).ifPresent(p -> {
-			l.forEach(s -> p.asMut().addSong(s));
-			play(p);
-		});
 	}
 }

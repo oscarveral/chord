@@ -66,6 +66,15 @@ public class PlaylistPanel extends JPanel {
 			public void onUserLogout(UserStatusEvent e) {
 				lista.clearSelection();
 			}
+			
+			@Override
+			public void onPlaylistsListUpdate(UserStatusEvent e) {
+				e.getUser().ifPresent(u -> {
+					if (!u.getPlaylists().isEmpty() && lista.getSelectedIndex() >= 0 && lista.getSelectedIndex() < u.getPlaylists().size()) {
+						StateManager.INSTANCE.setSelectedPlaylist(u.getPlaylist(lista.getSelectedIndex()));
+					}
+				});
+			}
 		});
 		
 		JScrollPane scrollPane = new JScrollPane(lista);

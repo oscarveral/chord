@@ -69,7 +69,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		 * @return Instancia actual del builder.
 		 */
 		public Builder songs(List<Song> songs) {
-			this.songs = songs;
+			this.songs = new ArrayList<>(songs);
 			return this;
 		}
 
@@ -186,12 +186,28 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		public boolean removeAll(Song song) {
 			return super.songs.removeIf(s -> s.equals(song));
 		}
+		
+		/**
+		 * Establece el nombre de la playlist.
+		 * 
+		 * @param name Nuevo nombre de la playlist.
+		 */
+		public void setName(String name) {
+			super.name = name;
+		}
+		
+		/**
+		 * Establece la descripción de la playlist.
+		 * 
+		 * @param desciption Nueva descripción de la playlist.
+		 */
+		public void setDescription(String desciption) {
+			super.description = desciption;
+		}
 	}
 
-	private final String description;
-
-	private final String name;
-
+	private String description;
+	private String name;
 	private final List<Song> songs;
 
 	/**

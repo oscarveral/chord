@@ -11,6 +11,7 @@ import javax.swing.ScrollPaneConstants;
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
 import umu.tds.chord.controller.UserStatusListener;
+import umu.tds.chord.model.Playlist;
 
 public class PlaylistFormPanel extends JPanel {
 	
@@ -18,11 +19,13 @@ public class PlaylistFormPanel extends JPanel {
 	private static final String templateName = "Nombre de la playlist";
 	private static final String templateDesc = "Descripción de la playlist";
 	private static final String submitText = "Crear playlist";
+	private static final String updateText = "Actualizar playlist seleccionada";
 	private static final String deleteText = "Eliminar playlist seleccionada";
 	
 	private TextField name;
 	private ResponsiveTextArea desc;
 	private ResponsiveButton submit;
+	private ResponsiveButton update;
 	private ResponsiveButton delete;
 	
 	private PlaylistFormVerifier verifier;
@@ -33,11 +36,14 @@ public class PlaylistFormPanel extends JPanel {
 		initializeName();
 		initializeDesc();
 		initializeSubmit();
+		initializeUpdate();
 		initializeDelete();
 		
 		initializeVerifier();
 		
 		registerContollerListeners();
+		
+		StateManager.INSTANCE.setCallbackPlaylistForm(this);
 	}
 
 	private void initializeName() {
@@ -84,13 +90,26 @@ public class PlaylistFormPanel extends JPanel {
 		add(submit, c);
 	}
 	
+	private void initializeUpdate() {
+		update = new ResponsiveButton(updateText);
+		update.addActionListener(e -> updatePlaylist());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 3;
+		c.insets = new Insets(5, 10, 5, 10);
+		c.fill = GridBagConstraints.BOTH;
+		
+		add(update, c);
+	}
+	
 	private void initializeDelete() {
 		delete = new ResponsiveButton(deleteText);
 		delete.addActionListener(e -> deletePlaylist());
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
-		c.gridy = 5;
+		c.gridy = 4;
 		c.insets = new Insets(5, 10, 10, 10);
 		c.fill = GridBagConstraints.BOTH;
 		
@@ -98,7 +117,7 @@ public class PlaylistFormPanel extends JPanel {
 	}
 	
 	private void initializeVerifier() {
-		verifier = new PlaylistFormVerifier(submit);
+		verifier = new PlaylistFormVerifier(submit, update);
 		verifier.setNameField(name);
 		verifier.setDescField(desc);
 	}
@@ -114,11 +133,6 @@ public class PlaylistFormPanel extends JPanel {
 			public void onUserLogin(UserStatusEvent e) {
 				onUserLogout(e);
 			}
-			
-			@Override
-			public void onPlaylistsListUpdate(UserStatusEvent e) {
-				onUserLogout(e);
-			}
 		});
 	}
 	
@@ -130,7 +144,21 @@ public class PlaylistFormPanel extends JPanel {
 		}
 	}
 	
+	private void updatePlaylist() {
+		if (verifier.verify()) {
+			String n = name.getText();
+			String d = desc.getText();
+			StateManager.INSTANCE.updateSelectedPlaylist(n, d);
+		}
+	}
+	
 	private void deletePlaylist() {
 		StateManager.INSTANCE.removeSelectedPlaylist();
+	}
+	
+	protected void setSelectedPlaylist(Playlist p) {
+		name.setText(p.getName());
+		desc.setText(p.getDescription());
+		verifier.verify();
 	}
 }
