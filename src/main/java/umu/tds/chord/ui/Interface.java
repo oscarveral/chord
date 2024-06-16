@@ -27,16 +27,11 @@ public final class Interface {
 	private static final String registerTitle = "Registro";
 	
 	private JFrame ventana;
-	
 	private CardLayout layout;
 	private JPanel container;
-	
 	private LoginPanel login;
 	private MainPanel main;
-	
-	private RegisterPanel register;
 	private JDialog registerDialog;
-	
 	private ToolBar tools;
 	
 	public Interface() {
@@ -75,7 +70,7 @@ public final class Interface {
 		ventana.setMinimumSize(minSize);
 		ventana.setIconImage(icono.getImage());
 		ventana.setSize(ventana.getPreferredSize());
-		ventana.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		ventana.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		ventana.addWindowListener(new WindowAdapter() {
 			
 			@Override
@@ -103,7 +98,7 @@ public final class Interface {
 	}
 	
 	private void initializeRegister() {
-		register = new RegisterPanel();
+		RegisterPanel register = new RegisterPanel();
 		registerDialog = new JDialog(ventana, true);
 		registerDialog.setAlwaysOnTop(true);				
 		registerDialog.setTitle(registerTitle);

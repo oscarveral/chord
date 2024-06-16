@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import umu.tds.chord.controller.Controller;
-import umu.tds.chord.controller.PlayStatusListener;
+import umu.tds.chord.controller.PlayerStatusListener;
 import umu.tds.chord.controller.Player;
 import umu.tds.chord.controller.PlayerStatusEvent;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -35,13 +35,6 @@ public class ReproductionPanel extends JPanel {
 	private static final String title = "Reproductor";
 	private static final int iconSize = 20;
 	
-	private ResponsiveButton addCola;
-	private ResponsiveButton reproPalylist;
-	private ResponsiveButton play;
-	private ResponsiveButton pause;
-	private ResponsiveButton stop;
-	private ResponsiveButton next;
-	private ResponsiveButton last;
 	private ResponsiveToggleButton random;
 	private JLabel currentSong;
 	private JLabel currentPlaylist;
@@ -75,7 +68,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeWest() {
 		Icon i = ImageScaler.loadImageIcon(addColaIconPath, iconSize, iconSize);
-		addCola = new ResponsiveButton(i);
+		ResponsiveButton addCola = new ResponsiveButton(i);
 		addCola.addActionListener(e -> StateManager.INSTANCE.addSelelectedSongsToQueue());
 		
 		JPanel co = new JPanel();
@@ -95,7 +88,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeEast() {
 		Icon i = ImageScaler.loadImageIcon(reproPlaylistIconPath, iconSize, iconSize);
-		reproPalylist = new ResponsiveButton(i);
+		ResponsiveButton reproPalylist = new ResponsiveButton(i);
 		reproPalylist.addActionListener(e -> StateManager.INSTANCE.reproduceSelectedPlaylist());
 		
 		JPanel co = new JPanel();
@@ -130,7 +123,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializePlay() {
 		Icon i = ImageScaler.loadImageIcon(playIconPath, iconSize, iconSize);
-		play = new ResponsiveButton(i);
+		ResponsiveButton play = new ResponsiveButton(i);
 		play.addActionListener(e -> Player.INSTANCE.reanudar());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -144,7 +137,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializePause() {
 		Icon i = ImageScaler.loadImageIcon(pauseIconPath, iconSize, iconSize);
-		pause = new ResponsiveButton(i);
+		ResponsiveButton pause = new ResponsiveButton(i);
 		pause.addActionListener(e -> Player.INSTANCE.pausar());
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -158,7 +151,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeStop() {
 		Icon i = ImageScaler.loadImageIcon(stopIconPath, iconSize, iconSize);
-		stop = new ResponsiveButton(i);
+		ResponsiveButton stop = new ResponsiveButton(i);
 		stop.addActionListener(e -> Player.INSTANCE.stop());
 	
 		GridBagConstraints c = new GridBagConstraints();
@@ -172,7 +165,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeNext() {
 		Icon i = ImageScaler.loadImageIcon(nextIconPath, iconSize, iconSize);
-		next = new ResponsiveButton(i);
+		ResponsiveButton next = new ResponsiveButton(i);
 		next.addActionListener(e -> Player.INSTANCE.siguiente());
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -186,7 +179,7 @@ public class ReproductionPanel extends JPanel {
 	
 	private void initializeLast() {
 		Icon i = ImageScaler.loadImageIcon(lastIconPath, iconSize, iconSize);
-		last = new ResponsiveButton(i);
+		ResponsiveButton last = new ResponsiveButton(i);
 		last.addActionListener(e -> Player.INSTANCE.anterior());
 		
 		GridBagConstraints c = new GridBagConstraints();
@@ -250,7 +243,7 @@ public class ReproductionPanel extends JPanel {
 			}
 		});
 		
-		Player.INSTANCE.registerPlayStatusListener(new PlayStatusListener() {
+		Player.INSTANCE.registerPlayStatusListener(new PlayerStatusListener() {
 		
 			@Override
 			public void onSongReproduction(PlayerStatusEvent e) {

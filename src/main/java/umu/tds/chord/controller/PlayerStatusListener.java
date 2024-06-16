@@ -5,7 +5,7 @@ import java.util.EventListener;
 /**
  * Interfaz para los eventos de escucha de canciones.
  */
-public interface PlayStatusListener extends EventListener {
+public interface PlayerStatusListener extends EventListener {
 	
 	/**
 	 * Emitido cuando se reproduce una canción.

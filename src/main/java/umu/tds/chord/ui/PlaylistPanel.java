@@ -12,8 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.UserStatusEvent;
@@ -44,15 +42,10 @@ public class PlaylistPanel extends JPanel {
 		
 		lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lista.setOpaque(false);
-		lista.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				// Evitar doble selección.
-				if (e.getValueIsAdjusting()) return;
-				Playlist p = lista.getSelectedValue();
-				StateManager.INSTANCE.setSelectedPlaylist(p);
-			}
+		lista.addListSelectionListener(e ->  {	
+			if (e.getValueIsAdjusting()) return;
+			Playlist p = lista.getSelectedValue();
+			StateManager.INSTANCE.setSelectedPlaylist(p);
 		});
 		
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
@@ -125,9 +118,7 @@ public class PlaylistPanel extends JPanel {
 				// En el inicio de sesión se debe cargar la lista de playlists.
 				@Override
 				public void onUserLogin(UserStatusEvent e) {
-					e.getUser().ifPresent(u -> {
-						setList(u.getPlaylists());
-					});
+					e.getUser().ifPresent(u -> setList(u.getPlaylists()));
 				}
 
 				@Override
@@ -141,8 +132,6 @@ public class PlaylistPanel extends JPanel {
 				}
 
 			});
-
 		}
-
 	}
 }

@@ -34,7 +34,7 @@ public enum Player {
 	private Optional<Playlist> playlist;
 	private Optional<MediaPlayer> reproductor;
 	
-	private Set<PlayStatusListener> playStatusListeners;
+	private Set<PlayerStatusListener> playStatusListeners;
 	
 	private boolean randomMode;
 	
@@ -244,7 +244,7 @@ public enum Player {
 	 * 
 	 * @param l Listener que se desea registrar.
 	 */
-	public void registerPlayStatusListener(PlayStatusListener l) {
+	public void registerPlayStatusListener(PlayerStatusListener l) {
 		playStatusListeners.add(l);
 	}
 	
@@ -253,7 +253,7 @@ public enum Player {
 	 * 
 	 * @param l Listener que se desea eliminar.
 	 */
-	public void removePlayStatusListener(PlayStatusListener l) {
+	public void removePlayStatusListener(PlayerStatusListener l) {
 		playStatusListeners.remove(l);
 	}
 }

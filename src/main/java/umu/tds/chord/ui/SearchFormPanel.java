@@ -29,8 +29,6 @@ public class SearchFormPanel extends JPanel {
 	private TextField interpreterFilter;
 	private ResponsiveCheckBox favouriteFilter;
 	private JComboBox<String> styleFilter;
-	private ResponsiveButton searchButton;
-	private SongListPanel resultsPanel;
 	
 	public SearchFormPanel() {
 		GridBagLayout layout = new GridBagLayout();
@@ -137,7 +135,7 @@ public class SearchFormPanel extends JPanel {
 	}
 	
 	private void initializeSearchButton() {
-		searchButton = new ResponsiveButton(searchText);
+		ResponsiveButton searchButton = new ResponsiveButton(searchText);
 		searchButton.addActionListener(e -> search());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -151,8 +149,7 @@ public class SearchFormPanel extends JPanel {
 	}
 	
 	private void initializeResultsPanel() {
-		
-		resultsPanel = new SongListPanel();
+		SearchResultPanel resultsPanel = new SearchResultPanel();
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;

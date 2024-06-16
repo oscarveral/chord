@@ -43,34 +43,7 @@ public enum StateManager {
 		
 		registerControllerListeners();
 	}
-	
-	public void setSelectedPlaylist(Playlist p) {
-		selectedPlaylist = Optional.ofNullable(p);
-		selectedPlaylist.ifPresent(s -> {
-			callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(s));
-			callbackPlaylistForm.ifPresent(c -> c.setSelectedPlaylist(s));
-		});
-	}
-	
-	public void clearSelectedSongs() {
-		selectedSongs.clear();
-	}
-	
-	public void addSelectedSong(Song s) {
-		selectedSongs.add(s);
-	}
-	
-	public void removeSelectedSongs(String password) {
-		Controller.INSTANCE.removeSongs(selectedSongs, password);
-	}
-	
-	public void removeSelectedPlaylist() {
-		selectedPlaylist.ifPresent(p -> {
-			Controller.INSTANCE.removePlaylist(p);
-			callbackPlaylistInfo.ifPresent(c -> c.clearSelectedPlaylist());
-		});
-	}
-	
+		
 	public void setCallbackMainPanel(MainPanel p) {
 		callbackMainPanel = Optional.ofNullable(p);
 	}
@@ -87,21 +60,61 @@ public enum StateManager {
 		callbackPlaylistForm = Optional.ofNullable(p);
 	}
 	
+	public void setSelectedPlaylist(Playlist p) {
+		selectedPlaylist = Optional.ofNullable(p);
+		selectedPlaylist.ifPresent(s -> {
+			callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(s));
+			callbackPlaylistForm.ifPresent(c -> c.setSelectedPlaylist(s));
+		});
+	}
+	
 	public void clearSelectedPlaylist() {
 		selectedPlaylist = Optional.empty();
 		callbackPlaylistInfo.ifPresent(c -> c.clearSelectedPlaylist());
 	}
 	
-	public void addSelectedSongsToSelectedPlaylist() {
+	public void removeSelectedPlaylist() {
 		selectedPlaylist.ifPresent(p -> {
-			Controller.INSTANCE.addSongsPlaylist(p, selectedSongs);
+			Controller.INSTANCE.removePlaylist(p);
+			callbackPlaylistInfo.ifPresent(c -> c.clearSelectedPlaylist());
 		});
 	}
 	
+	public void reproduceSelectedPlaylist() {
+		selectedPlaylist.ifPresent(Player.INSTANCE::loadPlaylist);
+	}
+	
+	public void updateSelectedPlaylist(String name, String desc) {
+		selectedPlaylist.ifPresent(p -> Controller.INSTANCE.updatePlaylist(p, name, desc));
+	}
+	
+	public void addSelectedSong(Song s) {
+		selectedSongs.add(s);
+	}
+	
+	public void clearSelectedSongs() {
+		selectedSongs.clear();
+	}
+	
+	public void removeSelectedSongs(String password) {
+		Controller.INSTANCE.removeSongs(selectedSongs, password);
+	}
+	
+	public void addSelelectedSongsToQueue() {
+		Player.INSTANCE.addCola(selectedSongs);
+	}
+	
+	public void reproduceFirstSelectedSong() {
+		if (selectedSongs.isEmpty()) return;
+		Player.INSTANCE.reproduce(selectedSongs.get(0));
+	}
+	
+	public void addSelectedSongsToSelectedPlaylist() {
+		selectedPlaylist.ifPresent(p -> Controller.INSTANCE.addSongsPlaylist(p, selectedSongs));
+	}
+	
 	public void removeSelectedSongsFromSelectedPlaylist() {
-		selectedPlaylist.ifPresent(p -> {
-			Controller.INSTANCE.removeSongsPlaylist(p, selectedSongs);
-		});
+		selectedPlaylist.ifPresent(p -> Controller.INSTANCE.removeSongsPlaylist(p, selectedSongs));
 	}
 	
 	public void triggerEvent(UIEvents e) {
@@ -144,11 +157,8 @@ public enum StateManager {
 			
 			@Override
 			public void onPlaylistsListUpdate(UserStatusEvent e) {
-				if (e.getUser().isPresent()) {
-					selectedPlaylist.ifPresent(p -> {
-						callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(p));
-					});
-				}
+				if (e.getUser().isPresent())
+					selectedPlaylist.ifPresent(p -> callbackPlaylistInfo.ifPresent(c -> c.setSelectedPlaylist(p)));
 			}
 		});
 		
@@ -158,22 +168,5 @@ public enum StateManager {
 				if (!e.isFailed()) selectedSongs.retainAll(e.getSongs());
 			}
 		});
-	}
-	
-	public void reproduceSelectedPlaylist() {
-		selectedPlaylist.ifPresent(Player.INSTANCE::loadPlaylist);
-	}
-	
-	public void updateSelectedPlaylist(String name, String desc) {
-		selectedPlaylist.ifPresent(p -> Controller.INSTANCE.updatePlaylist(p, name, desc));
-	}
-	
-	public void addSelelectedSongsToQueue() {
-		Player.INSTANCE.addCola(selectedSongs);
-	}
-	
-	public void reproduceFirstSelectedSong() {
-		if (selectedSongs.isEmpty()) return;
-		Player.INSTANCE.reproduce(selectedSongs.get(0));
 	}
 }

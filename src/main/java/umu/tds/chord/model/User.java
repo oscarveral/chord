@@ -23,9 +23,10 @@ import umu.tds.chord.utils.StringHasher;
  */
 public abstract sealed class User implements Mutable<User.Internal> {
 	
-	private static final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	private static final double premiumBaseCost = 30.0;
 	private static final int maxRecentSongs = 100;
+
+	private final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	/**
 	 * Clase constructora de usuarios.
@@ -302,7 +303,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * @return Canción que se ha eliminado.
 		 */
 		public boolean removeRecentSong(Song s) {
-			return super.recentSongs.remove(s);
+			return super.recentSongs.removeIf(song -> song.equals(s));
 		}
 
 		/**

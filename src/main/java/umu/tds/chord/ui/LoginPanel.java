@@ -37,11 +37,8 @@ public class LoginPanel extends JPanel {
 	private TextField usernameField;
 	private PasswordField passwordField;
 	private ResponsiveButton login;
-	
 	private AlertTextArea error;
-	
 	private LoginVerifier verifier;
-	
 	private JFileChooser chooser;
 	
 	public LoginPanel() {
@@ -132,9 +129,7 @@ public class LoginPanel extends JPanel {
 	
 	private void initializeRegister() {
 		ResponsiveButton register = new ResponsiveButton(registerText);
-		register.addActionListener(e -> {
-			StateManager.INSTANCE.triggerEvent(UIEvents.REGISTER);
-		});
+		register.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.REGISTER));
 		
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;

@@ -27,10 +27,8 @@ public class PlaylistInfoPanel extends JPanel {
 	private static final String deleteText = "Quitar canciones seleccionadas";
 	
 	private JLabel name;
-	private JLabel descPre;
 	private ResponsiveTextArea desc;
 	private PlaylistSongList songs;
-	private ResponsiveButton deleteSongs;
 	
 	public PlaylistInfoPanel() {
 		setLayout(new GridBagLayout());
@@ -61,7 +59,7 @@ public class PlaylistInfoPanel extends JPanel {
 	}
 	
 	private void initializeDescPre() {
-		descPre = new JLabel(descPreText);
+		JLabel descPre = new JLabel(descPreText);
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -111,7 +109,7 @@ public class PlaylistInfoPanel extends JPanel {
 	}
 	
 	private void initializeDeleteSongs() {
-		deleteSongs = new ResponsiveButton(deleteText);
+		ResponsiveButton deleteSongs = new ResponsiveButton(deleteText);
 		deleteSongs.addActionListener(e -> deleteSongs());
 		
 		GridBagConstraints c = new GridBagConstraints();

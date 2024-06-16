@@ -41,16 +41,9 @@ public class SearchContainer extends JPanel {
 	private static final String iconPath = "/images/icon.png";
 	private static final int iconSize = 20;
 
-	private SearchFormPanel searchPanel;
 	private JPanel buttonsPanel;
-	private ResponsiveButton deleteButton;
 	private JDialog deleteDialog;
-	private JPanel panel;
-	private JLabel label;
 	private PasswordField passInput;
-	private ResponsiveButton confirm;
-	private ResponsiveButton addToPlaylist;
-	private ResponsiveButton reproduceSearch;
 	
 	private List<Song> searched = new ArrayList<>();
 
@@ -69,7 +62,7 @@ public class SearchContainer extends JPanel {
 	}
 
 	private void initializeSearchPanel() {
-		searchPanel = new SearchFormPanel();
+		SearchFormPanel searchPanel = new SearchFormPanel();
 		add(searchPanel, BorderLayout.CENTER);
 	}
 
@@ -83,7 +76,7 @@ public class SearchContainer extends JPanel {
 	}
 
 	private void initializeDeleteButton() {
-		deleteButton = new ResponsiveButton(deleteText);
+		ResponsiveButton deleteButton = new ResponsiveButton(deleteText);
 
 		initializeDeleteDialog();
 
@@ -104,11 +97,10 @@ public class SearchContainer extends JPanel {
 	}
 
 	private void initializeDeleteDialog() {
-
 		deleteDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), true);
 		deleteDialog.setIconImage( ImageScaler.loadImageIcon(iconPath, iconSize, iconSize).getImage());
 
-		panel = new JPanel();
+		JPanel panel = new JPanel();
 
 		GridBagLayout layout = new GridBagLayout();
 		panel.setLayout(layout);
@@ -129,9 +121,9 @@ public class SearchContainer extends JPanel {
 			}
 		});
 
-		label = new JLabel(passInputText);
+		JLabel label = new JLabel(passInputText);
 		passInput = new PasswordField(passInputText);
-		confirm = new ResponsiveButton(confirmDelete);
+		ResponsiveButton confirm = new ResponsiveButton(confirmDelete);
 
 		Action action = new AbstractAction() {
 
@@ -178,7 +170,7 @@ public class SearchContainer extends JPanel {
 	}
 	
 	private void initializeAddToPlaylist() {
-		addToPlaylist = new ResponsiveButton(addToPlaylistText);
+		ResponsiveButton addToPlaylist = new ResponsiveButton(addToPlaylistText);
 		addToPlaylist.addActionListener(e -> addSongs());
 		
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -192,7 +184,7 @@ public class SearchContainer extends JPanel {
 	}
 	
 	private void inititalizeReproduceSearch() {
-		reproduceSearch = new ResponsiveButton(reproduceSearchText);
+		ResponsiveButton reproduceSearch = new ResponsiveButton(reproduceSearchText);
 		reproduceSearch.addActionListener(e -> reproduceSearch());
 		
 		GridBagConstraints constraints = new GridBagConstraints();

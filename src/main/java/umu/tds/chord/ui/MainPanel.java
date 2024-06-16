@@ -23,20 +23,8 @@ public class MainPanel extends JPanel {
 	private static final String playlistInfoTag = "pinfo";
 	private static final String reproListTag = "reproList";
  
-	private SongLoaderButton luz;
-	
-	private UserInfoPanel userInfo;
-	private ButtonPanel buttons;
-	
 	private JPanel centerContainer;
 	private CardLayout centerLayout;
-	private SearchContainer searchPanel;
-	private PlaylistManagementPanel playlistMngmt;
-	private RecentSongsPanel recentSongsPanel;
-	private PlaylistInfoPanel playlistInfo;
-	private BestSongsPanel reproducList;
-	private ReproductionPanel reproduction;
-	
 	private String currentCard;
 	
 	public MainPanel() {	
@@ -57,11 +45,11 @@ public class MainPanel extends JPanel {
 	}
 	
 	private void initializeCenterContainer() {
-		searchPanel = new SearchContainer();
-		playlistMngmt = new PlaylistManagementPanel();
-		recentSongsPanel = new RecentSongsPanel();
-		playlistInfo = new PlaylistInfoPanel();
-		reproducList = new BestSongsPanel();
+		SearchContainer searchPanel = new SearchContainer();
+		PlaylistManagementPanel playlistMngmt = new PlaylistManagementPanel();
+		RecentSongsPanel recentSongsPanel = new RecentSongsPanel();
+		PlaylistInfoPanel playlistInfo = new PlaylistInfoPanel();
+		ReproductionLogPanel reproducList = new ReproductionLogPanel();
 		
 		centerLayout = new CardLayout();
 		centerContainer = new JPanel(centerLayout);
@@ -80,13 +68,13 @@ public class MainPanel extends JPanel {
 	}
 	
 	private void initializeButtons() {
-		buttons = new ButtonPanel();
+		ButtonPanel buttons = new ButtonPanel();
 		add(buttons, BorderLayout.LINE_START);
 	}
 	
 	private void initializeNorth() {
-		userInfo = new UserInfoPanel();
-		luz = new SongLoaderButton();
+		UserInfoPanel userInfo = new UserInfoPanel();
+		SongLoaderButton luz = new SongLoaderButton();
 		
 		JPanel north = new JPanel(new GridBagLayout());
 	
@@ -135,7 +123,7 @@ public class MainPanel extends JPanel {
 	}
 	
 	private void initializeReproduction() {
-		reproduction = new ReproductionPanel();
+		ReproductionPanel reproduction = new ReproductionPanel();
 		add(reproduction, BorderLayout.SOUTH);
 	}
 	

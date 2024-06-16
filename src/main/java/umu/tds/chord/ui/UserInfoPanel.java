@@ -29,8 +29,6 @@ public class UserInfoPanel extends JPanel {
 	private JLabel userName;
 	private JLabel birthday;
 	private ResponsiveToggleButton premiumToggle;
-	private ResponsiveButton logoutButton;
-	private ResponsiveButton deleteAccountButton;
 
 	public UserInfoPanel() {
 
@@ -92,7 +90,7 @@ public class UserInfoPanel extends JPanel {
 	}
 
 	private void initializeLogoutButton() {
-		logoutButton = new ResponsiveButton(logoutButtonText);
+		ResponsiveButton logoutButton = new ResponsiveButton(logoutButtonText);
 		logoutButton.addActionListener(e -> logout());
 
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -105,7 +103,7 @@ public class UserInfoPanel extends JPanel {
 	}
 
 	private void initializeDeleteAccountButton() {
-		deleteAccountButton = new ResponsiveButton(deleteAccButtonText);
+		ResponsiveButton deleteAccountButton = new ResponsiveButton(deleteAccButtonText);
 		deleteAccountButton.addActionListener(e -> remove());
 
 		GridBagConstraints constraints = new GridBagConstraints();

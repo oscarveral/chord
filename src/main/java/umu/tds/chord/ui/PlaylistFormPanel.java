@@ -26,8 +26,6 @@ public class PlaylistFormPanel extends JPanel {
 	private ResponsiveTextArea desc;
 	private ResponsiveButton submit;
 	private ResponsiveButton update;
-	private ResponsiveButton delete;
-	
 	private PlaylistFormVerifier verifier;
 	
 	public PlaylistFormPanel() {
@@ -104,7 +102,7 @@ public class PlaylistFormPanel extends JPanel {
 	}
 	
 	private void initializeDelete() {
-		delete = new ResponsiveButton(deleteText);
+		ResponsiveButton delete = new ResponsiveButton(deleteText);
 		delete.addActionListener(e -> deletePlaylist());
 		
 		GridBagConstraints c = new GridBagConstraints();

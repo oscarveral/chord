@@ -26,9 +26,7 @@ public class ToolBar extends JMenuBar {
 	private static final String elderDiscountText = "Descuento del 50% para mayores de 65 años";
 	private static final String temporaryDiscountText = "Descuento del 20% durante 3 meses";
 	
-	private JMenu utilidades;
 	private JMenuItem pdf;
-	private JMenu discounts;
 	private JMenuItem noneDiscount;
 	private JMenuItem elderDiscount;
 	private JMenuItem temporaryDiscount;
@@ -41,7 +39,7 @@ public class ToolBar extends JMenuBar {
 	}
 	
 	private void initializeUtilities() {
-		utilidades = new JMenu(utilidadesText);
+		JMenu utilidades = new JMenu(utilidadesText);
 		pdf = new JMenuItem(genPDF);
 		setPDFGenerationStatus(false);
 		pdf.addActionListener(e -> genPDF());
@@ -50,7 +48,7 @@ public class ToolBar extends JMenuBar {
 	}
 	
 	private void initializeDiscounts() {
-		discounts = new JMenu(discountsText);
+		JMenu discounts = new JMenu(discountsText);
 		noneDiscount = new JMenuItem(noneDiscountText);
 		noneDiscount.addActionListener(e -> applyDiscount(Type.NONE));
 		elderDiscount = new JMenuItem(elderDiscountText);
