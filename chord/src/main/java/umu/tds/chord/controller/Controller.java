@@ -18,9 +18,6 @@ import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import umu.tds.chord.component.BuscadorCanciones;
-import umu.tds.chord.component.Canciones;
-import umu.tds.chord.component.CargadorCanciones;
 import umu.tds.chord.model.Playlist;
 import umu.tds.chord.model.PlaylistFactory;
 import umu.tds.chord.model.Song;
@@ -29,6 +26,9 @@ import umu.tds.chord.model.User;
 import umu.tds.chord.model.UserRepository;
 import umu.tds.chord.model.discount.Discount;
 import umu.tds.chord.model.discount.DiscountFactory;
+import umu.tds.component.BuscadorCanciones;
+import umu.tds.component.Canciones;
+import umu.tds.component.CargadorCanciones;
 
 /**
  * Controlador para la lógica de negocio. Expone la API que utilizará la
@@ -461,10 +461,12 @@ public enum Controller {
 
 		// No hacer nada en fallo.
 		if (c.isEmpty()) {
+			System.err.println("G");
 			e.setFailed(true);
 			songStatusListeners.forEach(l -> l.onSongLoad(e));
 			return;
 		}
+		
 		// Añadir las canciones al repositorio.
 		Canciones canciones = c.get();
 		canciones.getCancion().forEach(s -> {

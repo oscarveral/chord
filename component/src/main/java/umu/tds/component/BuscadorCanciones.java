@@ -1,4 +1,4 @@
-package umu.tds.chord.component;
+package umu.tds.component;
 
 /**
  * Interfaz que deben implementar las clases que ofrecerán la funcionalidad de

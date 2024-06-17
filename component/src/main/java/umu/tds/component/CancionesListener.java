@@ -1,4 +1,4 @@
-package umu.tds.chord.component;
+package umu.tds.component;
 
 import java.util.EventListener;
 

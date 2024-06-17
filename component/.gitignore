@@ -26,6 +26,3 @@ replay_pid*
 target/
 # Ignore doc folder
 doc/
-
-# Ignore config dirs
-.*/

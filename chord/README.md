@@ -45,7 +45,8 @@ es un pulsador proporcionado mediante la librería /componentes/Luz.jar. Será
 necesario instalarla en el repositorio local de Maven.
 
 Para realizar la instalación se deberá ejecutar el siguiente comando 
-desde /persistencia/driver para instalar el componente JavaBeam Luz.
+desde /persistencia/driver de forma que se pueda instalar el componente 
+JavaBeam Luz.
 
 ```bash
 mvn install:install-file -Dfile="Luz.jar" -DgroupId="umu.tds" -DartifactId="luz" -Dversion="1.0" -Dpackaging="jar" -DgeneratePom=true
@@ -56,27 +57,30 @@ utilizando el siguiente fragmento de texto.
 
 ```xml
 <dependency>
-	  <groupId>umu.tds</groupId>
-	  <artifactId>luz</artifactId>
-	  <version>1.0</version>
+	<groupId>umu.tds</groupId>
+	<artifactId>luz</artifactId>
+	<version>1.0</version>
 </dependency>
 ```
 
-## Carga de canciones desde internet.
+## Componente JavaBeam CargadorCanciones.
 
-Se implementa un componente que habilita la carga de canciones desde la red
-mediante su especificación en un fichero XML. El fichero XML y su esquema
-necesario se encuentran bajo el directorio /xml de este proyecto. Se utiliza
-Internet Archive como repositorio de canciones que se pueden descargar.
+Como requisito adicional, se debe utilizar un componente Java Beam de desarrollo
+propio para realizar cargas de lotes de canciones. Véase el proyecto "component"
+en la raiz del repositorio donde se implementa dicho componente y 
+se ofrecen las instrucciones necesarias para su instalación y uso mediante
+Maven.
+
+Una vez el componente se encuentra instalado en el repositorio local de Maven, 
+podrá se utilizado agregando al POM el siguiente fragmento de texto.
 
 ```xml
-<cancion titulo="In the Court of the Crimson King">
-		<URL><![CDATA[https://ia800102.us.archive.org/7/items/cd_in-the-court-of-the-crimson-king_king-crimson/disc1/05.%20King%20Crimson%20-%20The%20Court%20of%20the%20Crimson%20King%20%28including%20The%20Return%20of%20the%20Fire%20Witch%20and%20The%20Dance%20of%20the%20Puppets%29_sample.mp3]]></URL>
-		<estilo>Rock-sinfonico</estilo>
-		<interprete>King Crimson </interprete>
-</cancion>
+<dependency>
+	<groupId>umu.tds</groupId>
+	<artifactId>component</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
 ```
-Véase el fichero del directorio /xml para para obtener más ejemplos.
 
 ## Autor.
 

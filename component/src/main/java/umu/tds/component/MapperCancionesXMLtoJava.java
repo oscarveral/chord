@@ -1,4 +1,4 @@
-package umu.tds.chord.component;
+package umu.tds.component;
 
 import java.io.File;
 
@@ -13,12 +13,12 @@ public class MapperCancionesXMLtoJava {
 		JAXBContext jc;
 		Canciones canciones = null;
 		try {
-			jc = JAXBContext.newInstance("umu.tds.chord.component");
+			jc = JAXBContext.newInstance("umu.tds.component");
 			Unmarshaller u = jc.createUnmarshaller();
 			File file = new File(fichero);
 			canciones = (Canciones) u.unmarshal(file);
 		} catch (JAXBException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 		return canciones;
 	}

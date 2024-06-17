@@ -1,4 +1,4 @@
-package umu.tds.chord.component;
+package umu.tds.component;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +45,7 @@ public enum CargadorCanciones implements BuscadorCanciones {
 		if (!archivoCanciones.isPresent()) {
 			return;
 		}
-
+		
 		Canciones canciones = MapperCancionesXMLtoJava.cargarCanciones(archivoCanciones.get());
 		CancionesEvent e = new CancionesEvent(this, canciones);
 		notificarCargaCanciones(e);

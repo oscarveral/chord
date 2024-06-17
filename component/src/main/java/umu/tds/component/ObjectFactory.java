@@ -5,7 +5,7 @@
 // Generado el: 2017.10.26 a las 12:42:42 AM CEST
 //
 
-package umu.tds.chord.component;
+package umu.tds.component;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
