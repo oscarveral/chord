@@ -15,6 +15,7 @@ public class PlayerStatusEvent extends EventObject {
 
 	private Optional<Song> song;
 	private Optional<Playlist> playlist;
+	private double progress;
 	
 	/**
 	 * Constructor del evento.
@@ -25,6 +26,7 @@ public class PlayerStatusEvent extends EventObject {
 		super(source);
 		this.song = Optional.empty();
 		this.playlist = Optional.empty();
+		this.progress = 0.0;
 	}
 	
 	/**
@@ -61,5 +63,23 @@ public class PlayerStatusEvent extends EventObject {
 	 */
 	public Optional<Playlist> getPlaylist() {
 		return playlist;
+	}
+	
+	/**
+	 * Establece el progreso actual de la canción.
+	 * 
+	 * @param progress Progreso actual de la canción.
+	 */
+	public void setProgress(double progress) {
+		this.progress = progress;
+	}
+	
+	/**
+	 * Recupera los parámetros de duración.
+	 * 
+	 * @return Progreso de la canción. Valor entre 0 y 1.
+	 */
+	public double getProgress() {
+		return progress;
 	}
 }

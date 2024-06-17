@@ -5,11 +5,14 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 import umu.tds.chord.controller.Controller;
 import umu.tds.chord.controller.PlayerStatusListener;
@@ -34,13 +37,14 @@ public class ReproductionPanel extends JPanel {
 	private static final String currentPlaylistTemplate = "No se está reproduciendo de ninguna playlist.";
 	private static final String title = "Reproductor";
 	private static final int iconSize = 20;
+	private static final int progressScaleFactor = 10000;
 	
 	private ResponsiveToggleButton random;
 	private JLabel currentSong;
 	private JLabel currentPlaylist;
-	
 	private JPanel container;
 	private JPanel center;
+	private JSlider progress;
 	
 	public ReproductionPanel() {
 	
@@ -117,6 +121,7 @@ public class ReproductionPanel extends JPanel {
 		initializeLast();
 		initializeRandom();
 		initializeCurrentSong();
+		initializeProgress();
 		
 		container.add(center, BorderLayout.CENTER);
 	}
@@ -199,7 +204,7 @@ public class ReproductionPanel extends JPanel {
 		c.gridx = 0;
 		c.gridy = 2;
 		c.gridwidth = 6;
-		c.insets = new Insets(5, 0, 10, 0);
+		c.insets = new Insets(5, 0, 5, 0);
 		c.fill = GridBagConstraints.BOTH;
 		
 		GridBagConstraints d = new GridBagConstraints();
@@ -227,6 +232,40 @@ public class ReproductionPanel extends JPanel {
 		center.add(random, c);
 	}
 	
+	private void initializeProgress() {
+		progress = new JSlider();
+		progress.setValue(0);
+		progress.setMaximum(progressScaleFactor);
+		progress.setMinimum(0);
+		progress.addMouseListener(new MouseListener() {
+			
+			//private boolean shouldUpdate = false;
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				Player.INSTANCE.setReproductionProgress(progress.getValue() / (double) progress.getMaximum());					
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+		});
+		
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 6;
+		c.insets = new Insets(5, 0, 10, 0);
+		c.fill = GridBagConstraints.BOTH;
+		
+		center.add(progress, c);
+	}
+	
 	private void registerControllerListener() {
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 		
@@ -252,6 +291,13 @@ public class ReproductionPanel extends JPanel {
 					currentSong.setText(s.getName() + " - " + s.getAuthor() + " - " + s.getStyle())
 				);
 				e.getPlaylist().ifPresent(p -> currentPlaylist.setText("Playlist: " + p.getName()));
+				progress.setValue((int)(progressScaleFactor * e.getProgress()));
+			}
+			
+			@Override
+			public void onSongProgress(PlayerStatusEvent e) {
+				if (!progress.getValueIsAdjusting())
+					progress.setValue((int)(progressScaleFactor * e.getProgress()));
 			}
 		});
 	}

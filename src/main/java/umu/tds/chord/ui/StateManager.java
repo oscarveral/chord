@@ -106,7 +106,7 @@ public enum StateManager {
 	
 	public void reproduceFirstSelectedSong() {
 		if (selectedSongs.isEmpty()) return;
-		Player.INSTANCE.reproduce(selectedSongs.get(0));
+		Player.INSTANCE.pushReproduce(selectedSongs.get(0));
 	}
 	
 	public void addSelectedSongsToSelectedPlaylist() {
