@@ -85,7 +85,8 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 
 			switch (Properties.valueOf(p.getNombre())) {
 			// No se puden mutar las canciones.
-			case NAME, AUTHOR, PATH, STYLE: break;
+			case NAME, AUTHOR, PATH, STYLE:
+				break;
 			case REPRODUCCIONES:
 				p.setValor(String.valueOf(s.getReproducciones()));
 				break;
@@ -136,10 +137,12 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 		author = persistence.recuperarPropiedadEntidad(eSong, Properties.AUTHOR.name());
 		path = persistence.recuperarPropiedadEntidad(eSong, Properties.PATH.name());
 		style = persistence.recuperarPropiedadEntidad(eSong, Properties.STYLE.name());
-		reproducciones = Integer.valueOf(persistence.recuperarPropiedadEntidad(eSong, Properties.REPRODUCCIONES.name()));
+		reproducciones = Integer
+				.valueOf(persistence.recuperarPropiedadEntidad(eSong, Properties.REPRODUCCIONES.name()));
 
 		// Construcción y registro.
-		Song.Internal s = new Song.Builder(name).author(author).path(path).style(style).reproducciones(reproducciones).build().get().asMut();
+		Song.Internal s = new Song.Builder(name).author(author).path(path).style(style).reproducciones(reproducciones)
+				.build().get().asMut();
 
 		s.registerId(id);
 		TDSPoolDAO.addPersistent(s);
@@ -153,7 +156,8 @@ public enum TDSSongDAO implements DAO<Song.Internal> {
 	@Override
 	public List<Song.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.SONG_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar errores.
+				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar
+																											// errores.
 				.toList();
 	}
 

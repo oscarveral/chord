@@ -25,19 +25,19 @@ public class RegisterPanel extends JPanel {
 	private static final String createText = "Crear cuenta";
 	private static final String repeatedUser = "Nombre de usuario no disponible.";
 	private static final String sucessRegister = "Registro exitoso.";
-	
+
 	private TextField usernameField;
 	private PasswordField passwordField;
 	private PasswordField confirmField;
 	private DateField calendarField;
 	private ResponsiveButton create;
 	private AlertTextArea error;
-	
+
 	private RegisterVerifier verifier;
-		
-	public RegisterPanel() {		
+
+	public RegisterPanel() {
 		setLayout(new GridBagLayout());
-				
+
 		initializeLabel();
 		initializeUsernameField();
 		initializePasswordField();
@@ -46,27 +46,27 @@ public class RegisterPanel extends JPanel {
 		initializeCalendarField();
 		initializeCreate();
 		initializeError();
-		
+
 		initializeVerifier();
 		initializeVisibilityListener();
-		
+
 		setSize(getPreferredSize());
 	}
 
 	// ---------- Interfaz. ----------
-	
+
 	private void initializeLabel() {
 		JLabel label = new JLabel(registerText);
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(10, 10, 5, 10);
-		
+
 		add(label, constraints);
 	}
-	
+
 	private void initializeUsernameField() {
 		usernameField = new TextField(usernameText);
 
@@ -75,13 +75,13 @@ public class RegisterPanel extends JPanel {
 		constraints.gridy = 1;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(5, 10, 5, 10);
-		
+
 		add(usernameField, constraints);
 	}
-	
+
 	private void initializePasswordField() {
 		passwordField = new PasswordField(passwordText);
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 2;
@@ -90,7 +90,7 @@ public class RegisterPanel extends JPanel {
 
 		add(passwordField, constraints);
 	}
-	
+
 	private void initializeConfirmField() {
 		confirmField = new PasswordField(confirmText);
 
@@ -102,10 +102,10 @@ public class RegisterPanel extends JPanel {
 
 		add(confirmField, constraints);
 	}
-	
+
 	private void initializeBirthday() {
 		JLabel birthday = new JLabel(birthdayText);
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 4;
@@ -114,12 +114,12 @@ public class RegisterPanel extends JPanel {
 
 		add(birthday, constraints);
 	}
-	
+
 	private void initializeCalendarField() {
 		calendarField = new DateField();
-		
+
 		JDateChooser chooser = new JDateChooser(calendarField);
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 5;
@@ -128,11 +128,11 @@ public class RegisterPanel extends JPanel {
 
 		add(chooser, constraints);
 	}
-	
+
 	private void initializeCreate() {
 		create = new ResponsiveButton(createText);
 		create.addActionListener(e -> register());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 6;
@@ -141,10 +141,10 @@ public class RegisterPanel extends JPanel {
 
 		add(create, constraints);
 	}
-	
+
 	private void initializeError() {
 		error = new AlertTextArea();
-				
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 7;
@@ -153,25 +153,27 @@ public class RegisterPanel extends JPanel {
 
 		add(error, constraints);
 	}
-	
+
 	private void initializeVisibilityListener() {
 		// Limpiar la interfaz si se esconde este compoonente.
 		addAncestorListener(new AncestorListener() {
-			
+
 			@Override
 			public void ancestorRemoved(AncestorEvent event) {
 				verifier.refresh();
 				usernameField.requestFocus();
 			}
-			
+
 			@Override
-			public void ancestorMoved(AncestorEvent event) {}
-			
+			public void ancestorMoved(AncestorEvent event) {
+			}
+
 			@Override
-			public void ancestorAdded(AncestorEvent event) {}
+			public void ancestorAdded(AncestorEvent event) {
+			}
 		});
 	}
-	
+
 	// ---------- Validación. ----------
 
 	private void initializeVerifier() {
@@ -181,20 +183,21 @@ public class RegisterPanel extends JPanel {
 		verifier.setConfirmField(confirmField);
 		verifier.setCalendarField(calendarField);
 	}
-	
-	
+
 	// ---------- Comunicación con el controlador. ----------
-		
+
 	private void register() {
 		if (verifier.verify()) {
 			String username = verifier.getUsername();
 			String password = verifier.getPassword();
 			Date birthday = verifier.getBirthday();
-			
+
 			boolean res = Controller.INSTANCE.register(username, password, birthday);
-						
-			if (res) error.setSuccess(sucessRegister);
-			else error.setFail(repeatedUser); 
-		}		
+
+			if (res)
+				error.setSuccess(sucessRegister);
+			else
+				error.setFail(repeatedUser);
+		}
 	}
 }

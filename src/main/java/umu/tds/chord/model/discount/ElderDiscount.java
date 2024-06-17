@@ -12,7 +12,7 @@ public class ElderDiscount extends Discount {
 	protected ElderDiscount(Date start, Date end) {
 		super(start, end);
 	}
-	
+
 	protected ElderDiscount() {
 		super();
 	}

@@ -85,7 +85,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 			this.style = style;
 			return this;
 		}
-		
+
 		/**
 		 * Establece las reproducciones de la canción.
 		 * 
@@ -154,7 +154,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 			this.id = id;
 			this.isRegistered = true;
 		}
-		
+
 		/**
 		 * Incrementa en 1 la cantidad de reproducciones de la canción.
 		 */
@@ -263,7 +263,7 @@ public abstract sealed class Song implements Mutable<Song.Internal> {
 		// Helper de la libreria de Google.
 		return Objects.hashCode(this.name, this.author, this.path, this.style);
 	}
-	
+
 	/**
 	 * Obtiene la cantidad de reproducciones de la canción.
 	 * 

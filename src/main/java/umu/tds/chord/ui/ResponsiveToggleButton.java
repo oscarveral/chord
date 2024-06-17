@@ -9,20 +9,20 @@ import javax.swing.Icon;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
-public class ResponsiveToggleButton extends JToggleButton{
-	
+public class ResponsiveToggleButton extends JToggleButton {
+
 	private static final long serialVersionUID = -2954495693269815920L;
 
 	public ResponsiveToggleButton(String text) {
 		super(text);
 		initializeActionMap();
 	}
-	
+
 	public ResponsiveToggleButton(Icon icon) {
 		super(icon);
 		initializeActionMap();
 	}
-	
+
 	private void initializeActionMap() {
 		getActionMap().put(this, new AbstractAction() {
 

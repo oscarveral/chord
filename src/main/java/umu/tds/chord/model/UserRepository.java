@@ -43,9 +43,10 @@ public enum UserRepository {
 			return false;
 		}
 
-		Optional<User> optional = new User.Builder(username).password(password).birthday(birthday).build();		
-		if (optional.isEmpty()) return false;
-		
+		Optional<User> optional = new User.Builder(username).password(password).birthday(birthday).build();
+		if (optional.isEmpty())
+			return false;
+
 		// Persistencia.
 		User user = optional.get();
 		boolean result = DAOFactory.getInstance().getUserDAO().register(user.asMut());

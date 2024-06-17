@@ -19,14 +19,14 @@ public enum SongRepository {
 
 	public static final String ALL_STYLES = "Todos";
 	private static final String emptyFilter = "";
-	
+
 	private final Set<Song> songs;
 	private final Set<String> styles;
 
 	private SongRepository() {
 		songs = new HashSet<>();
 		styles = new HashSet<>();
-		//ALL_STYLES = "Todos";
+		// ALL_STYLES = "Todos";
 
 		styles.add(ALL_STYLES);
 
@@ -64,7 +64,7 @@ public enum SongRepository {
 
 		// Persistencia.
 		boolean persistence = DAOFactory.getInstance().getSongDAO().register(song.asMut());
-		
+
 		// Fallo de registro en persistencia.
 		if (!persistence) {
 			return Optional.empty();
@@ -95,7 +95,7 @@ public enum SongRepository {
 		String name = n.isPresent() ? n.get() : emptyFilter;
 		String author = a.isPresent() ? a.get() : emptyFilter;
 		String sty = s.isPresent() ? s.get() : ALL_STYLES;
-		
+
 		return songs.stream().filter(song -> song.getName().toLowerCase().contains(name.toLowerCase()))
 				.filter(song -> song.getAuthor().toLowerCase().contains(author.toLowerCase())).filter(song -> {
 					if (!sty.equals(ALL_STYLES)) {
@@ -114,14 +114,14 @@ public enum SongRepository {
 	public Set<Song> getSongs() {
 		return Collections.unmodifiableSet(this.songs);
 	}
-	
+
 	/**
 	 * Comprueba la existencia en el repositorio de una canción determinada.
 	 * 
-	 * @param name Nombre de la canción.
+	 * @param name   Nombre de la canción.
 	 * @param author Autor de la canción.
-	 * @param path Ruta de la canción.
-	 * @param style Estilo de la canción.
+	 * @param path   Ruta de la canción.
+	 * @param style  Estilo de la canción.
 	 * 
 	 * @return {@code true} si existe la canción especificada.
 	 */
@@ -129,7 +129,7 @@ public enum SongRepository {
 		Song song = new Song.Builder(name).author(author).path(path).style(style).build().get();
 		return songs.stream().anyMatch(s -> s.equals(song));
 	}
-	
+
 	/**
 	 * Retorna el set de estilos de las canciones del repositorio.
 	 *
@@ -138,7 +138,7 @@ public enum SongRepository {
 	public Set<String> getStyles() {
 		return Collections.unmodifiableSet(styles);
 	}
-	
+
 	/**
 	 * Comprueba la existencia en el repositorio de un estilo determinado.
 	 * 
@@ -149,7 +149,7 @@ public enum SongRepository {
 	public boolean existStyle(String style) {
 		return styles.contains(style);
 	}
-	
+
 	/**
 	 * Función para obtener el estilo comodín utilizado en las búsquedas
 	 *
@@ -176,14 +176,14 @@ public enum SongRepository {
 		}
 
 		// Eliminación de persistencia.
-		// Uso la versión de la canción del repositorio ya que se asegura que 
-		// tiene un id de persistencia asociado. Como Song hace override de 
-		// equals sería posible pasar como parámetro una canción igual pero no 
+		// Uso la versión de la canción del repositorio ya que se asegura que
+		// tiene un id de persistencia asociado. Como Song hace override de
+		// equals sería posible pasar como parámetro una canción igual pero no
 		// registrada en persistencia. Habilitamos la posibilidad de
 		// realizar la construcción de canciones nuevas fuera del repositorio.
 		song = songs.stream().filter(song::equals).findFirst().get();
 		boolean persistence = DAOFactory.getInstance().getSongDAO().delete(song.asMut());
-		
+
 		// Eliminación de memoria.
 		if (persistence) {
 			songs.remove(song);
@@ -197,8 +197,7 @@ public enum SongRepository {
 				styles.remove(style);
 			}
 		}
-		
-		
+
 		return persistence;
 	}
 
@@ -216,7 +215,7 @@ public enum SongRepository {
 			UserRepository.INSTANCE.updateUser(u);
 		});
 	}
-	
+
 	/**
 	 * Método para actualizar los valores de una canción en persistencia.
 	 * 
@@ -225,22 +224,23 @@ public enum SongRepository {
 	 * @return Resultado de la operación.
 	 */
 	public boolean updateSong(Song s) {
-		if (s == null || !songs.contains(s)) return false;
-		boolean persistence  = DAOFactory.getInstance().getSongDAO().modify(s.asMut());
+		if (s == null || !songs.contains(s))
+			return false;
+		boolean persistence = DAOFactory.getInstance().getSongDAO().modify(s.asMut());
 		if (!persistence) {
 			removeSongFromUsers(s);
 			removeSong(s);
 		}
 		return persistence;
 	}
- 	
+
 	// ---------- Depuración. ----------
-	
+
 	/**
 	 * @apiNote ALERTA. Método de depuración.
 	 * 
-	 * Fuerza un reseteo del estado del repositorio de canciones. Se eliminarán
-	 * todas las canciones de persistencia.
+	 *          Fuerza un reseteo del estado del repositorio de canciones. Se
+	 *          eliminarán todas las canciones de persistencia.
 	 */
 	public void clearSonRepositoryState() {
 		// Quitar todas las canciones.
@@ -252,6 +252,5 @@ public enum SongRepository {
 		styles.clear();
 		styles.add(ALL_STYLES);
 	}
-	
-	
+
 }

@@ -13,44 +13,50 @@ public interface UserStatusListener extends EventListener {
 	 * 
 	 * @param e Evento de estado de usuario.
 	 */
-	public default void onUserLogin(UserStatusEvent e) {}
-	
+	public default void onUserLogin(UserStatusEvent e) {
+	}
+
 	/**
 	 * Evento emitio al cerrar la sesión el usuario.
 	 * 
 	 * @param e Evento de estado de usuario.
 	 */
-	public default void onUserLogout(UserStatusEvent e) {}
-	
+	public default void onUserLogout(UserStatusEvent e) {
+	}
+
 	/**
-	 * Evento emitido cuando se produce un cambio de los datos principales
-	 * asociados al usuario.
+	 * Evento emitido cuando se produce un cambio de los datos principales asociados
+	 * al usuario.
 	 * 
 	 * @param e Evento de estado de usuario.
 	 */
-	public default void onUserMetadataChange(UserStatusEvent e) {}
-	
+	public default void onUserMetadataChange(UserStatusEvent e) {
+	}
+
 	/**
-	 * Evento emitido cuando se ha producido un cambio en la lista de playlists
-	 * del usuario.
+	 * Evento emitido cuando se ha producido un cambio en la lista de playlists del
+	 * usuario.
 	 * 
 	 * @param e Evento de estado del usuario.
 	 */
-	public default void onPlaylistsListUpdate(UserStatusEvent e) {}
-	
+	public default void onPlaylistsListUpdate(UserStatusEvent e) {
+	}
+
 	/**
-	 * Evento emitido cuando se ha producido un cambio en la lista de canciones 
+	 * Evento emitido cuando se ha producido un cambio en la lista de canciones
 	 * favoritas del usuario.
 	 * 
 	 * @param e Evento de estado del usuario.
 	 */
-	public default void onFavouriteSongsUpdate(UserStatusEvent e) {}
-	
+	public default void onFavouriteSongsUpdate(UserStatusEvent e) {
+	}
+
 	/**
 	 * Evento emitido cuando se ha producido un cambio en la lista de canciones
 	 * recientes del usuario.
 	 * 
 	 * @param e Evento de estado de usuario.
 	 */
-	public default void onRecentSongsUpdate(UserStatusEvent e) {}
+	public default void onRecentSongsUpdate(UserStatusEvent e) {
+	}
 }

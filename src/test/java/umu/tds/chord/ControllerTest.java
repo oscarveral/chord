@@ -22,37 +22,34 @@ public class ControllerTest {
 	private static final String persistentTestUsername = "PersistentTestUsername";
 	private static final String persistentTestPassword = "PersistentTestPassword";
 	private static final Date birthday = Date.from(Instant.now());
-	
+
 	private static final String songsXMLPath = "xml/canciones.xml";
 	private static final int numberSongs = 6;
 	private static final int numberStyles = 7;
-	
+
 	@BeforeClass
 	public static void beforeAll() {
 		// Eliminar usuario efímero de pruebas si existía.
-		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 		// Registrar usuario persistente de pruebas si no existía.
 		if (UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).isEmpty())
 			UserRepository.INSTANCE.addUser(persistentTestUsername, persistentTestPassword, birthday);
 	}
-	
+
 	@AfterClass
 	public static void afterAll() {
 		// Eliminar el usuario efímero de pruebas si existía.
-		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 		// Eliminar usuario persistente de pruebas si existía.
-		UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 	}
-	
+
 	@Before
 	public void before() {
 		// Limpiar el estado del controlador.
@@ -60,22 +57,22 @@ public class ControllerTest {
 		// Eliminar todas las canciones del repositorio de canciones.
 		SongRepository.INSTANCE.clearSonRepositoryState();
 	}
-	
+
 	@After
 	public void after() {
 		// Limpiar el estado del controlador.
 		Controller.INSTANCE.clearControllerState();
 		// Eliminar todas las canciones del repositorio de canciones.
 		SongRepository.INSTANCE.clearSonRepositoryState();
-		
+
 		// Añade el usuario persistente si fue borrado.
 		if (UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).isEmpty())
 			UserRepository.INSTANCE.addUser(persistentTestUsername, persistentTestPassword, birthday);
 	}
-		
+
 	@Test
 	public void testRegister() {
-		boolean res1 = Controller.INSTANCE.register(transientTestUsername, transientTestPassword, birthday);	
+		boolean res1 = Controller.INSTANCE.register(transientTestUsername, transientTestPassword, birthday);
 		assertEquals(true, res1);
 		boolean res3 = Controller.INSTANCE.register(transientTestUsername, transientTestPassword, birthday);
 		assertEquals(false, res3);

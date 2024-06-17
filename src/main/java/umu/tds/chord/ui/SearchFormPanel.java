@@ -29,49 +29,49 @@ public class SearchFormPanel extends JPanel {
 	private TextField interpreterFilter;
 	private ResponsiveCheckBox favouriteFilter;
 	private JComboBox<String> styleFilter;
-	
+
 	public SearchFormPanel() {
 		GridBagLayout layout = new GridBagLayout();
 		setLayout(layout);
-		
+
 		initializeTitleFilter();
 		initializeInterpreterFilter();
 		initializeFavouriteFilter();
 		initializeStyleFilter();
 		initializeSearchButton();
 		initializeResultsPanel();
-		
+
 		registerControllerListeners();
 	}
-	
+
 	private void initializeTitleFilter() {
-		titleFilter = new TextField(titleFilterText);		
+		titleFilter = new TextField(titleFilterText);
 		titleFilter.addActionListener(e -> search());
 		titleFilter.getDocument().addDocumentListener(new DocumentListener() {
-			
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				search();
 			}
-			
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
-			
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
 		});
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
 		constraints.insets = new Insets(5, 10, 0, 5);
-		
+
 		add(titleFilter, constraints);
 	}
 
@@ -79,75 +79,75 @@ public class SearchFormPanel extends JPanel {
 		interpreterFilter = new TextField(interpreterFilterText);
 		interpreterFilter.addActionListener(e -> search());
 		interpreterFilter.getDocument().addDocumentListener(new DocumentListener() {
-			
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				search();
 			}
-			
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
-			
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
 		});
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
 		constraints.insets = new Insets(5, 5, 0, 10);
-		
-		add(interpreterFilter, constraints);	
+
+		add(interpreterFilter, constraints);
 	}
-	
+
 	private void initializeFavouriteFilter() {
 		favouriteFilter = new ResponsiveCheckBox(favouriteText);
 		favouriteFilter.addActionListener(e -> search());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 1;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(10, 10, 0, 5);
-		
+
 		add(favouriteFilter, constraints);
 	}
-	
+
 	private void initializeStyleFilter() {
-		
-		styleFilter = new JComboBox<>();		
+
+		styleFilter = new JComboBox<>();
 		styleFilter.addActionListener(e -> search());
 		styleFilter.addItem(SongRepository.ALL_STYLES);
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(10, 5, 0, 10);
-		
+
 		add(styleFilter, constraints);
 	}
-	
+
 	private void initializeSearchButton() {
 		ResponsiveButton searchButton = new ResponsiveButton(searchText);
 		searchButton.addActionListener(e -> search());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 2;
 		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(10, 10, 5, 10);
-		
+
 		add(searchButton, constraints);
 	}
-	
+
 	private void initializeResultsPanel() {
 		SearchResultPanel resultsPanel = new SearchResultPanel();
 
@@ -163,13 +163,13 @@ public class SearchFormPanel extends JPanel {
 
 		add(resultsPanel, constraints);
 	}
-	
+
 	// -------- Interacción con el controlador --------
-	
+
 	private void registerControllerListeners() {
 
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-			
+
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				titleFilter.reset();
@@ -177,44 +177,48 @@ public class SearchFormPanel extends JPanel {
 				favouriteFilter.setSelected(false);
 				styleFilter.setSelectedItem(SongRepository.ALL_STYLES);
 			}
-			
+
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				onUserLogin(e);
 			}
-			
+
 			@Override
 			public void onFavouriteSongsUpdate(UserStatusEvent e) {
 				// Más dinámmico actualizar búsquedas en cambios de favoritos.
 				search();
 			}
 		});
-				
+
 		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
 
 			@Override
 			public void onSongLoad(SongStatusEvent e) {
-				if (e.isFailed()) return;
+				if (e.isFailed())
+					return;
 				e.getSongs().forEach(s -> styleFilter.addItem(s.getStyle()));
 			}
-						
+
 			@Override
 			public void onSongDelete(SongStatusEvent e) {
-				if (e.isFailed()) return;
+				if (e.isFailed())
+					return;
 				e.getSongs().forEach(s -> styleFilter.removeItem(s.getStyle()));
 				styleFilter.setSelectedItem(SongRepository.ALL_STYLES);
 			}
 		});
 	}
-	
+
 	private void search() {
 		Optional<String> name = Optional.empty();
-		if (!titleFilter.isEmpty()) name = Optional.ofNullable(titleFilter.getText());
+		if (!titleFilter.isEmpty())
+			name = Optional.ofNullable(titleFilter.getText());
 		Optional<String> author = Optional.empty();
-		if (!interpreterFilter.isEmpty()) author = Optional.ofNullable(interpreterFilter.getText());
+		if (!interpreterFilter.isEmpty())
+			author = Optional.ofNullable(interpreterFilter.getText());
 		Optional<String> style = Optional.ofNullable((String) styleFilter.getSelectedItem());
 		boolean favourite = favouriteFilter.isSelected();
-		
+
 		Controller.INSTANCE.searchSongs(name, author, style, favourite);
 	}
 }

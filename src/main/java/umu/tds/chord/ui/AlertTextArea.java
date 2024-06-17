@@ -10,10 +10,10 @@ public class AlertTextArea extends JTextArea {
 	private static final int rows = 1;
 	private static final int cols = 30;
 	private static final String empty = "";
-	
+
 	private static final Color red = Color.RED;
 	private static final Color green = Color.GREEN.darker();
-	
+
 	public AlertTextArea() {
 		super(rows, cols);
 		setText(empty);
@@ -21,12 +21,12 @@ public class AlertTextArea extends JTextArea {
 		setForeground(red);
 		setOpaque(false);
 	}
-	
+
 	public void setFail(String text) {
 		setForeground(red);
 		setText(text);
 	}
-	
+
 	public void setSuccess(String text) {
 		setForeground(green);
 		setText(text);

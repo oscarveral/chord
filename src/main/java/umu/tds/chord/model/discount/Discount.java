@@ -8,30 +8,30 @@ import umu.tds.chord.model.User;
  * Clase base que representa un descuento.
  */
 public class Discount {
-	
+
 	private Date start;
 	private Date end;
-	
+
 	protected Discount(Date start, Date end) {
 		this.start = start;
 		this.end = end;
 	}
-	
+
 	protected Discount() {
 		this.start = new Date();
 		this.end = new Date();
 	}
-	
+
 	/**
-	 * Obtiene el factor de descuento por el que se debe multiplicar el precio
-	 * para obtener el precio final.
+	 * Obtiene el factor de descuento por el que se debe multiplicar el precio para
+	 * obtener el precio final.
 	 * 
 	 * @return Factor de descuento.
 	 */
 	public double getDiscountFactor() {
 		return 1.0;
 	}
-	
+
 	/**
 	 * Indica si el descuento es aplicable al usuario proporcionado.
 	 * 
@@ -51,7 +51,7 @@ public class Discount {
 	public DiscountFactory.Type getType() {
 		return DiscountFactory.Type.NONE;
 	}
-	
+
 	/**
 	 * Obtiene la fecha de comienzo de aplicación del decuento.
 	 * 
@@ -60,7 +60,7 @@ public class Discount {
 	public Date getStart() {
 		return start;
 	}
-	
+
 	/**
 	 * Obtiene la fecha de fin de aplicación del descuento.
 	 * 

@@ -17,11 +17,8 @@ public class SongRepositoryTest {
 	private static final String testAuthorName = "testAuthor";
 	private static final String testPath = "testPath";
 	private static final String testStyle = "testStyle";
-	private static final Song testSong = new Song.Builder(testSongName)
-			.author(testAuthorName)
-			.path(testPath)
-			.style(testStyle)
-			.build().get();
+	private static final Song testSong = new Song.Builder(testSongName).author(testAuthorName).path(testPath)
+			.style(testStyle).build().get();
 
 	@Before
 	public void before() {
@@ -51,8 +48,8 @@ public class SongRepositoryTest {
 	public void testGetSearch() {
 		Optional<String> name = Optional.of(testSongName);
 		Optional<String> author = Optional.of(testSongName);
-		Optional<String> style = Optional.of(testSongName);		
-		
+		Optional<String> style = Optional.of(testSongName);
+
 		int size1 = SongRepository.INSTANCE.getSearch(name, author, style).size();
 		assertEquals(0, size1);
 		boolean res1 = SongRepository.INSTANCE.addSong(testSongName, testAuthorName, testPath, testStyle).isPresent();

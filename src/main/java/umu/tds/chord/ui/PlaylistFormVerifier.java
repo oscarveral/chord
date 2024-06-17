@@ -6,7 +6,7 @@ import javax.swing.event.DocumentListener;
 public class PlaylistFormVerifier {
 
 	protected static final String errorText = "Unsupported";
-	
+
 	private TextField name;
 	private ResponsiveTextArea desc;
 	private ResponsiveButton submit;
@@ -15,57 +15,59 @@ public class PlaylistFormVerifier {
 	public PlaylistFormVerifier(ResponsiveButton submit, ResponsiveButton update) {
 		this.submit = submit;
 		this.update = update;
-		
+
 		this.submit.setEnabled(false);
 		this.submit.setFocusable(false);
 		this.update.setEnabled(false);
 		this.update.setFocusable(false);
 	}
-	
+
 	public void setNameField(TextField name) {
-		if (this.name != null) return;
+		if (this.name != null)
+			return;
 		this.name = name;
 		this.name.getDocument().addDocumentListener(new DocumentListener() {
-			
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				verify();
 			}
-			
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
-			
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				throw new RuntimeException(errorText);
 			}
 		});
 	}
-	
+
 	public void setDescField(ResponsiveTextArea desc) {
-		if (this.desc != null) return;
+		if (this.desc != null)
+			return;
 		this.desc = desc;
 		this.desc.getDocument().addDocumentListener(new DocumentListener() {
-			
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				verify();
 			}
-			
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				removeUpdate(e);
 			}
-			
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				throw new RuntimeException(errorText);
 			}
 		});
 	}
-	
+
 	public boolean verify() {
 		boolean res = !name.isEmpty() && !desc.isEmpty();
 		submit.setEnabled(res);
@@ -74,7 +76,7 @@ public class PlaylistFormVerifier {
 		update.setFocusable(res);
 		return res;
 	}
-	
+
 	public void refresh() {
 		name.reset();
 		desc.reset();

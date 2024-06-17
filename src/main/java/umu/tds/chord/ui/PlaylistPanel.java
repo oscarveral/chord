@@ -35,41 +35,42 @@ public class PlaylistPanel extends JPanel {
 
 	// -------- Interfaz. --------
 
-
 	private void initializeLista() {
 		PlaylistListModel datos = new PlaylistListModel();
 		JList<Playlist> lista = new JList<>(datos);
-		
+
 		lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lista.setOpaque(false);
-		lista.addListSelectionListener(e ->  {	
-			if (e.getValueIsAdjusting()) return;
+		lista.addListSelectionListener(e -> {
+			if (e.getValueIsAdjusting())
+				return;
 			Playlist p = lista.getSelectedValue();
 			StateManager.INSTANCE.setSelectedPlaylist(p);
 		});
-		
+
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-			
+
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				lista.clearSelection();
 			}
-			
+
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				lista.clearSelection();
 			}
-			
+
 			@Override
 			public void onPlaylistsListUpdate(UserStatusEvent e) {
 				e.getUser().ifPresent(u -> {
-					if (!u.getPlaylists().isEmpty() && lista.getSelectedIndex() >= 0 && lista.getSelectedIndex() < u.getPlaylists().size()) {
+					if (!u.getPlaylists().isEmpty() && lista.getSelectedIndex() >= 0
+							&& lista.getSelectedIndex() < u.getPlaylists().size()) {
 						StateManager.INSTANCE.setSelectedPlaylist(u.getPlaylist(lista.getSelectedIndex()));
 					}
 				});
 			}
 		});
-		
+
 		JScrollPane scrollPane = new JScrollPane(lista);
 		scrollPane.setBorder(new EmptyBorder(scrollPaneBorder, scrollPaneBorder, scrollPaneBorder, scrollPaneBorder));
 		add(scrollPane, BorderLayout.CENTER);
@@ -85,7 +86,7 @@ public class PlaylistPanel extends JPanel {
 
 		public PlaylistListModel() {
 			playlists = new ArrayList<>();
-			
+
 			registerControllerListeners();
 		}
 

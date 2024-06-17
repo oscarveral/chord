@@ -175,7 +175,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		public boolean removeSong(Song song) {
 			return super.songs.remove(song);
 		}
-		
+
 		/**
 		 * Elimina de la playlist todas las instancias de la canción dada.
 		 * 
@@ -186,7 +186,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		public boolean removeAll(Song song) {
 			return super.songs.removeIf(s -> s.equals(song));
 		}
-		
+
 		/**
 		 * Establece el nombre de la playlist.
 		 * 
@@ -195,7 +195,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		public void setName(String name) {
 			super.name = name;
 		}
-		
+
 		/**
 		 * Establece la descripción de la playlist.
 		 * 
@@ -270,7 +270,7 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	public List<Song> getSongs() {
 		return Collections.unmodifiableList(songs);
 	}
-	
+
 	/**
 	 * Comprueba si la playlist está vacía.
 	 * 
@@ -284,10 +284,10 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 	public String toString() {
 		return name;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		
+
 		if (obj == null) {
 			return false;
 		}
@@ -297,10 +297,10 @@ public abstract sealed class Playlist implements Mutable<Playlist.Internal> {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		
+
 		return this.asMut().equals(obj);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return this.asMut().hashCode();

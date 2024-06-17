@@ -44,7 +44,7 @@ public class SearchContainer extends JPanel {
 	private JPanel buttonsPanel;
 	private JDialog deleteDialog;
 	private PasswordField passInput;
-	
+
 	private List<Song> searched = new ArrayList<>();
 
 	public SearchContainer() {
@@ -98,7 +98,7 @@ public class SearchContainer extends JPanel {
 
 	private void initializeDeleteDialog() {
 		deleteDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), true);
-		deleteDialog.setIconImage( ImageScaler.loadImageIcon(iconPath, iconSize, iconSize).getImage());
+		deleteDialog.setIconImage(ImageScaler.loadImageIcon(iconPath, iconSize, iconSize).getImage());
 
 		JPanel panel = new JPanel();
 
@@ -168,32 +168,32 @@ public class SearchContainer extends JPanel {
 		deleteDialog.setResizable(false);
 		deleteDialog.setVisible(false);
 	}
-	
+
 	private void initializeAddToPlaylist() {
 		ResponsiveButton addToPlaylist = new ResponsiveButton(addToPlaylistText);
 		addToPlaylist.addActionListener(e -> addSongs());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 1;
 		constraints.weightx = 0.5;
 		constraints.insets = new Insets(5, 10, 10, 5);
 		constraints.fill = GridBagConstraints.BOTH;
-		
+
 		buttonsPanel.add(addToPlaylist, constraints);
 	}
-	
+
 	private void inititalizeReproduceSearch() {
 		ResponsiveButton reproduceSearch = new ResponsiveButton(reproduceSearchText);
 		reproduceSearch.addActionListener(e -> reproduceSearch());
-		
+
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		constraints.weightx = 0.5;
 		constraints.insets = new Insets(5, 5, 10, 10);
 		constraints.fill = GridBagConstraints.BOTH;
-		
+
 		buttonsPanel.add(reproduceSearch, constraints);
 	}
 
@@ -202,10 +202,11 @@ public class SearchContainer extends JPanel {
 		Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
 			@Override
 			public void onSongDelete(SongStatusEvent e) {
-				if (!e.isFailed()) deleteDialog.setVisible(false);
+				if (!e.isFailed())
+					deleteDialog.setVisible(false);
 				passInput.reset();
 			}
-			
+
 			@Override
 			public void onSongSearch(SongStatusEvent e) {
 				searched.clear();
@@ -213,19 +214,18 @@ public class SearchContainer extends JPanel {
 			}
 		});
 	}
-	
+
 	private void deleteSelectedSongs(String password) {
 		if (!passInput.isEmpty())
 			StateManager.INSTANCE.removeSelectedSongs(password);
 		passInput.reset();
 	}
-	
+
 	private void addSongs() {
 		StateManager.INSTANCE.addSelectedSongsToSelectedPlaylist();
 	}
-	
+
 	private void reproduceSearch() {
 		Player.INSTANCE.loadPlaylisy(searched);
 	}
 }
-

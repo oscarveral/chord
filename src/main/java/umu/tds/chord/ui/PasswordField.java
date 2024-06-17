@@ -11,14 +11,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 public class PasswordField extends JPasswordField {
-	
+
 	private static final long serialVersionUID = 283297421907688703L;
 	private static final String error = "Unsupported";
 	private static final char echo = '*';
 
 	private final String text;
 	private boolean empty;
-	
+
 	public PasswordField(String text) {
 		this.text = text;
 		this.empty = true;
@@ -39,12 +39,14 @@ public class PasswordField extends JPasswordField {
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (empty) silentTextChange(text, Color.GRAY, (char) 0);
+				if (empty)
+					silentTextChange(text, Color.GRAY, (char) 0);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (empty) silentTextChange(null, Color.BLACK, echo);
+				if (empty)
+					silentTextChange(null, Color.BLACK, echo);
 			}
 		});
 	}
@@ -68,14 +70,14 @@ public class PasswordField extends JPasswordField {
 			}
 		});
 	}
-	
+
 	private void initializeActionListener() {
 		addActionListener(e -> {
 			if (isFocusOwner())
 				transferFocus();
 		});
 	}
-	
+
 	private void silentTextChange(String text, Color color, char echo) {
 		DocumentListener[] listeners = ((AbstractDocument) getDocument()).getDocumentListeners();
 		Arrays.stream(listeners).forEach(((AbstractDocument) getDocument())::removeDocumentListener);
@@ -83,13 +85,13 @@ public class PasswordField extends JPasswordField {
 		setForeground(color);
 		setEchoChar(echo);
 		setCaretPosition(0);
-		Arrays.stream(listeners).forEach(((AbstractDocument) getDocument())::addDocumentListener);		
+		Arrays.stream(listeners).forEach(((AbstractDocument) getDocument())::addDocumentListener);
 	}
-	
+
 	public boolean isEmpty() {
 		return empty;
 	}
-	
+
 	public void reset() {
 		initializeText();
 	}

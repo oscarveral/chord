@@ -126,7 +126,7 @@ public class UserInfoPanel extends JPanel {
 					userName.setText(userPre + u.getUserName());
 					birthday.setText(birthdayPre + u.getPrintableBirthday());
 					premiumToggle.setSelected(u.isPremium());
-					premiumToggle.setText("<html>"+premiumText+"<br />"+u.getPremiumCost()+"€</html>");
+					premiumToggle.setText("<html>" + premiumText + "<br />" + u.getPremiumCost() + "€</html>");
 				}, () -> onUserLogout(e));
 			}
 

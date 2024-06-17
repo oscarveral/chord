@@ -11,26 +11,26 @@ import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 public class ResponsiveButton extends JButton {
-	
+
 	private static final long serialVersionUID = 6309429743716264399L;
 
 	public ResponsiveButton(String text) {
 		super(text);
-		
+
 		initializeActionMap();
 	}
-	
+
 	public ResponsiveButton(Icon icon) {
 		super(icon);
-		
+
 		initializeActionMap();
 	}
-	
+
 	public ResponsiveButton(String text, ImageIcon icon) {
 		this(text);
 		setIcon(icon);
 	}
-	
+
 	private void initializeActionMap() {
 		getActionMap().put(this, new AbstractAction() {
 

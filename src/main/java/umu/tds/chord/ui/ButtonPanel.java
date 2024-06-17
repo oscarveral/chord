@@ -31,28 +31,27 @@ public class ButtonPanel extends JPanel {
 	private static final String playlistsButtonIconPath = "/images/playlist_icon.png";
 	private static final String masReproducidasText = "Canciones más reproducidas";
 	private static final String masReproducidasIconPath = "/images/most.png";
-	
+
 	private ResponsiveButton masReproducidas;
-	
+
 	public ButtonPanel() {
 		GridBagLayout layout = new GridBagLayout();
 		setLayout(layout);
-		
+
 		initializeSearchButton();
 		initializePlaylistManagementButton();
 		initializeRecentSongsButton();
 		initializePlaylistsButton();
 		initializePlaylistsPanel();
 		initializeMasReproducidas();
-		
+
 		registerControllerListener();
-		
-		setBorder(BorderFactory.createTitledBorder
-				(BorderFactory.createLineBorder(Color.BLACK), buttonMenuTitle));
+
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), buttonMenuTitle));
 	}
-	
+
 	// ---------- Interfaz. ----------
-	
+
 	private void initializeSearchButton() {
 
 		ImageIcon icon = ImageScaler.loadImageIcon(searchButtonIconPath, iconSize, iconSize);
@@ -136,26 +135,26 @@ public class ButtonPanel extends JPanel {
 
 		add(playlistsPanel, constraints);
 	}
-	
+
 	private void initializeMasReproducidas() {
 		ImageIcon icon = ImageScaler.loadImageIcon(masReproducidasIconPath, iconSize, iconSize);
 
 		masReproducidas = new ResponsiveButton(masReproducidasText, icon);
 		masReproducidas.addActionListener(e -> StateManager.INSTANCE.triggerEvent(UIEvents.MAS_REPRODUCIDAS));
-		
+
 		GridBagConstraints masReproducidasC = new GridBagConstraints();
 		masReproducidasC.gridx = 0;
 		masReproducidasC.gridy = 4;
 		masReproducidasC.insets = new Insets(0, 10, 0, 10);
 		masReproducidasC.fill = GridBagConstraints.HORIZONTAL;
 		masReproducidasC.anchor = GridBagConstraints.PAGE_START;
-		
+
 		add(masReproducidas, masReproducidasC);
 	}
-	
+
 	private void registerControllerListener() {
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
-		
+
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				e.getUser().ifPresent(u -> {
@@ -167,12 +166,12 @@ public class ButtonPanel extends JPanel {
 					}
 				});
 			}
-			
+
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				onUserLogin(e);
 			}
-			
+
 			@Override
 			public void onUserMetadataChange(UserStatusEvent e) {
 				onUserLogin(e);

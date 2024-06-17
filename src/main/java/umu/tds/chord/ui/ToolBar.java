@@ -25,19 +25,19 @@ public class ToolBar extends JMenuBar {
 	private static final String noneDiscountText = "Ninguno";
 	private static final String elderDiscountText = "Descuento del 50% para mayores de 65 años";
 	private static final String temporaryDiscountText = "Descuento del 20% durante 3 meses";
-	
+
 	private JMenuItem pdf;
 	private JMenuItem noneDiscount;
 	private JMenuItem elderDiscount;
 	private JMenuItem temporaryDiscount;
-	
+
 	public ToolBar() {
 		initializeUtilities();
 		initializeDiscounts();
-		
+
 		registerControllerListeners();
 	}
-	
+
 	private void initializeUtilities() {
 		JMenu utilidades = new JMenu(utilidadesText);
 		pdf = new JMenuItem(genPDF);
@@ -46,7 +46,7 @@ public class ToolBar extends JMenuBar {
 		utilidades.add(pdf);
 		add(utilidades);
 	}
-	
+
 	private void initializeDiscounts() {
 		JMenu discounts = new JMenu(discountsText);
 		noneDiscount = new JMenuItem(noneDiscountText);
@@ -60,14 +60,14 @@ public class ToolBar extends JMenuBar {
 		discounts.add(temporaryDiscount);
 		add(discounts);
 	}
-	
+
 	private void registerControllerListeners() {
 		Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 			@Override
 			public void onUserLogin(UserStatusEvent e) {
 				resetDiscounts();
 				e.getUser().ifPresent(u -> {
-					setPDFGenerationStatus(u.isPremium());	
+					setPDFGenerationStatus(u.isPremium());
 					switch (u.getDiscount().getType()) {
 					case NONE:
 						noneDiscount.setEnabled(false);
@@ -83,25 +83,25 @@ public class ToolBar extends JMenuBar {
 					}
 				});
 			}
-			
+
 			@Override
 			public void onUserLogout(UserStatusEvent e) {
 				setPDFGenerationStatus(false);
 			}
-			
+
 			@Override
 			public void onUserMetadataChange(UserStatusEvent e) {
 				onUserLogin(e);
 			}
-		
+
 		});
 	}
-	
+
 	private void setPDFGenerationStatus(boolean available) {
 		pdf.setFocusable(available);
 		pdf.setEnabled(available);
 	}
-	
+
 	private void genPDF() {
 		UIManager.put("FileChooser.readOnly", Boolean.FALSE);
 		JFileChooser fileChooser = new JFileChooser();
@@ -109,7 +109,7 @@ public class ToolBar extends JMenuBar {
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileHidingEnabled(false);
 		fileChooser.setDialogTitle(openFileDialogTitle);
-		
+
 		int res = fileChooser.showOpenDialog(SwingUtilities.getWindowAncestor(this));
 		if (res == JFileChooser.APPROVE_OPTION) {
 			// Obtener la ruta del directorio seleccionado.
@@ -120,13 +120,13 @@ public class ToolBar extends JMenuBar {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-		}		
+		}
 	}
-	
+
 	private void applyDiscount(Type t) {
 		Controller.INSTANCE.changeUserDiscount(t);
 	}
-	
+
 	private void resetDiscounts() {
 		noneDiscount.setEnabled(true);
 		elderDiscount.setEnabled(true);

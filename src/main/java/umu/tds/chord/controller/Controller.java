@@ -47,25 +47,25 @@ public enum Controller {
 
 	private static final String adminUser = "admin";
 	private static final String pdfTitle = "Chord. Resumen del usuario ";
-	
+
 	private BuscadorCanciones buscadorCanciones;
-	
+
 	private Optional<User> currentUser;
 
 	private Set<SongStatusListener> songStatusListeners;
 	private Set<UserStatusListener> userStatusListeners;
-	
+
 	private Controller() {
 		registerCancionesListener();
 
 		currentUser = Optional.empty();
-		
+
 		userStatusListeners = new HashSet<>();
 		songStatusListeners = new HashSet<>();
 	}
-	
+
 	// ---------- Métodos del controlador. ----------
-	
+
 	/**
 	 * Método para registrar un nuevo usuario en la aplicación.
 	 * 
@@ -79,16 +79,17 @@ public enum Controller {
 	public boolean register(String username, String password, Date birthday) {
 		return UserRepository.INSTANCE.addUser(username, password, birthday);
 	}
-	
+
 	/**
 	 * Método para iniciar sesión en el controlador como un determinado usuario.
 	 * 
 	 * @param username Nombre de usuario.
 	 * @param password Contraseña del usuario.
 	 * 
-	 * @return {@code true} si no había un usuario con sesion iniciada y hubo 
-	 * éxito iniciando sesión con el usuario especificado. {@code false} si ya 
-	 * había un usuario con sesión iniciada o en cualquier otro caso de error.
+	 * @return {@code true} si no había un usuario con sesion iniciada y hubo éxito
+	 *         iniciando sesión con el usuario especificado. {@code false} si ya
+	 *         había un usuario con sesión iniciada o en cualquier otro caso de
+	 *         error.
 	 */
 	public boolean login(String username, String password) {
 		if (currentUser.isEmpty()) {
@@ -101,17 +102,17 @@ public enum Controller {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Método para cerrar la sesión del usuario actual del controlador, 
-	 * actualizando toda su información en persistencia.
+	 * Método para cerrar la sesión del usuario actual del controlador, actualizando
+	 * toda su información en persistencia.
 	 * 
-	 * @return {@code true} si no había usuario con sesión iniciada o se pudo 
-	 * cerrar la sesión de forma satisfactoria. {@code false} si hubo algún 
-	 * error cerrando la sesión.
+	 * @return {@code true} si no había usuario con sesión iniciada o se pudo cerrar
+	 *         la sesión de forma satisfactoria. {@code false} si hubo algún error
+	 *         cerrando la sesión.
 	 * 
-	 * @implNote Un fallo de cierre de sesión abortará todo el proceso, 
-	 * manteniendo la sesión iniciada.
+	 * @implNote Un fallo de cierre de sesión abortará todo el proceso, manteniendo
+	 *           la sesión iniciada.
 	 */
 	public boolean logout() {
 		currentUser.ifPresent(u -> {
@@ -125,17 +126,17 @@ public enum Controller {
 		});
 		return currentUser.isEmpty();
 	}
-	
+
 	/**
-	 * Método para eliminar la cuenta del usuario con la sesión iniciada 
-	 * actualmente. 
+	 * Método para eliminar la cuenta del usuario con la sesión iniciada
+	 * actualmente.
 	 * 
-	 * @return {@code true} si no había usuario con sesión iniciada o se pudo
-	 * cerrar la sesión y eliminar el usuario de forma satisfactoria. {@code 
+	 * @return {@code true} si no había usuario con sesión iniciada o se pudo cerrar
+	 *         la sesión y eliminar el usuario de forma satisfactoria. {@code 
 	 * false} si hubo algún error durante la eliminación.
 	 * 
-	 * @implNote Un fallo de eliminación abortará todo el proceso, manteniendo
-	 * la sesión iniciada.
+	 * @implNote Un fallo de eliminación abortará todo el proceso, manteniendo la
+	 *           sesión iniciada.
 	 */
 	public boolean remove() {
 		currentUser.ifPresent(u -> {
@@ -149,7 +150,7 @@ public enum Controller {
 		});
 		return currentUser.isEmpty();
 	}
-	
+
 	/**
 	 * Método para cambiar el estado premium del usuario actual.
 	 */
@@ -160,7 +161,7 @@ public enum Controller {
 			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
 		});
 	}
-	
+
 	/**
 	 * Método para cambiar el estado de favorito de una canción para el usuario
 	 * actual.
@@ -170,19 +171,19 @@ public enum Controller {
 	public void toggleFavourite(Song s) {
 		currentUser.ifPresent(u -> {
 			boolean isFavourite = u.getFavouriteSongs().contains(s);
-			
-			if (isFavourite) u.asMut().removeFavouriteSong(s);
-			else u.asMut().addFavouriteSong(s);
-			
+
+			if (isFavourite)
+				u.asMut().removeFavouriteSong(s);
+			else
+				u.asMut().addFavouriteSong(s);
+
 			UserStatusEvent e = new UserStatusEvent(this, u);
-			
+
 			// Avisar a interesados.
-			userStatusListeners.forEach(l -> 
-				l.onFavouriteSongsUpdate(e)
-			);
+			userStatusListeners.forEach(l -> l.onFavouriteSongsUpdate(e));
 		});
 	}
-	
+
 	/**
 	 * Añade una canción a la lista de recientes del usuario.
 	 * 
@@ -195,7 +196,7 @@ public enum Controller {
 			userStatusListeners.forEach(l -> l.onRecentSongsUpdate(e));
 		});
 	}
-	
+
 	/**
 	 * Realiza una búsqueda de canciones a partir de los filtros proporcionados.
 	 * 
@@ -206,55 +207,52 @@ public enum Controller {
 	 */
 	public void searchSongs(Optional<String> n, Optional<String> a, Optional<String> s, boolean f) {
 		// No se permiten búsquedas sin una sesión abierta.
-		if (!currentUser.isPresent()) return;
-		
+		if (!currentUser.isPresent())
+			return;
+
 		// Buscar y eliminar las que no coincidan con el filtro de favorito.
 		List<Song> searched = new ArrayList<>(SongRepository.INSTANCE.getSearch(n, a, s));
 		// Si se buscan favoritas eliminar las no favoritas.
-		if (f) searched.removeIf(song -> 
-			!currentUser.get().getFavouriteSongs().contains(song)
-		);
-				
+		if (f)
+			searched.removeIf(song -> !currentUser.get().getFavouriteSongs().contains(song));
+
 		// Pasar la infomración a los escuchadores interesados.
 		SongStatusEvent e = new SongStatusEvent(this);
 		e.setSongs(searched);
 		songStatusListeners.forEach(l -> l.onSongSearch(e));
 	}
-	
+
 	/**
 	 * Elimina la selección actual de canciones del repositorio.
 	 */
 	public void removeSongs(List<Song> list, String password) {
-		
-		boolean canDelete = currentUser.isPresent() && 
-							currentUser.get().getUserName().equals(adminUser) && 
-							currentUser.get().checkPassword(password);
-		
+
+		boolean canDelete = currentUser.isPresent() && currentUser.get().getUserName().equals(adminUser)
+				&& currentUser.get().checkPassword(password);
+
 		SongStatusEvent e = new SongStatusEvent(this);
-		
+
 		if (!canDelete) {
 			e.setFailed(true);
 			songStatusListeners.forEach(l -> l.onSongDelete(e));
 			return;
 		}
-				
+
 		// Eliminar canciones.
 		list.forEach(s -> {
 			if (SongRepository.INSTANCE.removeSong(s))
 				e.addSong(s);
 		});
-		
+
 		songStatusListeners.forEach(l -> l.onSongDelete(e));
-		
+
 		// Reenviar canciones favoritas. Han podido cambiar.
 		currentUser.ifPresent(u -> {
 			UserStatusEvent ev = new UserStatusEvent(this, u);
-			userStatusListeners.forEach(l -> 
-				l.onFavouriteSongsUpdate(ev)
-			);
+			userStatusListeners.forEach(l -> l.onFavouriteSongsUpdate(ev));
 		});
 	}
-	
+
 	/**
 	 * Método para indicar al controlador que realice un envío inicial de datos
 	 * necesarios.
@@ -264,11 +262,11 @@ public enum Controller {
 		SongRepository.INSTANCE.getSongs().forEach(e::addSong);
 		songStatusListeners.forEach(l -> l.onSongLoad(e));
 	}
-	
+
 	/**
 	 * Método para crear una playlists para el usuario actual.
 	 * 
-	 * @param name Nombre de la playlists.
+	 * @param name        Nombre de la playlists.
 	 * @param description Descripción de la playlist.
 	 */
 	public void createPlaylist(String name, String description) {
@@ -281,7 +279,7 @@ public enum Controller {
 			UserRepository.INSTANCE.updateUser(u);
 		});
 	}
-	
+
 	/**
 	 * Método para eliminar una playlists del usuario.
 	 * 
@@ -289,17 +287,17 @@ public enum Controller {
 	 */
 	public void removePlaylist(Playlist p) {
 		currentUser.ifPresent(u -> {
-			if(u.asMut().removePlaylist(p)) {
+			if (u.asMut().removePlaylist(p)) {
 				UserStatusEvent e = new UserStatusEvent(this, u);
 				userStatusListeners.forEach(l -> l.onPlaylistsListUpdate(e));
 				UserRepository.INSTANCE.updateUser(u);
 			}
 		});
 	}
-	
+
 	/**
-	 * Añade las canciones de la lista proporcionada a la playlist proporcionada
-	 * si esta pertenece al usuario con la sesión actual.
+	 * Añade las canciones de la lista proporcionada a la playlist proporcionada si
+	 * esta pertenece al usuario con la sesión actual.
 	 * 
 	 * @param p Playlists a la que se añadirán las canciones.
 	 * @param l Lista de canciones que se desean añadir.
@@ -314,7 +312,7 @@ public enum Controller {
 			}
 		});
 	}
-	
+
 	/**
 	 * Elimina las canciones de la lista proporcionada a la playlist proporcionada
 	 * si esta pertenece al usuario con la sesión actual.
@@ -330,9 +328,9 @@ public enum Controller {
 				userStatusListeners.forEach(li -> li.onPlaylistsListUpdate(e));
 				UserRepository.INSTANCE.updateUser(u);
 			}
-		});	
+		});
 	}
-	
+
 	/**
 	 * Genera un PDF resumen con las playlist y canciones del usuario.
 	 * 
@@ -340,7 +338,8 @@ public enum Controller {
 	 */
 	public void genPDF(String path) {
 		currentUser.ifPresent(u -> {
-			if (!u.isPremium()) return;
+			if (!u.isPremium())
+				return;
 			try {
 				FileOutputStream fichero = new FileOutputStream(path + "/" + u.getUserName() + ".pdf");
 				Document documento = new Document();
@@ -361,7 +360,7 @@ public enum Controller {
 						lista.add(i);
 					});
 					pla.add(lista);
-					playlistList.add(pla);			
+					playlistList.add(pla);
 				});
 				documento.add(playlistList);
 				documento.close();
@@ -370,7 +369,7 @@ public enum Controller {
 			}
 		});
 	}
-	
+
 	/**
 	 * Inicia sesión en github utilizando un fichero github.properties.
 	 * 
@@ -382,7 +381,7 @@ public enum Controller {
 		try {
 			GitHub g = GitHubBuilder.fromPropertyFile(githubPropertiesPath).build();
 			if (g.isCredentialValid()) {
-				
+
 				String username = "github/" + g.getMyself().getLogin();
 				String pass = String.valueOf(g.getMyself().getId());
 				Date birth = g.getMyself().getCreatedAt();
@@ -391,11 +390,12 @@ public enum Controller {
 				UserRepository.INSTANCE.addUser(username, pass, birth);
 				return login(username, pass);
 			}
-		} catch (IOException e) {}
-		
+		} catch (IOException e) {
+		}
+
 		return false;
 	}
-	
+
 	/**
 	 * Método para cambiar el descuento que se desea aplicar a usuario.
 	 * 
@@ -409,7 +409,7 @@ public enum Controller {
 			userStatusListeners.forEach(l -> l.onUserMetadataChange(e));
 		});
 	}
-	
+
 	/**
 	 * Incrementa en 1 las reproducciones de la canción seleccionada.
 	 * 
@@ -419,7 +419,7 @@ public enum Controller {
 		s.asMut().addReproduccion();
 		SongRepository.INSTANCE.updateSong(s);
 	}
-	
+
 	/**
 	 * Actualiza la información de una playlist del usuario.
 	 * 
@@ -430,7 +430,7 @@ public enum Controller {
 	public void updatePlaylist(Playlist p, String n, String d) {
 		currentUser.ifPresent(u -> {
 			if (PlaylistFactory.updatePlaylist(p, n, d)) {
-				UserRepository.INSTANCE.updateUser(u);	
+				UserRepository.INSTANCE.updateUser(u);
 				UserStatusEvent e = new UserStatusEvent(this, u);
 				userStatusListeners.forEach(l -> l.onPlaylistsListUpdate(e));
 			}
@@ -458,7 +458,7 @@ public enum Controller {
 	private void processSongData(Optional<Canciones> c) {
 		// Se crea un evento de estado de canciones.
 		SongStatusEvent e = new SongStatusEvent(this);
-		
+
 		// No hacer nada en fallo.
 		if (c.isEmpty()) {
 			e.setFailed(true);
@@ -474,7 +474,7 @@ public enum Controller {
 			String style = s.getEstilo();
 			SongRepository.INSTANCE.addSong(name, author, url, style).ifPresent(e::addSong);
 		});
-		
+
 		// Envío del evento.
 		songStatusListeners.forEach(l -> l.onSongLoad(e));
 	}
@@ -488,7 +488,7 @@ public enum Controller {
 		buscadorCanciones = CargadorCanciones.INSTANCE;
 		buscadorCanciones.addCancionesListener(e -> processSongData(e.getCanciones()));
 	}
-	
+
 	// ---------- Listeners. ----------
 
 	/**
@@ -526,15 +526,15 @@ public enum Controller {
 	public void removeUserStatusListener(UserStatusListener l) {
 		userStatusListeners.remove(l);
 	}
-	
+
 	// ---------- Depuración. ----------
-	
+
 	/**
 	 * @apiNote ALERTA. Método de depuración.
 	 * 
-	 * Fuerza un reseteo del estado del controlador, vaciando las listas con los
-	 * listeners de eventos y quitando el usuario actual de forma forzada
-	 * actualizando sus datos en el caso de que hubiese cambios.
+	 *          Fuerza un reseteo del estado del controlador, vaciando las listas
+	 *          con los listeners de eventos y quitando el usuario actual de forma
+	 *          forzada actualizando sus datos en el caso de que hubiese cambios.
 	 */
 	public void clearControllerState() {
 		currentUser.ifPresent(u -> {

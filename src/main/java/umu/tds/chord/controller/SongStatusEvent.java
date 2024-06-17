@@ -7,16 +7,16 @@ import java.util.List;
 import umu.tds.chord.model.Song;
 
 /**
- * Clase que representa el estado de los eventos producidos que tienen que 
- * ver con las canciones.
+ * Clase que representa el estado de los eventos producidos que tienen que ver
+ * con las canciones.
  */
-public class SongStatusEvent extends EventObject{
+public class SongStatusEvent extends EventObject {
 
 	private static final long serialVersionUID = 7708870295969293430L;
-	
+
 	private List<Song> songs;
 	private boolean failed;
-	
+
 	/**
 	 * Constructor por defecto.
 	 * 
@@ -24,11 +24,11 @@ public class SongStatusEvent extends EventObject{
 	 */
 	public SongStatusEvent(Object source) {
 		super(source);
-		
+
 		this.songs = new ArrayList<>();
 		this.failed = false;
 	}
-	
+
 	/**
 	 * Obtiene la lista de canciones del evento.
 	 * 
@@ -37,16 +37,16 @@ public class SongStatusEvent extends EventObject{
 	public List<Song> getSongs() {
 		return songs;
 	}
-	
+
 	protected void addSong(Song song) {
 		songs.add(song);
 	}
-	
+
 	protected void setSongs(List<Song> list) {
 		songs.clear();
 		songs.addAll(list);
 	}
-	
+
 	/**
 	 * Indica que se ha producido un fallo.
 	 * 
@@ -55,7 +55,7 @@ public class SongStatusEvent extends EventObject{
 	public boolean isFailed() {
 		return failed;
 	}
-	
+
 	/**
 	 * Establece el estado de fallo del evento.
 	 * 

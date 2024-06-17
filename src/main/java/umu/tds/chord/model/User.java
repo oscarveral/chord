@@ -22,12 +22,12 @@ import umu.tds.chord.utils.StringHasher;
  * de datos.
  */
 public abstract sealed class User implements Mutable<User.Internal> {
-	
+
 	private static final double premiumBaseCost = 30.0;
 	private static final int maxRecentSongs = 100;
 
 	private final DateFormat printableDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-	
+
 	/**
 	 * Clase constructora de usuarios.
 	 */
@@ -160,7 +160,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 			recentSongs.forEach(s -> this.recentSongs.addLast(s));
 			return this;
 		}
-		
+
 		/**
 		 * Establece el descuento que está utilizando el usuario.
 		 * 
@@ -228,7 +228,8 @@ public abstract sealed class User implements Mutable<User.Internal> {
 		 * @param recentSong Canción que se desea añadir a la lista.
 		 */
 		public void addRecentSong(Song recentSong) {
-			if (super.recentSongs.size() == maxRecentSongs) super.recentSongs.pollLast();
+			if (super.recentSongs.size() == maxRecentSongs)
+				super.recentSongs.pollLast();
 			super.recentSongs.addFirst(recentSong);
 		}
 
@@ -317,7 +318,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 			super.isPremium = premium;
 			return super.isPremium;
 		}
-		
+
 		/**
 		 * Establece el descuento que aplicar al usuario.
 		 * 
@@ -386,9 +387,9 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	public Date getBirthday() {
 		return birthday;
 	}
-	
+
 	public String getPrintableBirthday() {
-        return printableDateFormat.format(birthday);  
+		return printableDateFormat.format(birthday);
 	}
 
 	/**
@@ -448,7 +449,7 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	public boolean isPremium() {
 		return isPremium;
 	}
-	
+
 	/**
 	 * Obtiene el descuento actual aplicado al usuario.
 	 * 
@@ -457,14 +458,15 @@ public abstract sealed class User implements Mutable<User.Internal> {
 	public Discount getDiscount() {
 		return discount;
 	}
-	
+
 	/**
 	 * Obtiene el precio del premium para el usuario.
 	 * 
 	 * @return Precio del premium del usuario.
 	 */
 	public double getPremiumCost() {
-		if (discount.aplicable(this)) return discount.getDiscountFactor() * premiumBaseCost;
+		if (discount.aplicable(this))
+			return discount.getDiscountFactor() * premiumBaseCost;
 		return premiumBaseCost;
 	}
 }

@@ -26,20 +26,20 @@ import umu.tds.chord.model.Song;
 public enum Player {
 
 	INSTANCE;
-		
+
 	private static final String virtualName = "Búsqueda";
-	
+
 	private Deque<Song> cola;
 	private Deque<Song> log;
 
 	private Optional<Song> currentSong;
 	private Optional<Playlist> playlist;
 	private Optional<MediaPlayer> reproductor;
-	
+
 	private Set<PlayerStatusListener> playStatusListeners;
-	
+
 	private boolean randomMode;
-	
+
 	private Player() {
 		cola = new ArrayDeque<>();
 		log = new ArrayDeque<>();
@@ -50,19 +50,20 @@ public enum Player {
 		playStatusListeners = new HashSet<>();
 		randomMode = false;
 
-		Platform.startup(() -> {});
+		Platform.startup(() -> {
+		});
 	}
-	
+
 	private void notifyState() {
 		PlayerStatusEvent e = buildNotification();
 		playStatusListeners.forEach(l -> l.onSongReproduction(e));
 	}
-	
+
 	private void notifyProgress() {
 		PlayerStatusEvent e = buildNotification();
 		playStatusListeners.forEach(l -> l.onSongProgress(e));
 	}
-	
+
 	private PlayerStatusEvent buildNotification() {
 		PlayerStatusEvent e = new PlayerStatusEvent(this);
 		currentSong.ifPresent(e::setSong);
@@ -70,7 +71,7 @@ public enum Player {
 		reproductor.ifPresent(r -> e.setProgress(getProgress()));
 		return e;
 	}
-	
+
 	private double getProgress() {
 		double res = 0.0;
 		if (reproductor.isPresent() && reproductor.get().getStatus() != Status.UNKNOWN) {
@@ -80,7 +81,7 @@ public enum Player {
 		}
 		return res;
 	}
-	
+
 	private void loadSong() {
 		// Desechado del reproductor antiguo.
 		reproductor.ifPresent(MediaPlayer::dispose);
@@ -89,7 +90,8 @@ public enum Player {
 		currentSong.ifPresent(s -> {
 			try {
 				// Crear la ruta a la canción.
-				Path mp3 = Path.of(System.getProperty("java.io.tmpdir"), String.valueOf(Integer.toUnsignedLong(s.hashCode())) + ".mp3");
+				Path mp3 = Path.of(System.getProperty("java.io.tmpdir"),
+						String.valueOf(Integer.toUnsignedLong(s.hashCode())) + ".mp3");
 				// Descarga de la canción si no existe.
 				if (!Files.exists(mp3)) {
 					mp3 = Files.createFile(mp3);
@@ -105,15 +107,16 @@ public enum Player {
 					r.setOnEndOfMedia(this::siguiente);
 					r.currentTimeProperty().addListener(o -> notifyProgress());
 				});
-			} 
-			catch (Exception e1) {}
+			} catch (Exception e1) {
+			}
 		});
 	}
-	
+
 	private void fillCola() {
 		playlist.ifPresent(p -> {
 			int size = p.getSongs().size();
-			if (size == 0) return;
+			if (size == 0)
+				return;
 			// En modo aleatorio se randomiza el orden.
 			if (randomMode) {
 				List<Song> tmp = new ArrayList<>(p.getSongs());
@@ -125,20 +128,20 @@ public enum Player {
 			p.getSongs().forEach(s -> cola.addLast(s));
 		});
 	}
-	
+
 	private void clearCola() {
 		// Limpiar la cola de la playlist actual implica eliminar desde el final
 		// una canción por cada una que tenga la playlist.
 		playlist.ifPresent(play -> play.getSongs().forEach(s -> cola.pollLast()));
 	}
-	
+
 	private void endReproduction() {
 		currentSong = Optional.empty();
 		reproductor.ifPresent(MediaPlayer::dispose);
 		reproductor = Optional.empty();
 		notifyState();
 	}
-	
+
 	protected void clearState() {
 		cola.clear();
 		playlist = Optional.empty();
@@ -149,10 +152,10 @@ public enum Player {
 		log.clear();
 		notifyState();
 	}
-		
+
 	/**
-	 * Reproduce una canción dada con prioridad sobre lo que suena actualmente.
-	 * Este método no agrega la canción que suena actualmente al historial de
+	 * Reproduce una canción dada con prioridad sobre lo que suena actualmente. Este
+	 * método no agrega la canción que suena actualmente al historial de
 	 * reproducción canciones del reproductor.
 	 * 
 	 * @param s Canción que se desea reproducir.
@@ -167,11 +170,11 @@ public enum Player {
 		});
 		notifyState();
 	}
-	
+
 	/**
-	 * Reproduce la canción dada con prioridad asegurando que la canción
-	 * que estaba sonando anteriormente se agrega al historial de reproducción 
-	 * de canciones del reproductor.
+	 * Reproduce la canción dada con prioridad asegurando que la canción que estaba
+	 * sonando anteriormente se agrega al historial de reproducción de canciones del
+	 * reproductor.
 	 * 
 	 * @param s Canción que se desea reproducir.
 	 */
@@ -179,23 +182,24 @@ public enum Player {
 		currentSong.ifPresent(song -> log.addLast(song));
 		reproduce(s);
 	}
-	
+
 	/**
-	 * Establece la playlist dada como playlis que se debe reproducir y agrega
-	 * sus canciones a la cola actual de reproducción.
+	 * Establece la playlist dada como playlis que se debe reproducir y agrega sus
+	 * canciones a la cola actual de reproducción.
 	 * 
 	 * @param p Playlist que se desea reproducir.
 	 */
 	public void loadPlaylist(Playlist p) {
 		// Se quitan los datos de la playlist anterior y se cargan los nuevos.
 		clearCola();
-		playlist = Optional.ofNullable(PlaylistFactory.clonePlaylist(p).get());	
+		playlist = Optional.ofNullable(PlaylistFactory.clonePlaylist(p).get());
 		fillCola();
 		// Si no hay nada sonado debe sonar la siguiente canción.
-		if (reproductor.isEmpty()) siguiente();
+		if (reproductor.isEmpty())
+			siguiente();
 		notifyState();
 	}
-	
+
 	/**
 	 * Reproduce una lista de canciones como una playlist virtual cuyo nombre es
 	 * {@link Player#virtualName}.
@@ -208,24 +212,24 @@ public enum Player {
 			loadPlaylist(p);
 		});
 	}
-	
+
 	/**
 	 * Pausa la reproducción de la canción actual.
 	 */
 	public void pausar() {
 		reproductor.ifPresent(MediaPlayer::pause);
 	}
-	
+
 	/**
 	 * Reanuda la reproducción de la canción actual.
 	 */
 	public void reanudar() {
 		reproductor.ifPresent(MediaPlayer::play);
 	}
-	
+
 	/**
-	 * Reproduce la próxima canción en la cola o la próxima canción de la 
-	 * playlist si la cola estaba vacía.
+	 * Reproduce la próxima canción en la cola o la próxima canción de la playlist
+	 * si la cola estaba vacía.
 	 */
 	public void siguiente() {
 		currentSong.ifPresent(s -> log.addLast(s));
@@ -233,27 +237,28 @@ public enum Player {
 			fillCola();
 		}
 		reproduce(cola.pollFirst());
-	}	
+	}
+
 	/**
 	 * Reproduce la canción anterior de la playlist.
 	 */
 	public void anterior() {
 		currentSong.ifPresent(s -> cola.addFirst(s));
 		if (log.isEmpty()) {
-			endReproduction();	
+			endReproduction();
 			return;
 		}
 		reproduce(log.pollLast());
 	}
-	
+
 	/**
-	 * Para la reproducción de la canción actual empezando desde el principio
-	 * dicha canción cuando se continue la reproducción.
+	 * Para la reproducción de la canción actual empezando desde el principio dicha
+	 * canción cuando se continue la reproducción.
 	 */
 	public void stop() {
 		reproductor.ifPresent(MediaPlayer::stop);
 	}
-	
+
 	/**
 	 * Añade la lista de canciones proporcionadas a la cola.
 	 * 
@@ -261,10 +266,11 @@ public enum Player {
 	 */
 	public void addCola(List<Song> l) {
 		l.forEach(s -> cola.addFirst(s));
-		if (reproductor.isEmpty()) siguiente();
+		if (reproductor.isEmpty())
+			siguiente();
 		notifyState();
 	}
-	
+
 	/**
 	 * Establece el modo aleatorio de reproducción.
 	 * 
@@ -275,8 +281,8 @@ public enum Player {
 		clearCola();
 		randomMode = random;
 		fillCola();
- 	}
-	
+	}
+
 	/**
 	 * Cambia la reproducción al progreso especificado.
 	 * 
@@ -289,7 +295,7 @@ public enum Player {
 			r.seek(newDuration);
 		});
 	}
-	
+
 	/**
 	 * Registra un listener de estado de reproducción.
 	 * 
@@ -298,7 +304,7 @@ public enum Player {
 	public void registerPlayStatusListener(PlayerStatusListener l) {
 		playStatusListeners.add(l);
 	}
-	
+
 	/**
 	 * Elimina un listener de estado de reporducción.
 	 * 

@@ -13,9 +13,9 @@ public class SearchResultPanel extends JPanel {
 
 	public SearchResultPanel() {
 		setLayout(new BorderLayout(10, 10));
-		initializeTable();	
+		initializeTable();
 	}
-	
+
 	private void initializeTable() {
 		SongTable table = new SongTable(Mode.SEARCH);
 		JScrollPane scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

@@ -26,21 +26,18 @@ import umu.tds.chord.model.Song;
 public class SongTable extends JTable {
 
 	private static final long serialVersionUID = 7439318313367847560L;
-	
+
 	private SongTableModel data;
-	
+
 	public enum Mode {
-		STANDARD,
-		EXTENDED,
-		SEARCH,
-		RECENT,
+		STANDARD, EXTENDED, SEARCH, RECENT,
 	}
 
 	public SongTable(Mode mode) {
 		data = new SongTableModel();
 		setModel(data);
 		initializeInteractivity();
-		
+
 		switch (mode) {
 		case STANDARD:
 			data.setUpStandardMode();
@@ -58,15 +55,16 @@ public class SongTable extends JTable {
 			break;
 		}
 	}
-	
+
 	private void initializeInteractivity() {
 		setAutoCreateRowSorter(true);
 		setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		getSelectionModel().addListSelectionListener(e -> {
-				
+
 			// Evitar doble selección.
-			if (e.getValueIsAdjusting()) return;
-			
+			if (e.getValueIsAdjusting())
+				return;
+
 			// Obtenemos las canciones seleccionadas.
 			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
@@ -75,9 +73,9 @@ public class SongTable extends JTable {
 			if (!lsm.isSelectionEmpty())
 				for (int i : lsm.getSelectedIndices()) {
 					int index = getRowSorter().convertRowIndexToModel(i);
-					Song s  = ((SongTableModel) getModel()).getList().get(index);
+					Song s = ((SongTableModel) getModel()).getList().get(index);
 					StateManager.INSTANCE.addSelectedSong(s);
-			}
+				}
 
 		});
 		addMouseListener(new MouseAdapter() {
@@ -95,21 +93,25 @@ public class SongTable extends JTable {
 				StateManager.INSTANCE.clearSelectedSongs();
 				clearSelection();
 			}
+
 			@Override
-			public void ancestorMoved(AncestorEvent event) {}
+			public void ancestorMoved(AncestorEvent event) {
+			}
+
 			@Override
-			public void ancestorAdded(AncestorEvent event) {}
+			public void ancestorAdded(AncestorEvent event) {
+			}
 		});
 	}
-	
+
 	public void loadSongList(List<Song> songs) {
 		data.setList(songs);
 	}
-		
+
 	private final class SongTableModel extends AbstractTableModel {
 
 		private static final long serialVersionUID = 7161104567245200626L;
-		private static final String[] columnNames = { "Título", "Intérprete", "Estilo", "Favorito", "Reproducciones"};
+		private static final String[] columnNames = { "Título", "Intérprete", "Estilo", "Favorito", "Reproducciones" };
 
 		private List<Song> songs;
 		private Set<Song> favourites;
@@ -188,7 +190,7 @@ public class SongTable extends JTable {
 			this.songs.addAll(songs);
 			fireTableDataChanged();
 		}
-	
+
 		public void setFavourites(Set<Song> favourites) {
 			this.favourites.clear();
 			this.favourites.addAll(favourites);
@@ -206,7 +208,7 @@ public class SongTable extends JTable {
 		private void toggleFavourite(Song s) {
 			Controller.INSTANCE.toggleFavourite(s);
 		}
-		
+
 		private void setUpExtendedMode() {
 			Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 
@@ -219,7 +221,7 @@ public class SongTable extends JTable {
 				public void onFavouriteSongsUpdate(UserStatusEvent e) {
 					onUserLogin(e);
 				}
-				
+
 				@Override
 				public void onUserLogout(UserStatusEvent e) {
 					getRowSorter().setSortKeys(null);
@@ -243,7 +245,7 @@ public class SongTable extends JTable {
 					fireTableDataChanged();
 				}
 			});
-			
+
 			Player.INSTANCE.registerPlayStatusListener(new PlayerStatusListener() {
 				@Override
 				public void onSongReproduction(PlayerStatusEvent e) {
@@ -251,7 +253,7 @@ public class SongTable extends JTable {
 				}
 			});
 		}
-		
+
 		private void setUpSearchMode() {
 			removeExtendedColumns();
 			Controller.INSTANCE.registerSongStatusListener(new SongStatusListener() {
@@ -269,30 +271,32 @@ public class SongTable extends JTable {
 						songs.removeAll(e.getSongs());
 					fireTableDataChanged();
 				}
-				
+
 				@Override
 				public void onSongSearch(SongStatusEvent e) {
-					if(!e.isFailed())
+					if (!e.isFailed())
 						setList(e.getSongs());
 				}
 			});
-			
+
 			Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
 				@Override
 				public void onUserLogin(UserStatusEvent e) {
 					e.getUser().ifPresent(u -> setFavourites(u.getFavouriteSongs()));
 				}
+
 				@Override
 				public void onFavouriteSongsUpdate(UserStatusEvent e) {
 					onUserLogin(e);
 				}
+
 				@Override
 				public void onUserLogout(UserStatusEvent e) {
 					getRowSorter().setSortKeys(null);
 				}
 			});
 		}
-		
+
 		private void setUpRecentMode() {
 			removeExtendedColumns();
 			Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
@@ -303,16 +307,17 @@ public class SongTable extends JTable {
 						setFavourites(u.getFavouriteSongs());
 					});
 				}
-				
+
 				@Override
 				public void onRecentSongsUpdate(UserStatusEvent e) {
 					onUserLogin(e);
 				}
-				
+
 				@Override
 				public void onFavouriteSongsUpdate(UserStatusEvent e) {
 					onUserLogin(e);
 				}
+
 				@Override
 				public void onUserLogout(UserStatusEvent e) {
 					getRowSorter().setSortKeys(null);
@@ -328,7 +333,7 @@ public class SongTable extends JTable {
 				}
 			});
 		}
-		
+
 		private void setUpStandardMode() {
 			removeExtendedColumns();
 			Controller.INSTANCE.registerUserStatusListener(new UserStatusListener() {
@@ -349,7 +354,7 @@ public class SongTable extends JTable {
 				}
 			});
 		}
-		
+
 		private void removeExtendedColumns() {
 			removeColumn(getColumnModel().getColumn(4));
 		}

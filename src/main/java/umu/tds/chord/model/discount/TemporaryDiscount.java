@@ -12,16 +12,16 @@ public class TemporaryDiscount extends Discount {
 	protected TemporaryDiscount(Date start, Date end) {
 		super(start, end);
 	}
-	
+
 	protected TemporaryDiscount() {
 		super(new Date(), DateConversor.convertToDate(LocalDateTime.now().plusMonths(3)));
 	}
-	
+
 	@Override
 	public boolean aplicable(User u) {
-		return DateConversor.covertToLocalDateTime(getEnd()).isAfter(LocalDateTime.now()) &&
-				DateConversor.covertToLocalDateTime(getStart()).isBefore(LocalDateTime.now());
-	
+		return DateConversor.covertToLocalDateTime(getEnd()).isAfter(LocalDateTime.now())
+				&& DateConversor.covertToLocalDateTime(getStart()).isBefore(LocalDateTime.now());
+
 	}
 
 	@Override

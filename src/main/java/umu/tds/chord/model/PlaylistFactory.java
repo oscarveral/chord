@@ -46,7 +46,7 @@ public final class PlaylistFactory {
 
 		return true;
 	}
-	
+
 	/**
 	 * Crea un clon de la playlist dada.
 	 * 
@@ -57,7 +57,8 @@ public final class PlaylistFactory {
 	 * @implNote El clon retornado no está registrado en persistencia.
 	 */
 	public static Optional<Playlist> clonePlaylist(Playlist p) {
-		return Optional.ofNullable(new Playlist.Builder(p.getName()).description(p.getDescription()).songs(p.getSongs()).build().get());
+		return Optional.ofNullable(
+				new Playlist.Builder(p.getName()).description(p.getDescription()).songs(p.getSongs()).build().get());
 	}
 
 }

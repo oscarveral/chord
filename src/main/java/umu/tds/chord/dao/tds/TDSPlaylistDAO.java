@@ -127,7 +127,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 				return Optional.empty();
 			}
 		}
-		
+
 		// Recuperación de la entidad.
 		Entidad ePlaylist = persistence.recuperarEntidad(id);
 		// Asegurar que el tipo es de Playlist.
@@ -164,7 +164,8 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 	@Override
 	public List<Playlist.Internal> recoverAll() {
 		return persistence.recuperarEntidades(Properties.PLAYLIST_ENTITY_TYPE.name()).stream()
-				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar errores.
+				.map(entity -> this.recover(entity.getId())).filter(Optional::isPresent).map(Optional::get) // Ignorar
+																											// errores.
 				.toList();
 	}
 
@@ -173,23 +174,23 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 	 */
 	@Override
 	public boolean register(Playlist.Internal p) {
-		
+
 		// Checks obligatorios.
 		if (p == null || p.isRegistered()) {
 			return false;
 		}
-		
+
 		// Comprobar si ya está registrado.
 		Entidad ePlaylist = null;
 		try {
 			ePlaylist = persistence.recuperarEntidad(p.getId());
 		} catch (NullPointerException e) {
 		}
-		
+
 		if (ePlaylist != null) {
 			return false;
 		}
-				
+
 		// Creación de la entidad.
 		ePlaylist = new Entidad();
 		ePlaylist.setNombre(Properties.PLAYLIST_ENTITY_TYPE.name());
@@ -206,7 +207,7 @@ public enum TDSPlaylistDAO implements DAO<Playlist.Internal> {
 		ePlaylist = persistence.registrarEntidad(ePlaylist);
 		p.registerId(ePlaylist.getId());
 		TDSPoolDAO.addPersistent(p);
-		
+
 		return true;
 	}
 }

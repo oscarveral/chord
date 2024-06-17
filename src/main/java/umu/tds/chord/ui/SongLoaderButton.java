@@ -18,16 +18,16 @@ public class SongLoaderButton extends Luz {
 	private static final String fileExtensionDesc = "Fichero XML (*.xml)";
 	private static final String fileExtension = ".xml";
 	private static final String openFileDialogTitle = "Abrir fichero de carga";
-	
+
 	private JFileChooser fileChooser;
-	
+
 	public SongLoaderButton() {
 		initializeFileChooser();
 		initializeEncendidoListener();
 	}
-	
+
 	// ---------- Interfaz. ----------
-	
+
 	private void initializeFileChooser() {
 		UIManager.put("FileChooser.readOnly", Boolean.TRUE);
 		fileChooser = new JFileChooser();
@@ -35,21 +35,22 @@ public class SongLoaderButton extends Luz {
 		fileChooser.setFileHidingEnabled(false);
 		fileChooser.setDialogTitle(openFileDialogTitle);
 		fileChooser.setFileFilter(new FileFilter() {
-				
-				@Override
-				public String getDescription() {
-					return fileExtensionDesc;
-				}
-				
-				@Override
-				public boolean accept(File f) {
-					if (f.isDirectory()) return true;
-					String filename = f.getName().toLowerCase();
-					return filename.endsWith(fileExtension);
-				}
-			});
+
+			@Override
+			public String getDescription() {
+				return fileExtensionDesc;
+			}
+
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory())
+					return true;
+				String filename = f.getName().toLowerCase();
+				return filename.endsWith(fileExtension);
+			}
+		});
 	}
-	
+
 	private void initializeEncendidoListener() {
 		addEncendidoListener(ev -> {
 			EncendidoEvent e = (EncendidoEvent) ev;
@@ -70,9 +71,9 @@ public class SongLoaderButton extends Luz {
 			}
 		});
 	}
-	
+
 	// ---------- Interacción con el controlador. ----------
-	
+
 	private void cargarCanciones(String path) {
 		Controller.INSTANCE.cargarCanciones(path);
 	}

@@ -15,48 +15,46 @@ import umu.tds.chord.model.PlaylistFactory;
 import umu.tds.chord.model.UserRepository;
 
 public class UserRepositoryTest {
-	
+
 	private static final String transientTestUsername = "TransientTestUser";
 	private static final String transientTestPassword = "TransientTestPassword";
 	private static final String persistentTestUsername = "PersistentTestUsername";
 	private static final String persistentTestPassword = "PersistentTestPassword";
 	private static final Date birthday = Date.from(Instant.now());
-	
-	private static final Playlist testPlaylist = PlaylistFactory.createPlaylist("TestPlaylist", "TestDescription").get();
-	
+
+	private static final Playlist testPlaylist = PlaylistFactory.createPlaylist("TestPlaylist", "TestDescription")
+			.get();
+
 	@BeforeClass
 	public static void beforeAll() {
 		// Eliminar usuario efímero de pruebas si existía.
-		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 		// Registrar usuario persistente de pruebas si no existía.
 		if (UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).isEmpty())
 			UserRepository.INSTANCE.addUser(persistentTestUsername, persistentTestPassword, birthday);
 	}
-	
+
 	@AfterClass
 	public static void afterAll() {
 		// Eliminar el usuario efímero de pruebas si existía.
-		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(transientTestUsername, transientTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 		// Eliminar usuario persistente de pruebas si existía.
-		UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).ifPresent(u -> 
-			UserRepository.INSTANCE.removeUser(u)
-		);
-		
+		UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword)
+				.ifPresent(u -> UserRepository.INSTANCE.removeUser(u));
+
 	}
-	
+
 	@After
 	public void after() {
 		// Añade el usuario persistente si fue borrado.
 		if (UserRepository.INSTANCE.getUser(persistentTestUsername, persistentTestPassword).isEmpty())
 			UserRepository.INSTANCE.addUser(persistentTestUsername, persistentTestPassword, birthday);
 	}
-	
+
 	@Test
 	public void testAddUser() {
 		boolean res1 = UserRepository.INSTANCE.addUser(transientTestUsername, transientTestPassword, birthday);

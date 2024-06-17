@@ -14,10 +14,10 @@ public class ResponsiveCheckBox extends JCheckBox {
 
 	public ResponsiveCheckBox(String text) {
 		super(text);
-		
+
 		initializeActionMap();
 	}
-	
+
 	private void initializeActionMap() {
 		getActionMap().put(this, new AbstractAction() {
 

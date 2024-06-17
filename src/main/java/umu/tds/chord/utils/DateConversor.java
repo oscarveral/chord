@@ -17,11 +17,9 @@ public class DateConversor {
 	 * @return Fecha convertida.
 	 */
 	public static LocalDateTime covertToLocalDateTime(Date date) {
-		return date.toInstant()
-			      .atZone(ZoneId.systemDefault())
-			      .toLocalDateTime();
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 	}
-	
+
 	/**
 	 * Método de conversión de fechas de {@link LocalDateTime} a {@link Date}.
 	 * 
@@ -30,7 +28,6 @@ public class DateConversor {
 	 * @return Fecha convertida.
 	 */
 	public static Date convertToDate(LocalDateTime date) {
-		return Date.from(date.atZone(ZoneId.systemDefault())
-			      .toInstant());	
+		return Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
 	}
 }

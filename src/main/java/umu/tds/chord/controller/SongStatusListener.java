@@ -12,19 +12,22 @@ public interface SongStatusListener extends EventListener {
 	 * 
 	 * @param e Evento de estado de canciones.
 	 */
-	public default void onSongLoad(SongStatusEvent e) {}
-	
+	public default void onSongLoad(SongStatusEvent e) {
+	}
+
 	/**
 	 * Emitido cuando se realiza una eliminación de canciones.
 	 * 
 	 * @param e Evento de estado de canciones.
 	 */
-	public default void onSongDelete(SongStatusEvent e) {}
-	
+	public default void onSongDelete(SongStatusEvent e) {
+	}
+
 	/**
 	 * Emitido cuando se hace una búsqueda de canciones.
 	 * 
 	 * @param e Evento de estado de canciones.
 	 */
-	public default void onSongSearch(SongStatusEvent e) {}
+	public default void onSongSearch(SongStatusEvent e) {
+	}
 }
