@@ -47,8 +47,8 @@ public class SongRepositoryTest {
 	@Test
 	public void testGetSearch() {
 		Optional<String> name = Optional.of(testSongName);
-		Optional<String> author = Optional.of(testSongName);
-		Optional<String> style = Optional.of(testSongName);
+		Optional<String> author = Optional.of(testAuthorName);
+		Optional<String> style = Optional.of(testStyle);
 
 		int size1 = SongRepository.INSTANCE.getSearch(name, author, style).size();
 		assertEquals(0, size1);

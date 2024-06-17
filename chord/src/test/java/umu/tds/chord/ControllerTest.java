@@ -23,7 +23,8 @@ public class ControllerTest {
 	private static final String persistentTestPassword = "PersistentTestPassword";
 	private static final Date birthday = Date.from(Instant.now());
 
-	private static final String songsXMLPath = "xml/canciones.xml";
+	// Atención a posibles fallos por ruta no válida.
+	private static final String songsXMLPath = "/users/human/Desktop/canciones.xml";
 	private static final int numberSongs = 6;
 	private static final int numberStyles = 7;
 
