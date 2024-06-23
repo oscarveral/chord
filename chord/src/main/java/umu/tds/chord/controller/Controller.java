@@ -467,7 +467,7 @@ public enum Controller {
 				try {
 					String songPath = songFile.getCanonicalPath();
 					String name = songFile.getName().split(Player.EXTENSION)[0];
-					String author = name.split("-")[0].replace('&', ' ');
+					String author = name.split("-")[0].replace('&', ',');
 					String title = name.split("-")[1];
 					SongRepository.INSTANCE.addSong(title, author, songPath, style).ifPresent(ev::addSong);
 				}
