@@ -111,7 +111,7 @@ public class ControllerTest {
 
 	@Test
 	public void testCargarCanciones() {
-		Controller.INSTANCE.cargarCanciones(songsXMLPath);
+		Controller.INSTANCE.cargarCancionesRemoto(songsXMLPath);
 		int numCanciones = SongRepository.INSTANCE.getSongs().size();
 		int numStilos = SongRepository.INSTANCE.getStyles().size();
 		assertEquals(numberSongs, numCanciones);

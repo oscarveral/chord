@@ -7,7 +7,7 @@ canciones a partir de ficheros XML.
 
 Se implementa un componente que habilita la carga de canciones desde la red
 mediante su especificación en un fichero XML. El fichero XML y su esquema
-necesario se encuentran bajo el directorio /xml de este proyecto. 
+necesario se encuentran bajo el directorio [/xml](xml/). 
 Se utiliza Internet Archive como repositorio de canciones que se pueden descargar.
 
 ```xml
@@ -17,7 +17,7 @@ Se utiliza Internet Archive como repositorio de canciones que se pueden descarga
 		<interprete>King Crimson </interprete>
 </cancion>
 ```
-Véase el fichero del directorio /xml para para obtener más ejemplos.
+Véase el fichero del directorio [/xml](xml/) para para obtener más ejemplos.
 
 ## Instalación.
 
@@ -30,7 +30,7 @@ mvn install
 
 Si se prefiere realizar una instalación manual, es posible generar un fichero 
 .jar y después isntalar manualmente el fichero generado en el repositorio local.
-Usualmente, se podrá encontrar el fichero generado en el directorio /target en 
+Usualmente, se podrá encontrar el fichero generado en el directorio [/target](target/) en 
 este proyecto.
 
 ```bash

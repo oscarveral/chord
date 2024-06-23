@@ -17,7 +17,7 @@ public class SongLoaderButton extends Luz {
 	private static final long serialVersionUID = 5506228270829859873L;
 	private static final String fileExtensionDesc = "Fichero XML (*.xml)";
 	private static final String fileExtension = ".xml";
-	private static final String openFileDialogTitle = "Abrir fichero de carga";
+	private static final String openFileDialogTitle = "Cargar canciones nuevas";
 
 	private JFileChooser fileChooser;
 
@@ -33,6 +33,7 @@ public class SongLoaderButton extends Luz {
 		fileChooser = new JFileChooser();
 		fileChooser.setMultiSelectionEnabled(false);
 		fileChooser.setFileHidingEnabled(false);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		fileChooser.setDialogTitle(openFileDialogTitle);
 		fileChooser.setFileFilter(new FileFilter() {
 
@@ -63,18 +64,13 @@ public class SongLoaderButton extends Luz {
 					File f = fileChooser.getSelectedFile();
 					try {
 						String path = f.getCanonicalPath();
-						cargarCanciones(path);
+						if (f.isDirectory()) Controller.INSTANCE.cargarCancionesLocal(path);
+						else Controller.INSTANCE.cargarCancionesRemoto(path);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
 				}
 			}
 		});
-	}
-
-	// ---------- Interacción con el controlador. ----------
-
-	private void cargarCanciones(String path) {
-		Controller.INSTANCE.cargarCanciones(path);
 	}
 }

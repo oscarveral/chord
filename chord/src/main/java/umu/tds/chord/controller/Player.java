@@ -1,5 +1,6 @@
 package umu.tds.chord.controller;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
@@ -27,7 +28,12 @@ public enum Player {
 
 	INSTANCE;
 
+	public static final String EXTENSION = ".mp3";
+	
 	private static final String virtualName = "Búsqueda";
+	private static final String tempPath = System.getProperty("java.io.tmpdir");
+	private static final String remoteProtocol = "http";
+	
 
 	private Deque<Song> cola;
 	private Deque<Song> log;
@@ -89,20 +95,12 @@ public enum Player {
 		// Si se ha especificado canción, se debe cargar.
 		currentSong.ifPresent(s -> {
 			try {
-				// Crear la ruta a la canción.
-				Path mp3 = Path.of(System.getProperty("java.io.tmpdir"),
-						String.valueOf(Integer.toUnsignedLong(s.hashCode())) + ".mp3");
-				// Descarga de la canción si no existe.
-				if (!Files.exists(mp3)) {
-					mp3 = Files.createFile(mp3);
-					URL uri = new URL(s.getPath());
-					InputStream stream = uri.openStream();
-					Files.copy(stream, mp3, StandardCopyOption.REPLACE_EXISTING);
-				}
-				// Crear el medio que se reproducirá.
-				Media media = new Media(mp3.toFile().toURI().toString());
+				// Crear el medio de reproducción.
+				Optional<Media> media = createSongMedia(s);
+				if (media.isEmpty()) return;
+				
 				// Se añade el nuevo reproductor.
-				reproductor = Optional.of(new MediaPlayer(media));
+				reproductor = Optional.of(new MediaPlayer(media.get()));
 				reproductor.ifPresent(r -> {
 					r.setOnEndOfMedia(this::siguiente);
 					r.currentTimeProperty().addListener(o -> notifyProgress());
@@ -110,6 +108,31 @@ public enum Player {
 			} catch (Exception e1) {
 			}
 		});
+	}
+	
+	private Optional<Media> createSongMedia(Song s) {
+		// Si la canción es local no hace falta descargarla
+		if (!s.getPath().startsWith(remoteProtocol)) {
+			File f = new File(s.getPath());
+			return Optional.ofNullable(new Media(f.toURI().toString()));
+		}
+			
+		try {
+			// Crear la ruta a la canción.
+			Path mp3 = Path.of(tempPath, String.valueOf(Integer.toUnsignedLong(s.hashCode())) + EXTENSION);
+			// Descarga de la canción si no existe.
+			if (!Files.exists(mp3)) {
+				mp3 = Files.createFile(mp3);
+				URL uri = new URL(s.getPath());
+				InputStream stream = uri.openStream();
+				Files.copy(stream, mp3, StandardCopyOption.REPLACE_EXISTING);
+			}
+			// Crear el medio que se reproducirá.
+			return Optional.ofNullable(new Media(mp3.toFile().toURI().toString()));
+		}
+		catch (Exception e) {		
+			return Optional.empty();
+		}	
 	}
 
 	private void fillCola() {

@@ -1,8 +1,10 @@
 package umu.tds.chord.controller;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -444,8 +446,36 @@ public enum Controller {
 	 *
 	 * @param fichero Fichero que describe las canciones que cargar.
 	 */
-	public void cargarCanciones(String fichero) {
+	public void cargarCancionesRemoto(String fichero) {
 		buscadorCanciones.setArchivoCanciones(fichero);
+	}
+	
+	/**
+	 * Carga las canciones del directorio especificado.
+	 * 
+	 * @param path Ruta al directorio con las canciones. El direcotorio debe
+	 * componerse de subdirecotorios que clasifiquen las canciones por estilos.
+	 * En cada subdirectorio habrán canciones .mp3 con el formato autor-titulo.mp3.
+	 */
+	public void cargarCancionesLocal(String path) {
+		SongStatusEvent ev = new SongStatusEvent(this);
+		File dir = new File(path);
+		
+		Arrays.asList(dir.listFiles((c, n) -> new File(c, n).isDirectory())).forEach(subdir -> {
+			String style = subdir.getName();
+			Arrays.asList(subdir.listFiles((c, n) -> n.endsWith(Player.EXTENSION))).forEach(songFile -> {
+				try {
+					String songPath = songFile.getCanonicalPath();
+					String name = songFile.getName().split(Player.EXTENSION)[0];
+					String author = name.split("-")[0].replace('&', ' ');
+					String title = name.split("-")[1];
+					SongRepository.INSTANCE.addSong(title, author, songPath, style).ifPresent(ev::addSong);
+				}
+				catch (IOException e) {}	
+			});
+		});
+		
+		songStatusListeners.forEach(l -> l.onSongLoad(ev));
 	}
 
 	/**
